@@ -1,0 +1,2 @@
+flask==1.1
+PyMongo==3.9

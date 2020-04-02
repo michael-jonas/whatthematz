@@ -1,0 +1,12 @@
+web:
+  build: docker/server
+  command: python -u /usr/src/app/matzah_backend.py
+
+  ports:
+    - "5000:5000"
+  volumes:
+    - ./server:/usr/src/app
+  links:
+    - db
+db:
+  image: mongo:3.0.2
