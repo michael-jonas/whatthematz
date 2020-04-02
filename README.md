@@ -1,3 +1,5 @@
+== What the Matz? ==
+
 Installation:
 
 1. Install docker
@@ -5,5 +7,3 @@ Installation:
 3. Run:
 	docker-compose build
 	docker-compose up
-	<!-- docker build -t server server -->
-4. 
