@@ -6,6 +6,7 @@ from flask import Flask, redirect, url_for, request, render_template, jsonify
 from flask_api import status
 
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 DEBUG = True
 app = Flask(__name__)
@@ -46,19 +47,27 @@ if DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = [123, 321, 222, 666]
     for name, room in zip(names, rooms):
+        # create a seder
         result = db.seders.insert_one(SederData(
             name=f"{name}'s seder",
             roomCode=room,
             huntIds=[],
 
         ))
+        # create the hunt
         seder_uid = result.inserted_id
-        huntResult = db.hunts.insert_one(HuntData(sederId=seder_uid))
+        huntResult = db.hunts.insert_one(HuntData(
+            sederId=seder_uid,
+            isActive=True,
+            city='toronto',
+        ))
         updated_fields = {'huntIds': [huntResult.inserted_id]}
         db.seders.update_one(
             filter={'_id': seder_uid},
             update={'$set': updated_fields},
         )
+
+        print(name, room, result.inserted_id, huntResult.inserted_id)
 
 
 PROJECT_PATH = '/usr/src/app'
@@ -75,20 +84,31 @@ def checkLocation():
     Also any additional info needed for the follow up GET
     in the event that they are correct"""
 
-    response = {'Error': "Whoops! We seem to have gotten lost"}
-    error_result = (response, status.HTTP_400_BAD_REQUEST)
 
     # get parameters and sanitize
-    huntId = request.form['huntId']
-    locationName = request.form['locationName']
+    huntIdArg = request.args.get('huntId')
+    locationName = request.args.get('locationName')
 
-    if not huntId or not locationName:
+    try:
+        huntId = ObjectId(huntIdArg)
+        failedToParse = False
+    except:
+        huntId = None
+        failedToParse = True
+
+    if(not huntId or not locationName):
+            # not failedToParse or
+        # not isinstance(locationName, str)):
+        response = {'Error': "Whoops! Bad args"}
+        error_result = (response, status.HTTP_400_BAD_REQUEST)
         return error_result
 
-    result = db.hunts.find_one(filter={'_id': huntId})
+    result = db.hunts.find_one({'_id': huntId})
 
     # if the hunt doesn't exist or hasn't started return a 400
     if not result or not result['isActive']:
+        response = {'Error': "Whoops! invalid hunt"}
+        error_result = (response, status.HTTP_400_BAD_REQUEST)
         return error_result
 
     # check if they got the right one
