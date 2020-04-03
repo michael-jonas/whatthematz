@@ -28,6 +28,13 @@ class App extends React.Component {
     this.setState({ currentPage: Pages.HUNT });
   };
 
+  updateJoinedSeder = (name, sederCode) => {
+    this.setState({
+      name: name,
+      sederCode: sederCode,
+    });
+  };
+
   render() {
     return (
       <>
@@ -48,6 +55,7 @@ class App extends React.Component {
             name={this.state.name}
             sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
+            updateJoinedSeder={this.updateJoinedSeder}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (

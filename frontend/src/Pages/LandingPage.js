@@ -16,12 +16,12 @@ export default class LandingPage extends React.Component {
     this.handleSederCodeChange = this.handleSederCodeChange.bind(this);
   }
 
+  // Basic Form State
   canJoin() {
     this.setState((state) => ({
       canJoin: state.sederCode.length === 4 && state.name.length > 0,
     }));
   }
-
   handleNameChange(event) {
     this.setState({
       name: event.target.value,
@@ -33,6 +33,14 @@ export default class LandingPage extends React.Component {
       sederCode: event.target.value,
     });
     this.canJoin();
+  }
+
+  // Actions
+  tryJoinSeder() {
+    // fetch blah
+    // wow no server guess we succeeded
+    this.props.updateJoinedSeder(this.state.name, this.state.sederCode);
+    this.props.goToLobby();
   }
 
   render() {
@@ -65,7 +73,7 @@ export default class LandingPage extends React.Component {
             <Button
               disabled={!this.state.canJoin}
               variant="primary"
-              onClick={() => console.log(this.state.sederCode)}
+              onClick={() => this.tryJoinSeder()}
             >
               Join Seder
             </Button>
