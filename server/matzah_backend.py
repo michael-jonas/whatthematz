@@ -151,7 +151,7 @@ def join_seder():
     sederId = sederData['_id']
 
     # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
-    currentHunt = mongo.db.hunts.find({"sederId": sederId}).limit(1).sort({$natural:-1})
+    currentHunt = mongo.db.hunts.find({"sederId": sederId}).limit(1).sort({"$natural":-1})
 
     # Get unique mongo _id of the hunt
     currentHuntId = currentHunt['_id']
@@ -159,7 +159,7 @@ def join_seder():
     # Check to see if the hunt has started
     if currentHunt['isActive'] is True:
         # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
-        mongo.db.seders.update_one({"_id": sederId}, { $push: {huntQueue: nickname} })
+        mongo.db.seders.update_one({"_id": sederId}, {"$push": {"huntQueue": nickname} })
         response = {
             'queued': True,
             'hunt_id': currentHuntId
@@ -167,7 +167,7 @@ def join_seder():
 
     else:
         # Hunt hasn't started yet, add them as a participant in the hunt
-        mongo.db.hunts.update_one({"_id": currentHuntId}, { $push: {participants: nickname} })
+        mongo.db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": nickname} })
         response = {
             'queued': False,
             'hunt_id': currentHuntId
