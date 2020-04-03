@@ -1,5 +1,5 @@
 import os
-import namedtuple
+from datetime import datetime
 
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
@@ -11,17 +11,20 @@ app = Flask(__name__)
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
 
-SederData = namedtuple('SederData', [
-    '_id',
-    'Name',
-    'Participants',
-    'RoomCode',
-    'City',
-    'MatzahXY',
-    'CreationTime',
-    'IsActive',
-])
+def SederData(
+    sid, name, isActive=False, participants=None, roomCode=None,
+    city=None, matzahXY=None, creationTime=None):
 
+    return {
+        '_id': sid,
+        'name': name,
+        'isActive': isActive,
+        'participants': participants or [],
+        'roomCode': roomCode or -1,
+        'city': city or '',
+        'matzahXY': matzahXY or (0,0),
+        'creationTime': creationTime or datetime.now()
+    }
 
 PROJECT_PATH = '/usr/src/app'
 
