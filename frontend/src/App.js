@@ -12,8 +12,9 @@ class App extends React.Component {
     super(props);
     this.state = {
       currentPage: Pages.LANDING,
-      nickname: "",
-      seder: "",
+      name: "",
+      sederCode: "",
+      huntId: "",
     };
   }
 
@@ -44,23 +45,23 @@ class App extends React.Component {
         </Navbar>
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage
-            nickname={this.state.nickname}
-            seder={this.state.seder}
+            name={this.state.name}
+            sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (
           <LobbyPage
-            nickname={this.state.nickname}
-            seder={this.state.seder}
+            name={this.state.name}
+            sederCode={this.state.sederCode}
             goToLanding={this.goToLanding}
             goToHunt={this.goToHunt}
           />
         )}
         {this.state.currentPage === Pages.HUNT && (
           <HuntPage
-            nickname={this.state.nickname}
-            seder={this.state.seder}
+            name={this.state.name}
+            sederCode={this.state.sederCode}
             goToLanding={this.goToLanding}
             goToLobby={this.goToLobby}
           />
