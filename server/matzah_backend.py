@@ -16,12 +16,12 @@ client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
 
 def SederData(
-    name, roomCode=None, huntIds=None,
+    name, roomCode='', huntIds=None,
     creationTime=None):
 
     return {
         'name': name,
-        'roomCode': roomCode or 0,
+        'roomCode': str(roomCode) if roomCode else 'invalid room code',
         'huntIds': [],
         'creationTime': creationTime or datetime.now(),
         'huntQueue': [],
@@ -97,8 +97,6 @@ def checkLocation():
         failedToParse = True
 
     if(not huntId or not locationName):
-            # not failedToParse or
-        # not isinstance(locationName, str)):
         response = {'Error': "Whoops! Bad args"}
         error_result = (response, status.HTTP_400_BAD_REQUEST)
         return error_result
