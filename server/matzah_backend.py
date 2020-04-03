@@ -134,7 +134,8 @@ def join_seder():
     # Grab the users nickname
     nickname = data.get('nickname', None)
     if nickname is None:
-        return jsonify({'ok': False, 'message': 'You need a nickname homie'}), 400
+        response = {'ok': False, 'message': 'You need a nickname homie'}
+        return jsonify(response), 400
 
     # Grab the entire seder document that matches the roomcode
     sederData = mongo.db.seders.find_one({"roomCode": roomCode})
@@ -142,7 +143,8 @@ def join_seder():
 
     # Check that the seder exists
     if sederData is None:
-        return jsonify({'ok': False, 'message': 'Seder not found'}), 400
+        response = {'ok': False, 'message': 'Seder not found'}
+        return jsonify(response), 400
     
     # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
     sederId = sederData['_id']
@@ -157,11 +159,20 @@ def join_seder():
     if currentHunt['isActive'] is True:
         # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
         mongo.db.seders.update_one({"_id": sederId}, { $push: {huntQueue: nickname} })
+        response = {
+            'queued': True,
+            'hunt_id': currentHuntId
+        }
+
     else:
         # Hunt hasn't started yet, add them as a participant in the hunt
         mongo.db.hunts.update_one({"_id": currentHuntId}, { $push: {participants: nickname} })
+        response = {
+            'queued': False,
+            'hunt_id': currentHuntId
+        }
 
-
+    return jsonify(response), 400 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
