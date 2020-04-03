@@ -21,7 +21,7 @@ def SederData(
         'name': name,
         'roomCode': roomCode or 0,
         'huntIds': [],
-        'creationTime': creationTime or datetime.now()
+        'creationTime': creationTime or datetime.now(),
     }
 
 def HuntData(
@@ -30,13 +30,13 @@ def HuntData(
     creationTime=None):
 
     return {
-        'sederId': sederId
+        'sederId': sederId,
         'isActive': isActive,
         'participants': participants or [],
         'city': city or '',
         'matzahXY': matzahXY or (0,0),
-        'winner': winner
-        'finders': finders or []
+        'winner': winner,
+        'finders': finders or [],
         'creationTime': creationTime or datetime.now()
     }
 
@@ -52,9 +52,10 @@ if DEBUG:
         ))
         seder_uid = result.inserted_id
         huntResult = db.hunts.insert_one(HuntData(sederId=seder_uid))
+        updated_fields = {'huntIds': [huntResult.inserted_id]}
         db.seders.update_one(
             filter={'_id': seder_uid},
-            huntIds=[huntResult.inserted_id],
+            update={'$set': updated_fields},
         )
 
 
