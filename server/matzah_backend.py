@@ -50,14 +50,12 @@ if DEBUG:
             huntIds=[],
 
         ))
-        # seder_uid = result.inserted_id
-        # db.hunts.insert_one(HuntData(sederId=seder_uid))
-        # db.seders.
-
-
-        #     isActive=False,
-        #     participants=[n for n in names if n != name],
-        #     matzahXY=(10, 10),
+        seder_uid = result.inserted_id
+        huntResult = db.hunts.insert_one(HuntData(sederId=seder_uid))
+        db.seders.update_one(
+            filter={'_id': seder_uid},
+            huntIds=[huntResult.inserted_id],
+        )
 
 PROJECT_PATH = '/usr/src/app'
 
