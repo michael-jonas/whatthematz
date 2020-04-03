@@ -21,7 +21,7 @@ def SederData(
 
     return {
         'name': name,
-        'roomCode': str(roomCode) if roomCode else 'invalid room code',
+        'roomCode': str(roomCode),
         'huntIds': [],
         'creationTime': creationTime or datetime.now(),
         'huntQueue': [],
@@ -144,40 +144,37 @@ def new():
 
 @app.route('/join_seder', methods=['PUT'])
 def join_seder():
+
     # Get data from the HTTP request
-    data = request.get_json()
+    sederCode = request.args.get('roomCode')
+    nickname = request.args.get('nickname')
 
-    # Get the seder room code. Note this isn't the mongo _id
-    sederCode = data.get('roomCode', None)
-
-    # Grab the users nickname
-    nickname = data.get('nickname', None)
     if nickname is None:
         response = {'ok': False, 'message': 'You need a nickname homie'}
         return jsonify(response), 400
 
     # Grab the entire seder document that matches the roomcode
-    sederData = mongo.db.seders.find_one({"roomCode": roomCode})
+    sederData = db.seders.find_one({"roomCode": sederCode})
 
 
     # Check that the seder exists
     if sederData is None:
-        response = {'ok': False, 'message': 'Seder not found'}
+        response = {'ok': False, 'message': 'Seder not found', 'sederCode': sederCode}
         return jsonify(response), 400
     
     # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
     sederId = sederData['_id']
 
     # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
-    currentHunt = mongo.db.hunts.find({"sederId": sederId}).limit(1).sort({"$natural":-1})
+    currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
 
     # Get unique mongo _id of the hunt
-    currentHuntId = currentHunt['_id']
+    currentHuntId = str(currentHunt['_id'])
 
     # Check to see if the hunt has started
     if currentHunt['isActive'] is True:
         # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
-        mongo.db.seders.update_one({"_id": sederId}, {"$push": {"huntQueue": nickname} })
+        db.seders.update_one({"_id": sederId}, {"$push": {"huntQueue": nickname} })
         response = {
             'queued': True,
             'hunt_id': currentHuntId
@@ -185,7 +182,7 @@ def join_seder():
 
     else:
         # Hunt hasn't started yet, add them as a participant in the hunt
-        mongo.db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": nickname} })
+        db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": nickname} })
         response = {
             'queued': False,
             'hunt_id': currentHuntId
