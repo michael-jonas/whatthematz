@@ -1,4 +1,4 @@
-== What the Matz? ==
+# What the Matz?
 
 Installation:
 

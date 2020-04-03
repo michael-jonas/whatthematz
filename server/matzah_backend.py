@@ -25,6 +25,19 @@ def SederData(
         'creationTime': creationTime or datetime.now()
     }
 
+if DEBUG:
+    names = ['jonas', 'david', 'daniel', 'allison']
+    rooms = [123, 321, 222, 666]
+    for name, room in zip(names, rooms):
+        db.seders.insert_one(SederData(
+            name=f"{name}'s seder",
+            isActive=False,
+            participants=[n for n in names if n != name],
+            roomCode=room,
+            city='toronto',
+            matzahXY=(10, 10),
+        ))
+
 
 PROJECT_PATH = '/usr/src/app'
 
