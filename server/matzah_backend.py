@@ -1,12 +1,27 @@
 import os
+import namedtuple
+
 from flask import Flask, redirect, url_for, request, render_template
 from pymongo import MongoClient
 
+DEBUG = True
 app = Flask(__name__)
 
 # I think this is the default port for mongodb
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
+
+SederData = namedtuple('SederData', [
+    '_id',
+    'Name',
+    'Participants',
+    'RoomCode',
+    'City',
+    'MatzahXY',
+    'CreationTime',
+    'IsActive',
+])
+
 
 PROJECT_PATH = '/usr/src/app'
 
@@ -43,4 +58,4 @@ def new():
     return redirect(url_for('todo'))
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', debug=DEBUG)
