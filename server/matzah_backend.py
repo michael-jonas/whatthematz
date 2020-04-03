@@ -57,7 +57,52 @@ if DEBUG:
             huntIds=[huntResult.inserted_id],
         )
 
+
 PROJECT_PATH = '/usr/src/app'
+
+def get_image_id(huntDoc):
+    """Finds the image_id needed for loading an image from db"""
+    return -1
+
+@app.route('/check_location', methods=['GET'])
+def checkLocation():
+    """User hits this endpoint when they click on a location.
+
+    The result is whether the location is found or not
+    Also any additional info needed for the follow up GET
+    in the event that they are correct"""
+
+    response = {'Error': "Whoops! We seem to have gotten lost"}
+    error_result = (response, status.HTTP_400_BAD_REQUEST)
+
+    # get parameters and sanitize
+    huntId = request.form['huntId']
+    locationName = request.form['locationName']
+
+    if not huntId or not locationName:
+        return error_result
+
+    result = db.hunts.find_one(filter={'_id': huntId})
+
+    # if the hunt doesn't exist or hasn't started return a 400
+    if not result or not result['isActive']:
+        return error_result
+
+    # check if they got the right one
+    if result['city'].lower() == locationName.lower():
+        image_id = get_image_id(result)
+        response = {
+            'found': True,
+            'image_id': image_id,
+        }
+    else:
+        response = {
+            'found': False,
+            'image_id': -1,
+        }
+
+    return (response, status.HTTP_200_OK)
+
 
 @app.route('/')
 def todo():
