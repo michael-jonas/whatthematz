@@ -38,7 +38,7 @@ class App extends React.Component {
   render() {
     return (
       <>
-        <Navbar bg="dark" variant="dark">
+        <Navbar bg="dark" variant="dark" style={{ marginBottom: 20 }}>
           <Navbar.Brand>
             <img
               alt=""

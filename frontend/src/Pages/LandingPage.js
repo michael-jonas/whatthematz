@@ -45,20 +45,10 @@ export default class LandingPage extends React.Component {
 
   render() {
     return (
-      <>
-        <Container style={{ marginTop: 20 }}>
-          <h1>Join a Seder!</h1>
+      <Container style={{ maxWidth: 400 }}>
+        <Container>
+          <h1 style={{ textAlign: "center" }}>Join a Seder!</h1>
           <Form>
-            <Form.Group controlId="Nickname">
-              <Form.Label>Name</Form.Label>
-              <Form.Control
-                type="text"
-                autoComplete="off"
-                placeholder="Enter your name"
-                value={this.state.name}
-                onChange={this.handleNameChange}
-              />
-            </Form.Group>
             <Form.Group controlId="SederCode">
               <Form.Label>Seder Code</Form.Label>
               <Form.Control
@@ -70,26 +60,39 @@ export default class LandingPage extends React.Component {
                 onChange={this.handleSederCodeChange}
               />
             </Form.Group>
-            <Button
-              disabled={!this.state.canJoin}
-              variant="primary"
-              onClick={() => this.tryJoinSeder()}
-            >
-              Join Seder
-            </Button>
+            <Form.Group controlId="Nickname">
+              <Form.Label>Name</Form.Label>
+              <Form.Control
+                type="text"
+                autoComplete="off"
+                placeholder="Enter your name"
+                value={this.state.name}
+                onChange={this.handleNameChange}
+              />
+            </Form.Group>
+
+            <div style={{ textAlign: "center" }}>
+              <Button
+                disabled={!this.state.canJoin}
+                variant="primary"
+                onClick={() => this.tryJoinSeder()}
+              >
+                Join Seder
+              </Button>
+            </div>
           </Form>
         </Container>
 
-        <Container style={{ marginTop: 20 }}>
+        <Container style={{ marginTop: 20, textAlign: "center" }}>
           <h2>OR</h2>
         </Container>
 
-        <Container style={{ marginTop: 20 }}>
+        <Container style={{ marginTop: 20, textAlign: "center" }}>
           <Button>
             <h1>Create a Seder!</h1>
           </Button>
         </Container>
-      </>
+      </Container>
     );
   }
 }
