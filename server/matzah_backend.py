@@ -12,11 +12,10 @@ client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
 
 def SederData(
-    sid, name, isActive=False, participants=None, roomCode=None,
+    name, isActive=False, participants=None, roomCode=None,
     city=None, matzahXY=None, creationTime=None):
 
     return {
-        '_id': sid,
         'name': name,
         'isActive': isActive,
         'participants': participants or [],
@@ -25,6 +24,7 @@ def SederData(
         'matzahXY': matzahXY or (0,0),
         'creationTime': creationTime or datetime.now()
     }
+
 
 PROJECT_PATH = '/usr/src/app'
 
