@@ -1,7 +1,8 @@
 import os
 from datetime import datetime
 
-from flask import Flask, redirect, url_for, request, render_template
+
+from flask import Flask, redirect, url_for, request, render_template, jsonify
 from flask_api import status
 
 from pymongo import MongoClient
@@ -21,7 +22,8 @@ def SederData(
         'name': name,
         'roomCode': roomCode or 0,
         'huntIds': [],
-        'creationTime': creationTime or datetime.now()
+        'creationTime': creationTime or datetime.now(),
+        'huntQueue': []
     }
 
 def HuntData(
@@ -120,6 +122,46 @@ def new():
     db.tododb.insert_one(item_doc)
 
     return redirect(url_for('todo'))
+
+@app.route('/join_seder', methods=['PUT'])
+def join_seder():
+    # Get data from the HTTP request
+    data = request.get_json()
+
+    # Get the seder room code. Note this isn't the mongo _id
+    sederCode = data.get('roomCode', None)
+
+    # Grab the users nickname
+    nickname = data.get('nickname', None)
+    if nickname is None:
+        return jsonify({'ok': False, 'message': 'You need a nickname homie'}), 400
+
+    # Grab the entire seder document that matches the roomcode
+    sederData = mongo.db.seders.find_one({"roomCode": roomCode})
+
+
+    # Check that the seder exists
+    if sederData is None:
+        return jsonify({'ok': False, 'message': 'Seder not found'}), 400
+    
+    # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
+    sederId = sederData['_id']
+
+    # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
+    currentHunt = mongo.db.hunts.find({"sederId": sederId}).limit(1).sort({$natural:-1})
+
+    # Get unique mongo _id of the hunt
+    currentHuntId = currentHunt['_id']
+
+    # Check to see if the hunt has started
+    if currentHunt['isActive'] is True:
+        # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
+        mongo.db.seders.update_one({"_id": sederId}, { $push: {huntQueue: nickname} })
+    else:
+        # Hunt hasn't started yet, add them as a participant in the hunt
+        mongo.db.hunts.update_one({"_id": currentHuntId}, { $push: {participants: nickname} })
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
