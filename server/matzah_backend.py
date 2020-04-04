@@ -16,7 +16,7 @@ from imaging import *
 
 DEBUG = True
 DEFAULT_WIN_COUNT = 0
-CITIES = ['toronto']
+CITIES = ['Toronto']
 app = Flask(__name__)
 
 # MEMBERS idxs of components
@@ -519,7 +519,7 @@ def createSeder():
 
     
     # 1. Create a seder
-    roomCode = get_room_code()
+    roomCode = getRoomCode()
     avatar = random.randint(0,9)
     userId = ObjectId()
     insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(userId): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
@@ -577,6 +577,6 @@ def getSeders():
     for seder in seders:
         sederList.append(seder)
     return str(sederList)
-    
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
