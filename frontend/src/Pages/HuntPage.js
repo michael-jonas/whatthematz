@@ -7,8 +7,6 @@ export default class HuntPage extends React.Component {
     super(props);
     this.mapRef = React.createRef();
     this.state = {
-      name: props.name,
-      sederName: props.sederName,
       markersLoaded: false,
       showMarkers: false,
       lat: 0,
@@ -21,7 +19,7 @@ export default class HuntPage extends React.Component {
 
   async loadMarkers(retries) {
     // fetch list of cities
-    const response = await fetch(`get_list_of_cities`);
+    const response = await fetch(`/get_list_of_cities`);
     if (true) {
       //response.ok) {
       //const json = await response.json();
@@ -30,7 +28,11 @@ export default class HuntPage extends React.Component {
       this.markerLayer = json.map((marker) => {
         let latlng = { lat: marker[1], lng: marker[2] };
         return (
-          <Marker key={marker[0]} position={latlng}>
+          <Marker
+            key={marker[0]}
+            position={latlng}
+            onclick={() => this.checkRightCity(marker[0])}
+          >
             <Tooltip>{marker[0]}</Tooltip>
           </Marker>
         );
@@ -46,7 +48,19 @@ export default class HuntPage extends React.Component {
       }
     }
   }
-
+  async checkRightCity(name) {
+    const response = await fetch(
+      `/check_location?huntId=${this.props.huntId}&locationName=${name}`
+    );
+    if (response.ok) {
+      const json = await response.json();
+      if (json.found === true) {
+        // complete hunt, navigate away
+      } else {
+        // toast hunt not complete
+      }
+    }
+  }
   checkShowMarkers = () => {
     const map = this.mapRef.current;
     if (map != null) {
