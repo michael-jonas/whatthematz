@@ -44,17 +44,16 @@ export default class CreatePage extends React.Component {
       }
     );
 
-    const json = await response.json();
+    if (response.ok) {
+      const json = await response.json();
 
-    console.log(json);
-
-    // wow no server guess we succeeded
-    this.props.updateCreatedSeder(
-      this.state.name,
-      json.sederCode ? json.sederCode : "",
-      this.state.sederName
-    );
-    this.props.goToLobby();
+      this.props.updateCreatedSeder(
+        this.state.name,
+        json.sederCode ? json.sederCode : "",
+        this.state.sederName
+      );
+      this.props.goToLobby();
+    }
   }
 
   render() {
