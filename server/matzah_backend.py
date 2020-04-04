@@ -154,6 +154,10 @@ def goodResponse(result):
     if not isinstance(result, dict):
         result = {'result': result}
 
+    for k, v in result.items():
+        if isinstance(v, ObjectId):
+            result[k] = str(v)
+
     return (result, status.HTTP_200_OK)
 
 class BEVENTS(Enum):
@@ -394,6 +398,7 @@ def joinSeder():
             'queued': True,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
+            'sederName': sederData['sederName'],
             'userId': str(user_uuid)
         }
         # response = db.seders.find_one({"_id": sederId})
@@ -407,6 +412,7 @@ def joinSeder():
             'queued': False,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
+            'sederName': sederData['sederName'],
             'userId': str(user_uuid)
         }
         # response = db.hunts.find_one({"_id": currentHuntId})
@@ -562,8 +568,13 @@ def createSeder():
     newHuntId = newHunt.inserted_id
     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
 
-    response = {'sederId': sederId, 'roomCode': roomCode, 'huntId': newHuntId}
-    return (response, status.HTTP_200_OK)
+    response = {
+        'sederId': sederId,
+        'sederName': sederName,
+        'roomCode': roomCode,
+        'huntId': newHuntId,
+    }
+    return goodResponse(response)
 
 def getRoomCode(stringLength = 4):
     pf = ProfanityFilter()
