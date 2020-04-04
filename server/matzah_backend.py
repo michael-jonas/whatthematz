@@ -409,7 +409,7 @@ def concludeHuntAndCreateNewHunt():
 
     insertData = HuntData(sederId=sederId, participants=participantsToInsert, city=city)
     newHuntId = db.hunts.insert_one(insertData).inserted_id
-    db.seders.find_and_update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
+    db.seders.find_one_and_update( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
 
@@ -427,7 +427,7 @@ def createSeder():
     roomCode = get_room_code()
     avatar = random.randint(0,9)
     userId = ObjectId()
-    insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(user_uuid): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
+    insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(userId): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
     sederData = db.seders.insert_one(insertSederData)
     sederId = sederData.inserted_id
     
@@ -435,11 +435,11 @@ def createSeder():
     # 2. Create a hunt and update seders to include the hunt
     city = CITIES[random.randint(0,len(CITIES)-1)]
     insertHuntData = HuntData(sederId=sederId, participants=[userId], city=city)
-    newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
-    db.seders.find_and_update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
+    newHunt = db.hunts.insert_one(insertHuntData)
+    newHuntId = newHunt.inserted_id
+    result = db.seders.find_one_and_update( {'_id': sederId}, { "$push": {"huntIds": str(newHuntId)} }, return_document=ReturnDocument.AFTER)
     response = {'ok:': True}
-    return (response, status.HTTP_200_OK)
-
+    return ( response, status.HTTP_200_OK)
 
 def get_room_code(stringLength = 4):
     letters = string.ascii_uppercase
