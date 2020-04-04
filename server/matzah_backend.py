@@ -82,7 +82,7 @@ def ImageData(imgOrBytes, rect):
 
 if DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
-    rooms = [1234, 4321, 2222, 6666]
+    rooms = ['ADCD', 'DCBA', 'AAAA', 'BBBB']
     idxs = range(len(names))
     for i, name, room in zip(idxs, names, rooms):
         startTime = datetime.now() if i == 2 else None
