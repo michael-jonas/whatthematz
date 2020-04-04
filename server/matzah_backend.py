@@ -358,7 +358,7 @@ def getImage():
 def joinSeder():
 
     # Get data from the HTTP request
-    sederCode = request.args.get('roomCode')
+    roomCode = request.args.get('roomCode')
     nickname = request.args.get('nickname')
 
     if nickname is None:
@@ -366,7 +366,7 @@ def joinSeder():
         return (response, status.HTTP_400_BAD_REQUEST)
 
     # Grab the entire seder document that matches the roomcode
-    sederData = db.seders.find_one({"roomCode": sederCode})
+    sederData = db.seders.find_one({"roomCode": roomCode})
 
 
     # Check that the seder exists
@@ -495,7 +495,7 @@ def concludeHuntAndCreateNewHunt():
 
     # get parameters and sanitize
     huntToConcludeId = request.args.get('huntId')
-    sederCode        = request.args.get('roomCode')
+    roomCode        = request.args.get('roomCode')
     winnerId           = request.args.get('winnerId')
 
     huntToConcludeId = parseIdArg(huntToConcludeId)
@@ -515,7 +515,7 @@ def concludeHuntAndCreateNewHunt():
     # # a) increment winner count
     # # b) Pop manz off the huntQueue from the seder and into the finders list
     # # c) Create new mongo hunt document
-    sederData = db.seders.find_one({"roomCode": sederCode} )
+    sederData = db.seders.find_one({"roomCode": roomCode} )
 
     # Check that the seder exists
     if sederData is None:
@@ -562,7 +562,7 @@ def createSeder():
     newHuntId = newHunt.inserted_id
     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
 
-    response = {'sederId': sederId, 'sederCode': sederCode, 'huntId': newHuntId}
+    response = {'sederId': sederId, 'roomCode': roomCode, 'huntId': newHuntId}
     return (response, status.HTTP_200_OK)
 
 def getRoomCode(stringLength = 4):
