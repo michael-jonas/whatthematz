@@ -50,7 +50,7 @@ export default class CreatePage extends React.Component {
       this.props.updateSederInfo(
         this.state.name,
         json.sederId,
-        json.sederCode,
+        json.roomCode,
         json.sederName,
         json.huntId
       );

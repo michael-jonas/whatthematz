@@ -19,7 +19,7 @@ class App extends React.Component {
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
-      sederCode: "",
+      roomCode: "",
       sederId: "",
       huntId: "",
       sederName: "",
@@ -102,11 +102,11 @@ class App extends React.Component {
     }
   };
 
-  updateSederInfo = (name, sederId, sederCode, sederName, huntId) => {
+  updateSederInfo = (name, sederId, roomCode, sederName, huntId) => {
     this.setState({
       name: name,
       sederId: sederId,
-      sederCode: sederCode,
+      roomCode: roomCode,
       sederName: sederName,
       huntId: huntId,
     });
@@ -163,7 +163,7 @@ class App extends React.Component {
         {this.state.currentPage === Pages.JOIN && (
           <JoinPage
             name={this.state.name}
-            sederCode={this.state.sederCode}
+            roomCode={this.state.roomCode}
             goToLobby={this.goToLobby}
             updateSederInfo={this.updateSederInfo}
           />
@@ -172,7 +172,7 @@ class App extends React.Component {
           <LobbyPage
             name={this.state.name}
             players={this.state.playerList}
-            sederCode={this.state.sederCode}
+            roomCode={this.state.roomCode}
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToHunt={this.goToHunt}
@@ -182,7 +182,7 @@ class App extends React.Component {
           <HuntPage
             name={this.state.name}
             players={this.state.playerList}
-            sederCode={this.state.sederCode}
+            roomCode={this.state.roomCode}
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToLobby={this.goToLobby}
