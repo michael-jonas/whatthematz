@@ -2,9 +2,10 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
 
 import LandingPage from "./Pages/LandingPage";
+import CreatePage from "./Pages/CreatePage";
+import JoinPage from "./Pages/JoinPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import { Pages } from "./Globals/Enums";
@@ -37,6 +38,12 @@ class App extends React.Component {
   };
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
+  };
+  goToCreate = () => {
+    this.setState({ currentPage: Pages.CREATE });
+  };
+  goToJoin = () => {
+    this.setState({ currentPage: Pages.JOIN });
   };
   goToHunt = () => {
     this.setState({ currentPage: Pages.HUNT });
@@ -80,11 +87,22 @@ class App extends React.Component {
           <Navbar.Collapse></Navbar.Collapse>
         </Navbar>
         {this.state.currentPage === Pages.LANDING && (
-          <LandingPage
+          <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
+        )}
+        {this.state.currentPage === Pages.CREATE && (
+          <CreatePage
             name={this.state.name}
             sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
             updateJoinedSeder={this.updateJoinedSeder}
+          />
+        )}
+        {this.state.currentPage === Pages.JOIN && (
+          <JoinPage
+            name={this.state.name}
+            sederCode={this.state.sederCode}
+            goToLobby={this.goToLobby}
+            updateCreatedSeder={this.updateCreatedSeder}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (
