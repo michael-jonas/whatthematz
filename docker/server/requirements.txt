@@ -3,3 +3,4 @@ Flask-API==2.0
 PyMongo==3.9
 Pillow
 profanityfilter
+pytest
