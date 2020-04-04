@@ -1,10 +1,12 @@
 import React from "react";
 import logo from "./logo.svg";
+import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
-import Container from "react-bootstrap/Container";
 
 import LandingPage from "./Pages/LandingPage";
+import CreatePage from "./Pages/CreatePage";
+import JoinPage from "./Pages/JoinPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import { Pages } from "./Globals/Enums";
@@ -13,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: Pages.LANDING,
+      currentPage: Pages.LOBBY,
       name: "",
       sederCode: "",
       huntId: "",
@@ -38,8 +40,32 @@ class App extends React.Component {
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
+  goToCreate = () => {
+    this.setState({ currentPage: Pages.CREATE });
+  };
+  goToJoin = () => {
+    this.setState({ currentPage: Pages.JOIN });
+  };
   goToHunt = () => {
     this.setState({ currentPage: Pages.HUNT });
+  };
+
+  handleBackButton = () => {
+    switch (this.state.currentPage) {
+      case Pages.LOBBY:
+        // Warn leaving lobby
+        this.goToLanding();
+        break;
+      case Pages.CREATE:
+      case Pages.JOIN:
+        this.goToLanding();
+        break;
+      case Pages.HUNT:
+        // unsure
+        break;
+      default:
+        break;
+    }
   };
 
   updateJoinedSeder = (name, sederCode) => {
@@ -48,7 +74,6 @@ class App extends React.Component {
       sederCode: sederCode,
     });
   };
-
   updateCreatedSeder = (name, sederCode, sederName) => {
     this.setState({
       name: name,
@@ -62,12 +87,18 @@ class App extends React.Component {
       <div>
         <Navbar
           expand="xs"
-          bg="dark"
-          variant="dark"
+          //bg="dark"
+          variant="light"
           style={{ marginBottom: 20 }}
         >
           <Navbar.Toggle />
-          <Navbar.Brand style={{ textAlign: "center" }}>
+          <Navbar.Brand
+            style={{
+              position: "absolute",
+              left: "50%",
+              transform: "translatex(-50%)",
+            }}
+          >
             <img
               alt=""
               src={logo}
@@ -77,10 +108,29 @@ class App extends React.Component {
             />
             UnleavenTheCurve
           </Navbar.Brand>
-          <Navbar.Collapse></Navbar.Collapse>
+          {this.state.currentPage !== Pages.LANDING && (
+            <input
+              style={{ width: 40, height: 40 }}
+              type="image"
+              alt="Back"
+              src={backButton}
+              onClick={() => this.handleBackButton()}
+            />
+          )}
         </Navbar>
         {this.state.currentPage === Pages.LANDING && (
-          <LandingPage
+          <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
+        )}
+        {this.state.currentPage === Pages.CREATE && (
+          <CreatePage
+            name={this.state.name}
+            sederName={this.state.sederName}
+            goToLobby={this.goToLobby}
+            updateCreatedSeder={this.updateCreatedSeder}
+          />
+        )}
+        {this.state.currentPage === Pages.JOIN && (
+          <JoinPage
             name={this.state.name}
             sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
