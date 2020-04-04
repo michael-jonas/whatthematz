@@ -466,7 +466,7 @@ def concludeHuntAndCreateNewHunt():
     # get parameters and sanitize
     huntToConcludeId = request.args.get('huntId')
     sederCode        = request.args.get('roomCode')
-    winner           = request.args.get('winnerName')
+    winner           = request.args.get('winnerId')
 
     huntToConcludeId = parseIdArg(huntToConcludeId)
     if not huntToConcludeId:
