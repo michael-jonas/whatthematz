@@ -5,6 +5,7 @@ import random
 import string
 import json
 
+import PIL
 from profanityfilter import ProfanityFilter
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
@@ -60,9 +61,17 @@ def HuntData(
         'isFinished': isFinished,
     }
 
-def ImageData(img, rect):
+def ImageData(imgOrBytes, rect):
+
+    if isinstance(imgOrBytes, PIL.Image):
+        imgByteArr = io.BytesIO()
+        imgOrBytes.save(imgByteArr, format='PNG')
+        imgByteArr = imgByteArr.getvalue()
+    else:
+        imgByteArr = imgOrBytes
+
     return {
-        'img': img,
+        'imgBytes': imgByteArr,
         'rect': rect,
     }
 
@@ -134,6 +143,30 @@ def goodResponse(result):
         result = {'result': result}
 
     return (result, status.HTTP_200_OK)
+
+@app.route('/get_seder_details', methods=['GET'])
+def getSederDetails():
+    sederId = parseIdArg(request.args.get('sederId'))
+    # userId is optional!
+    userId = parseIdArg(request.args.get('userId'))
+
+    if not sederId:
+        return badResponse('Bad args.')
+    sederData = db.seders.find_one({"_id": sederId})
+    if not sederData:
+        return badResponse('No seder with given id')
+
+    currentHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
+    huntData = getHuntById(currentHuntId)
+    isHuntActive = huntData['isActive']
+
+    response = {'currentHuntId': currentHuntId, 'isHuntActive': isHuntActive}
+
+    if userId:
+        participants = huntData['participants']
+        response['isUserInHunt'] = userId in participants
+
+    return goodResponse(response)
 
 @app.route('/get_player_list', methods=['GET'])
 def getPlayerList():
@@ -321,7 +354,6 @@ def joinSeder():
     currentHuntId = currentHunt['_id']
     avatar = random.randint(0,9)
     user_uuid = ObjectId()
-    
 
     # Check to see if the hunt has started
     if currentHunt['isActive'] is True:
