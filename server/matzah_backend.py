@@ -34,12 +34,13 @@ def SederData(
     name, roomCode='', huntIds=None,
     creationTime=None, members=None):
 
+    roomCode = str(roomCode)
     if roomCode:
         assert len(roomCode) == L_ROOMCODES
 
     return {
         'name': name,
-        'roomCode': str(roomCode),
+        'roomCode': roomCode,
         'huntIds': [],
         'creationTime': creationTime or datetime.now(),
         'huntQueue': [],
