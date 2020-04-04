@@ -3,5 +3,7 @@
 	"country": "canada",
 	"easyHints": [ "The capital of Ontario", "Home of the 6ix God", "Did someone ask for the CN tower?"],
 	"mediumHints": [ "fuck you", "ass hole", "shitstain"],
-	"hardHints": [ "die", "ass", "face"]
+	"hardHints": [ "die", "ass", "face"],
+	"latitude": 43.6532,
+	"longitude": -79.3832
 }

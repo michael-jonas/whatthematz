@@ -16,7 +16,7 @@ from imaging import *
 
 DEBUG = True
 DEFAULT_WIN_COUNT = 0
-CITIES = ['Toronto']
+CITIES = ['toronto']
 app = Flask(__name__)
 
 # MEMBERS idxs of components
@@ -414,8 +414,8 @@ def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
     sederId = sederData['_id']
 
     # get the last hunt from DB if not given to us
-    if not currentHuntData and sederData['huntQueue']:
-        lastHuntId = sederData['huntQueue'][-1]
+    if not currentHuntData and sederData['huntIds']:
+        lastHuntId = sederData['huntIds'][-1]
         currentHuntData = db.hunts.find_one({"_id": currentHuntId})
 
     # create players from previous and queued
@@ -441,7 +441,7 @@ def setupHunt(huntId, city=None, matzahXY=None):
     """
 
     # by default generate a random hunt
-    if not city and not matzahRect:
+    if not city and not matzahXY:
         city = CITIES[random.randint(0,len(CITIES)-1)]
         img, rect = getRandomHide(city)
 
@@ -466,7 +466,7 @@ def concludeHuntAndCreateNewHunt():
     # get parameters and sanitize
     huntToConcludeId = request.args.get('huntId')
     sederCode        = request.args.get('roomCode')
-    winner           = request.args.get('winnerId')
+    winnerId           = request.args.get('winnerId')
 
     huntToConcludeId = parseIdArg(huntToConcludeId)
     if not huntToConcludeId:
@@ -476,11 +476,10 @@ def concludeHuntAndCreateNewHunt():
     # 1. Update the hunt that just concluded
     # # a) isActive = False
     # # b) isFinished = True
-    # @ Jonas you will need to use the winners UID not their nickname
     # # c) winner = winner_nickname
-    updates = {'isActive': False, 'isFinished': True, 'winner': winner}
+    updates = {'$set': {'isActive': False, 'isFinished': True, 'winner': winnerId}}
     hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
-    prevParticipants = hunt.participants
+    prevParticipants = hunt['participants']
 
     # 2. Create a new hunt
     # # a) increment winner count
@@ -495,26 +494,17 @@ def concludeHuntAndCreateNewHunt():
 
     sederId = sederData['_id']
     members = sederData['members']
-    # How does this work @Jonas
-    # sederData.members doesn't have an attribute winner?
-    # also get rid of magic numbers
-    members.winner[M_WINS] += 1
+    members[winnerId][M_WINS] += 1
 
     # pops the player queue for the next hunt
     newHuntParticipants = tuple(sederData['huntQueue'])
-    # @Jonas why the difference in syntax here
-    # set one, pass the other one?
-    # we can probably aggregate this call to db.seders.update_one 
-    # with the later one
-    updates = {'$set': {'huntQueue': []}, 'members': members}
-    db.seders.update_one( {'_id': sederId}, updates)
-
     newHuntId = createHuntInSeder(sederData, newHuntParticipants, hunt)
     # sets up new hunt with random image (by setting args None)
     setupHunt(newHuntId, city=None, matzahXY=None)
 
     # updates the seder with the newest hunt
-    db.seders.update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId}})
+    updates = {'$set': {'huntQueue': []}, 'members': members, "$push": {"huntIds": newHuntId}}
+    db.seders.update_one( {'_id': sederId}, updates)
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
 
@@ -546,7 +536,7 @@ def createSeder():
     response = {'ok:': True}
     return ( response, status.HTTP_200_OK)
 
-def get_room_code(stringLength = 4):
+def getRoomCode(stringLength = 4):
     pf = ProfanityFilter()
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
@@ -554,6 +544,38 @@ def get_room_code(stringLength = 4):
         roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
 
+@app.route('/get_cities', methods=['GET'])
+def getCities():
+    # returns: list of tuples, each tuple contains (city name, lat, lon)
+    cities = []
+    for city in CITIES:
+        fpath = os.path.join('cities', city + '.json')
+        if os.path.exists(fpath) and os.path.isfile(fpath):
+            with open(fpath) as f:
+                data = json.load(f)
+            lat = data['latitude']
+            lon = data['longitude']
+            cityLatLon = (city, lat, lon)
+            cities.append(cityLatLon)
+        else:
+            # return bad if no json found
+            return badResponse('Invalid Resource, city JSON not found')
+    return goodResponse(cities)
 
+@app.route('/get_hunts', methods=['GET'])
+def getHunts():
+    hunts = db.hunts.find({})
+    huntList = []
+    for hunt in hunts:
+        huntList.append(hunt)
+    return str(huntList)
+
+@app.route('/get_seders', methods=['GET'])
+def getSeders():
+    seders = db.seders.find({})
+    sederList = []
+    for seder in seders:
+        sederList.append(seder)
+    return str(sederList)
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
