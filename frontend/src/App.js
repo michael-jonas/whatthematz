@@ -20,8 +20,10 @@ class App extends React.Component {
       currentPage: Pages.LANDING,
       name: "",
       sederCode: "",
+      sederId: "",
       huntId: "",
-      sederName: "Weenie Hut Jr",
+      sederName: "",
+      playerList: [],
       backModal: false,
     };
   }
@@ -100,17 +102,13 @@ class App extends React.Component {
     }
   };
 
-  updateJoinedSeder = (name, sederCode) => {
+  updateSederInfo = (name, sederId, sederCode, sederName, huntId) => {
     this.setState({
       name: name,
-      sederCode: sederCode,
-    });
-  };
-  updateCreatedSeder = (name, sederCode, sederName) => {
-    this.setState({
-      name: name,
+      sederId: sederId,
       sederCode: sederCode,
       sederName: sederName,
+      huntId: huntId,
     });
   };
 
@@ -159,7 +157,7 @@ class App extends React.Component {
             name={this.state.name}
             sederName={this.state.sederName}
             goToLobby={this.goToLobby}
-            updateCreatedSeder={this.updateCreatedSeder}
+            updateSederInfo={this.updateSederInfo}
           />
         )}
         {this.state.currentPage === Pages.JOIN && (
@@ -167,23 +165,27 @@ class App extends React.Component {
             name={this.state.name}
             sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
-            updateJoinedSeder={this.updateJoinedSeder}
+            updateSederInfo={this.updateSederInfo}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (
           <LobbyPage
             name={this.state.name}
-            players={this.playerList}
+            players={this.state.playerList}
             sederCode={this.state.sederCode}
             sederName={this.state.sederName}
+            huntId={this.state.huntId}
             goToHunt={this.goToHunt}
           />
         )}
         {this.state.currentPage === Pages.HUNT && (
           <HuntPage
             name={this.state.name}
+            players={this.state.playerList}
             sederCode={this.state.sederCode}
             sederName={this.state.sederName}
+            huntId={this.state.huntId}
+            goToLobby={this.goToLobby}
           />
         )}
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>

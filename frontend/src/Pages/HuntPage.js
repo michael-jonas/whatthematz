@@ -45,7 +45,9 @@ export default class HuntPage extends React.Component {
     } else {
       //retry loop, max timeouts? nahhh
       if (retries < 3) {
-        setTimeout(this.loadMarkers(retries++), 1000);
+        setTimeout(() => {
+          this.loadMarkers(++retries);
+        }, 1000);
       }
     }
   }
@@ -64,7 +66,7 @@ export default class HuntPage extends React.Component {
       // be sad, maybe check if hunt still active?
     } else if (retries < 3) {
       setTimeout(() => {
-        this.checkRightCity(name, retries++);
+        this.checkRightCity(name, ++retries);
       }, 1000);
     }
   }
@@ -85,7 +87,9 @@ export default class HuntPage extends React.Component {
     } else {
       //retry loop, max timeouts? nahhh
       if (retries < 3) {
-        setTimeout(this.getHints(retries++), 1000);
+        setTimeout(() => {
+          this.getHints(++retries);
+        }, 1000);
       }
     }
   }

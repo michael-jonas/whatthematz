@@ -36,7 +36,7 @@ export default class CreatePage extends React.Component {
   }
 
   // Actions
-  async tryCreateSeder() {
+  async tryCreateSeder(retries) {
     const response = await fetch(
       `/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
       {
@@ -47,12 +47,20 @@ export default class CreatePage extends React.Component {
     if (response.ok) {
       const json = await response.json();
 
-      this.props.updateCreatedSeder(
+      this.props.updateSederInfo(
         this.state.name,
-        json.sederCode ? json.sederCode : "",
-        this.state.sederName
+        json.sederId,
+        json.sederCode,
+        json.sederName,
+        huntId
       );
       this.props.goToLobby();
+    } else if (response.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.tryCreateSeder(++retries);
+      });
+    } else {
+      // Todo Toast a message?
     }
   }
 
@@ -85,7 +93,7 @@ export default class CreatePage extends React.Component {
             <Button
               disabled={!this.state.canCreate}
               variant="primary"
-              onClick={() => this.tryCreateSeder()}
+              onClick={() => this.tryCreateSeder(0)}
             >
               Create Seder
             </Button>

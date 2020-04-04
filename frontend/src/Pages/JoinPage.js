@@ -44,13 +44,23 @@ export default class JoinPage extends React.Component {
       }
     );
 
-    const json = await response.json();
-
-    console.log(json);
-
-    // wow no server guess we succeeded
-    this.props.updateJoinedSeder(this.state.name, this.state.sederCode);
-    this.props.goToLobby();
+    if (response.ok) {
+      const json = await response.json();
+      this.props.updateSederInfo(
+        this.state.name,
+        json.sederId,
+        json.sederCode,
+        json.sederName,
+        huntId
+      );
+      this.props.goToLobby();
+    } else if (response.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.tryJoinSeder(++retries);
+      });
+    } else {
+      // Todo Toast a message?
+    }
   }
 
   render() {
