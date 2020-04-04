@@ -374,6 +374,7 @@ def concludeHuntAndCreateNewHunt():
 
     insertData = HuntData(sederId=sederId, participants=participantsToInsert, city=city)
     newHuntId = db.hunts.insert_one(insertData).inserted_id
+    db.seders.find_and_update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
 
@@ -386,20 +387,31 @@ def createSeder():
         response = {'Error': "Whoops! Bad args"}
         return (response, status.HTTP_400_BAD_REQUEST)
 
-    insertSederData = SederData(name=sederName) 
+    
+    # 1. Create a seder
     roomCode = get_room_code()
-    db.seders.insert_one
+    avatar = random.randint(0,9)
+    userId = ObjectId()
+    insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(user_uuid): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
+    sederData = db.seders.insert_one(insertSederData)
+    sederId = sederData.inserted_id
+    
 
+    # 2. Create a hunt and update seders to include the hunt
+    city = CITIES[random.randint(0,len(CITIES)-1)]
+    insertHuntData = HuntData(sederId=sederId, participants=[userId], city=city)
+    newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
+    db.seders.find_and_update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
+    response = {'ok:': True}
+    return (response, status.HTTP_200_OK)
 
 
 def get_room_code(stringLength = 4):
-
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
+    while (pf.is_profane(roomCode)):
+        roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
-
-
-
 
 
 if __name__ == "__main__":
