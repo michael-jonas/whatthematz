@@ -3,6 +3,8 @@ import logo from "./logo.svg";
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
+import Modal from "react-bootstrap/Modal";
+import Button from "react-bootstrap/Button";
 
 import LandingPage from "./Pages/LandingPage";
 import CreatePage from "./Pages/CreatePage";
@@ -15,11 +17,12 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: Pages.LOBBY,
+      currentPage: Pages.HUNT,
       name: "",
       sederCode: "",
       huntId: "",
       sederName: "Weenie Hut Jr",
+      backModal: false,
     };
   }
 
@@ -50,18 +53,47 @@ class App extends React.Component {
     this.setState({ currentPage: Pages.HUNT });
   };
 
+  openBackModal = () => {
+    this.setState({
+      backModal: true,
+    });
+  };
+
+  closeBackModal = () => {
+    this.setState({
+      backModal: false,
+    });
+  };
+
   handleBackButton = () => {
     switch (this.state.currentPage) {
       case Pages.LOBBY:
         // Warn leaving lobby
-        this.goToLanding();
+        this.openBackModal();
         break;
       case Pages.CREATE:
       case Pages.JOIN:
         this.goToLanding();
         break;
       case Pages.HUNT:
-        // unsure
+        this.openBackModal();
+        break;
+      default:
+        break;
+    }
+  };
+
+  confirmBack = () => {
+    switch (this.state.currentPage) {
+      case Pages.LOBBY:
+        // Clear values?
+        this.goToLanding();
+        this.closeBackModal();
+        break;
+      case Pages.HUNT:
+        // Requeue somehow
+        this.goToLobby();
+        this.closeBackModal();
         break;
       default:
         break;
@@ -155,6 +187,26 @@ class App extends React.Component {
             goToLobby={this.goToLobby}
           />
         )}
+        <Modal show={this.state.backModal} onHide={this.closeBackModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Are you sure you want to go back?</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {this.state.currentPage === Pages.LOBBY
+              ? "If you leave now, you'll lose your score and have to rejoin the Seder."
+              : "If you leave now, you'll have to wait until the next hunt."}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="danger" onClick={this.confirmBack}>
+              {this.state.currentPage === Pages.LOBBY
+                ? "Leave Seder"
+                : "Leave Hunt"}
+            </Button>
+            <Button variant="primary" onClick={this.closeBackModal}>
+              Cancel
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </div>
     );
   }
