@@ -13,13 +13,16 @@ export default class LobbyPage extends React.Component {
   }
 
   componentDidMount() {
-    setTimeout(
+    this.timeout = setTimeout(
       () =>
         this.setState({
           justJoined: false,
         }),
       5000
     );
+  }
+  componentWillUnmount() {
+    clearTimeout(this.timeout);
   }
 
   render() {
@@ -29,14 +32,12 @@ export default class LobbyPage extends React.Component {
 
     return (
       <Container>
-        <Container style={{ textAlign: "center" }}>
-          {this.state.justJoined ? (
-            <WelcomeAnnouncement sederName={this.props.sederName} />
-          ) : (
-            <WaitingAnnouncement sederName={this.props.sederName} />
-          )}
-        </Container>
-        <h2>Players in the room</h2>
+        {this.state.justJoined ? (
+          <WelcomeAnnouncement sederName={this.props.sederName} />
+        ) : (
+          <WaitingAnnouncement sederName={this.props.sederName} />
+        )}
+        <h4>Players in the room</h4>
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>

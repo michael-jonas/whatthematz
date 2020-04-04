@@ -10,7 +10,7 @@ export default class CreatePage extends React.Component {
     this.state = {
       name: this.props.name,
       sederName: this.props.sederName,
-      canCreate: false,
+      canCreate: props.sederName.length > 0 && props.name.length > 0,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSederNameChange = this.handleSederNameChange.bind(this);
@@ -39,8 +39,12 @@ export default class CreatePage extends React.Component {
   tryCreateSeder() {
     // fetch blah
     // wow no server guess we succeeded
-    //this.props.updateJoinedSeder(this.state.name, this.state.sederCode);
-    //this.props.goToLobby();
+    this.props.updateCreatedSeder(
+      this.state.name,
+      this.state.sederCode,
+      this.state.sederName
+    );
+    this.props.goToLobby();
   }
 
   render() {
@@ -58,7 +62,7 @@ export default class CreatePage extends React.Component {
             />
           </Form.Group>
           <Form.Group controlId="Nickname">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Treasure Hunter Name</Form.Label>
             <Form.Control
               type="text"
               autoComplete="off"

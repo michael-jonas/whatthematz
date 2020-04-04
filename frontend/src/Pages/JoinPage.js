@@ -10,7 +10,7 @@ export default class JoinPage extends React.Component {
     this.state = {
       name: props.name,
       sederCode: props.sederCode,
-      canJoin: false,
+      canJoin: props.sederCode.length === 4 && props.name.length > 0,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSederCodeChange = this.handleSederCodeChange.bind(this);

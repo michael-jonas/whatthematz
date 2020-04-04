@@ -54,6 +54,7 @@ class App extends React.Component {
     switch (this.state.currentPage) {
       case Pages.LOBBY:
         // Warn leaving lobby
+        this.goToLanding();
         break;
       case Pages.CREATE:
       case Pages.JOIN:
@@ -107,10 +108,11 @@ class App extends React.Component {
             />
             UnleavenTheCurve
           </Navbar.Brand>
-          {this.state.currentPage != Pages.LANDING && (
+          {this.state.currentPage !== Pages.LANDING && (
             <input
               style={{ width: 40, height: 40 }}
               type="image"
+              alt="Back"
               src={backButton}
               onClick={() => this.handleBackButton()}
             />
@@ -124,7 +126,7 @@ class App extends React.Component {
             name={this.state.name}
             sederName={this.state.sederName}
             goToLobby={this.goToLobby}
-            updateJoinedSeder={this.updateJoinedSeder}
+            updateCreatedSeder={this.updateCreatedSeder}
           />
         )}
         {this.state.currentPage === Pages.JOIN && (
@@ -132,7 +134,7 @@ class App extends React.Component {
             name={this.state.name}
             sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
-            updateCreatedSeder={this.updateCreatedSeder}
+            updateJoinedSeder={this.updateJoinedSeder}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (
