@@ -44,7 +44,7 @@ def SederData(
 
 def HuntData(
     sederId, isActive=False, participants=None,
-    city=None, matzahXY=None, winner=-1, finders=None,
+    city=None, imageId=None, winner=-1, finders=None,
     creationTime=None, startTime=None, isFinished=False):
     
     return {
@@ -53,7 +53,7 @@ def HuntData(
         # a list of Unique Ids (nicknames stored in Seder)
         'participants': participants or [],
         'city': city or '',
-        'matzahXY': matzahXY or (0,0),
+        'imageId': imageId,
         'winner': winner,
         'creationTime': creationTime or datetime.now(),
         'startTime': startTime,
@@ -251,26 +251,41 @@ def getImage():
     huntIdArg = request.args.get('huntId')
     huntId = parseIdArg(huntIdArg)
 
+    returnsRect = bool(request.args.get('getRect'))
+
     if not huntId:
         return error_result
 
     result = db.hunts.find_one({'_id': huntId})
 
-    if not result or not result['city']:
-        return error_result
+    if not result:
+        return badResponse('Could not find hunt')
+    if not result['imageId']:
+        return badResponse('Hunt has no image associated')
 
-    # TODO don't just do a random image?
-    img = getRandomImage(result['city'])
-    matzahImg = getMatzahImage()
-    randomHide(img, matzahImg)
-    if not img:
-        response = {'Error': "Whoops! couldn't find an image"}
-        error_result = (response, status.HTTP_500_INTERNAL_SERVER_ERROR)
-        return error_result
+    imageId = result['imageId']
+    hidden_image = db.hidden_images.find_one({'_id': imageId})
+    if not hidden_image:
+        return badResponse('Could not find image in DB')
 
-    imgByteArr = io.BytesIO()
-    img.save(imgByteArr, format='JPEG')
-    imgByteArr = imgByteArr.getvalue()
+    imageBytes = hidden_images['imgBytes']
+    rect = hidden_image['rect']
+
+    # # TODO don't just do a random image?
+    # img = getRandomImage(result['city'])
+    # matzahImg = getMatzahImage()
+    # randomHide(img, matzahImg)
+    # if not img:
+    #     response = {'Error': "Whoops! couldn't find an image"}
+    #     error_result = (response, status.HTTP_500_INTERNAL_SERVER_ERROR)
+    #     return error_result
+
+    # imgByteArr = io.BytesIO()
+    # img.save(imgByteArr, format='JPEG')
+    # imgByteArr = imgByteArr.getvalue()
+    if returnsRect:
+        return goodResponse(rect)
+
     return send_file(
         io.BytesIO(imgByteArr),
         mimetype='image/jpg',
@@ -300,6 +315,7 @@ def joinSeder():
     sederId = sederData['_id']
 
     # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
+    # @Jonas are you sure this works as expected? Sorting after the limit statement?
     currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
     # Get unique mongo _id of the hunt
     currentHuntId = currentHunt['_id']
@@ -406,9 +422,9 @@ def setupHunt(huntId, city=None, matzahXY=None):
         rect = (x, y, w, h)
 
     # put the image in the images db, and link to it from the hunt
-    image_id = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
-    db.hunts.find_one_and_update({'_id': huntId}, {'img_id': image_id})
-    return image_id
+    imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
+    db.hunts.find_one_and_update({'_id': huntId}, {'imageId': imageId})
+    return imageId
 
 
 @app.route('/conclude_hunt', methods=['PUT'])
