@@ -4,6 +4,7 @@ import Player from "../Components/Player";
 import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
 import Nav from "react-bootstrap/Nav";
+import Button from "react-bootstrap/Button";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -46,6 +47,7 @@ export default class LobbyPage extends React.Component {
 
     return (
       <Container>
+        <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button>
         {this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
         ) : (
