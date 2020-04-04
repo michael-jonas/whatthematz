@@ -1,9 +1,11 @@
 import os
+import io
 from datetime import datetime
 import random
+from imaging import *
 
 
-from flask import Flask, redirect, url_for, request, render_template, jsonify
+from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
 
 from pymongo import MongoClient, ReturnDocument
@@ -81,6 +83,13 @@ def get_image_id(huntDoc):
     """Finds the image_id needed for loading an image from db"""
     return -1
 
+def parseIdArg(idArg):
+    try:
+        result = ObjectId(idArg)
+    except:
+        result = None
+    return result
+
 @app.route('/check_location', methods=['GET'])
 def checkLocation():
     """User hits this endpoint when they click on a location.
@@ -88,7 +97,6 @@ def checkLocation():
     The result is whether the location is found or not
     Also any additional info needed for the follow up GET
     in the event that they are correct"""
-
 
     # get parameters and sanitize
     huntIdArg = request.args.get('huntId')
@@ -129,23 +137,39 @@ def checkLocation():
 
     return (response, status.HTTP_200_OK)
 
+@app.route('/get_image')
+def getImage():
 
-@app.route('/')
-def todo():
+    response = {'Error': "Whoops! invalid hunt"}
+    error_result = (response, status.HTTP_400_BAD_REQUEST)
 
-    content = {'please move along': 'nothing to see here'}
-    return content, status.HTTP_404_NOT_FOUND
+    huntIdArg = request.args.get('huntId')
+    huntId = parseIdArg(huntIdArg)
 
-@app.route('/new', methods=['POST'])
-def new():
+    if not huntId:
+        return error_result
 
-    item_doc = {
-        'name': request.form['name'],
-        'description': request.form['description']
-    }
-    db.tododb.insert_one(item_doc)
+    result = db.hunts.find_one({'_id': huntId})
 
-    return redirect(url_for('todo'))
+    if not result or not result['city']:
+        return error_result
+
+    # TODO don't just do a random image?
+    img = getRandomImage(result['city'])
+    matzahImg = getMatzahImage()
+    randomHide(img, matzahImg)
+    if not img:
+        response = {'Error': "Whoops! couldn't find an image"}
+        error_result = (response, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return error_result
+
+    imgByteArr = io.BytesIO()
+    img.save(imgByteArr, format='JPEG')
+    imgByteArr = imgByteArr.getvalue()
+    return send_file(
+        io.BytesIO(imgByteArr),
+        mimetype='image/jpg',
+    )
 
 @app.route('/join_seder', methods=['PUT'])
 def joinSeder():

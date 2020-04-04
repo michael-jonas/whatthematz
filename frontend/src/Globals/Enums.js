@@ -10,6 +10,8 @@ Page List
 
 export const Pages = {
   LANDING: "landing",
+  JOIN: "join",
+  CREATE: "create",
   LOBBY: "lobby",
   HUNT: "hunt",
 };

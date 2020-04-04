@@ -2,6 +2,8 @@ import React from "react";
 import logo from "./logo.svg";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
+import Container from "react-bootstrap/Container";
+
 import LandingPage from "./Pages/LandingPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
@@ -15,8 +17,20 @@ class App extends React.Component {
       name: "",
       sederCode: "",
       huntId: "",
+      sederName: "Weenie Hut Jr",
     };
   }
+
+  playerList = [
+    {
+      name: "bob",
+      score: 0,
+    },
+    {
+      name: "ted",
+      score: 3,
+    },
+  ];
 
   goToLobby = () => {
     this.setState({ currentPage: Pages.LOBBY });
@@ -35,11 +49,25 @@ class App extends React.Component {
     });
   };
 
+  updateCreatedSeder = (name, sederCode, sederName) => {
+    this.setState({
+      name: name,
+      sederCode: sederCode,
+      sederName: sederName,
+    });
+  };
+
   render() {
     return (
-      <>
-        <Navbar bg="dark" variant="dark">
-          <Navbar.Brand>
+      <div>
+        <Navbar
+          expand="xs"
+          bg="dark"
+          variant="dark"
+          style={{ marginBottom: 20 }}
+        >
+          <Navbar.Toggle />
+          <Navbar.Brand style={{ textAlign: "center" }}>
             <img
               alt=""
               src={logo}
@@ -47,8 +75,9 @@ class App extends React.Component {
               height="30"
               className="d-inline-block align-top"
             />
-            UnleavenTheBread
+            UnleavenTheCurve
           </Navbar.Brand>
+          <Navbar.Collapse></Navbar.Collapse>
         </Navbar>
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage
@@ -61,7 +90,9 @@ class App extends React.Component {
         {this.state.currentPage === Pages.LOBBY && (
           <LobbyPage
             name={this.state.name}
+            players={this.playerList}
             sederCode={this.state.sederCode}
+            sederName={this.state.sederName}
             goToLanding={this.goToLanding}
             goToHunt={this.goToHunt}
           />
@@ -74,7 +105,7 @@ class App extends React.Component {
             goToLobby={this.goToLobby}
           />
         )}
-      </>
+      </div>
     );
   }
 }
