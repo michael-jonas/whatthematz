@@ -20,13 +20,18 @@ DEFAULT_WIN_COUNT = 0
 CITIES = ['Toronto']
 app = Flask(__name__)
 
+# MEMBERS idxs of components
+M_NICKNAME = 0
+M_WINS = 1
+M_AVATAR = 2
+
 # I think this is the default port for mongodb
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
 
 def SederData(
     name, roomCode='', huntIds=None,
-    creationTime=None):
+    creationTime=None, members=None):
 
     return {
         'name': name,
@@ -34,7 +39,9 @@ def SederData(
         'huntIds': [],
         'creationTime': creationTime or datetime.now(),
         'huntQueue': [],
-        'members': {}
+        # maps a Unique Id to a List
+        # that List contains [nickname, wins, avatar]
+        'members': members or dict(),
     }
 
 def HuntData(
@@ -45,6 +52,7 @@ def HuntData(
     return {
         'sederId': sederId,
         'isActive': isActive,
+        # a list of Unique Ids (nicknames stored in Seder)
         'participants': participants or [],
         'city': city or '',
         'matzahXY': matzahXY or (0,0),
@@ -61,11 +69,16 @@ if DEBUG:
     for i, name, room in zip(idxs, names, rooms):
         startTime = datetime.now() if i == 2 else None
 
+        memberNicks = [n for n in names if n != name]
+        memberIds = list(range(len(memberNicks)))
+        members = dict((str(mid), [nick, 0, 0]) for mid, nick in zip(memberIds, memberNicks))
+
         # create a seder
         result = db.seders.insert_one(SederData(
             name=f"{name}'s seder",
             roomCode=room,
             huntIds=[],
+            members=members if i == 1 else None,
         ))
         # create the hunt
         seder_uid = result.inserted_id
@@ -117,6 +130,34 @@ def goodResponse(result):
         result = {'result': result}
 
     return (result, status.HTTP_200_OK)
+
+@app.route('/get_player_list', methods=['GET'])
+def getPlayerList():
+    # get parameters and sanitize
+    huntId = request.args.get('huntId')
+    hunt = getHuntById(huntId)
+    if not hunt:
+        return badResponse('Bad args')
+
+    sederId = hunt['sederId']
+    if isinstance(sederId, str):
+        sederId = ObjectId(sederId)
+
+    players = hunt['participants']
+    sederData = db.seders.find_one({"_id": sederId})
+    members = sederData['members']
+
+    # convert our data format into a dictionary
+    def _foo(l):
+        return {
+            'nickname': l[M_NICKNAME],
+            'wins': l[M_WINS],
+            'avatar': l[M_AVATAR],
+        }
+
+    result = dict((pid, _foo(members[str(pid)])) for pid in players)
+    return goodResponse(members)
+
 
 @app.route('/hunt_start_time', methods=['GET'])
 def huntStartTime():
@@ -301,13 +342,7 @@ def triggerHunt():
 
     # get parameters and sanitize
     huntIdArg = request.args.get('huntId')
-
-    try:
-        huntId = ObjectId(huntIdArg)
-        failedToParse = False
-    except:
-        huntId = None
-        failedToParse = True
+    hunt = getHuntById(huntIdArg)
 
     if(not huntId):
         response = {'Error': "Whoops! Bad args"}
