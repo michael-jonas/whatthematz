@@ -125,24 +125,6 @@ def checkLocation():
 
     return (response, status.HTTP_200_OK)
 
-
-@app.route('/')
-def todo():
-
-    content = {'please move along': 'nothing to see here'}
-    return content, status.HTTP_404_NOT_FOUND
-
-@app.route('/new', methods=['POST'])
-def new():
-
-    item_doc = {
-        'name': request.form['name'],
-        'description': request.form['description']
-    }
-    db.tododb.insert_one(item_doc)
-
-    return redirect(url_for('todo'))
-
 @app.route('/join_seder', methods=['PUT'])
 def joinSeder():
 
