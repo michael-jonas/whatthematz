@@ -238,7 +238,7 @@ def checkLocation():
 
     return (response, status.HTTP_200_OK)
 
-@app.route('/get_image')
+@app.route('/get_image', methods=['GET'])
 def getImage():
 
     response = {'Error': "Whoops! invalid hunt"}
@@ -272,7 +272,7 @@ def getImage():
         mimetype='image/jpg',
     )
 
-@app.route('/join_seder', methods=['PUT'])
+@app.route('/join_seder', methods=['POST'])
 def joinSeder():
 
     # Get data from the HTTP request
