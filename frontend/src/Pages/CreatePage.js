@@ -8,8 +8,8 @@ export default class CreatePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: this.props.name,
-      sederName: this.props.sederName,
+      name: props.name,
+      sederName: props.sederName,
       canCreate: props.sederName.length > 0 && props.name.length > 0,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
@@ -36,12 +36,22 @@ export default class CreatePage extends React.Component {
   }
 
   // Actions
-  tryCreateSeder() {
-    // fetch blah
+  async tryCreateSeder() {
+    const response = await fetch(
+      `/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
+      {
+        method: "POST",
+      }
+    );
+
+    const json = await response.json();
+
+    console.log(json);
+
     // wow no server guess we succeeded
     this.props.updateCreatedSeder(
       this.state.name,
-      this.state.sederCode,
+      json.sederCode ? json.sederCode : "",
       this.state.sederName
     );
     this.props.goToLobby();

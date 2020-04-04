@@ -36,8 +36,18 @@ export default class JoinPage extends React.Component {
   }
 
   // Actions
-  tryJoinSeder() {
-    // fetch blah
+  async tryJoinSeder() {
+    const response = await fetch(
+      `/join_seder?roomCode=${this.state.sederCode}&nickname=${this.state.name}`,
+      {
+        method: "POST",
+      }
+    );
+
+    const json = await response.json();
+
+    console.log(json);
+
     // wow no server guess we succeeded
     this.props.updateJoinedSeder(this.state.name, this.state.sederCode);
     this.props.goToLobby();
