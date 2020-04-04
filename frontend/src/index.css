@@ -14,7 +14,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "Source Sans Pro";
+  font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
 }
 
 code {
@@ -24,4 +26,8 @@ code {
 
 .light {
   font-weight: normal;
+}
+
+.nav-pills .nav-link {
+  border-radius: 1rem;
 }

@@ -15,7 +15,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: Pages.LANDING,
+      currentPage: Pages.LOBBY,
       name: "",
       sederCode: "",
       huntId: "",

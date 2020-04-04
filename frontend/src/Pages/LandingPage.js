@@ -10,7 +10,7 @@ export default class LandingPage extends React.Component {
         <div style={{ textAlign: "center", marginTop: 20 }}>
           Select an option
         </div>
-        <div style={{ margin: "auto" }}>
+        <div style={{ margin: "auto", textAlign: "center" }}>
           <Button
             onClick={() => this.props.goToCreate()}
             style={{ margin: 20 }}

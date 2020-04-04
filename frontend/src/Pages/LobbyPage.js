@@ -3,12 +3,14 @@ import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
 import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
+import Nav from "react-bootstrap/Nav";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       justJoined: true,
+      mapInstructions: true,
     };
   }
 
@@ -23,6 +25,18 @@ export default class LobbyPage extends React.Component {
   }
   componentWillUnmount() {
     clearTimeout(this.timeout);
+  }
+
+  showMapInstructions() {
+    this.setState({
+      mapInstructions: true,
+    });
+  }
+
+  showWaldoInstructions() {
+    this.setState({
+      mapInstructions: false,
+    });
   }
 
   render() {
@@ -41,6 +55,26 @@ export default class LobbyPage extends React.Component {
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
+        <h4 style={{ marginTop: 30 }}>How to play</h4>
+        <Nav variant="pills" defaultActiveKey="map">
+          <Nav.Item>
+            <Nav.Link
+              onSelect={() => this.showMapInstructions()}
+              eventKey="map"
+            >
+              Discover the location
+            </Nav.Link>
+          </Nav.Item>
+          <Nav.Item>
+            <Nav.Link
+              onSelect={() => this.showWaldoInstructions()}
+              eventKey="waldo"
+            >
+              Find the Afikoman
+            </Nav.Link>
+          </Nav.Item>
+        </Nav>
+        {this.state.mapInstructions ? "map" : "notMap"}
       </Container>
     );
   }
