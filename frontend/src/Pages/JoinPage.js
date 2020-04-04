@@ -71,6 +71,7 @@ export default class JoinPage extends React.Component {
           <Form.Group controlId="roomCode">
             <Form.Label>Room Code</Form.Label>
             <Form.Control
+              style={{ textTransform: "uppercase" }}
               autoComplete="off"
               maxLength="4"
               type="text"
