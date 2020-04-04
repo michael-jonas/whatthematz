@@ -13,7 +13,7 @@ export default class JoinPage extends React.Component {
       canJoin: props.roomCode.length === 4 && props.name.length > 0,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
-    this.handleroomCodeChange = this.handleroomCodeChange.bind(this);
+    this.handleRoomCodeChange = this.handleRoomCodeChange.bind(this);
   }
 
   // Basic Form State Handlers
