@@ -30,7 +30,7 @@ def SederData(
 def HuntData(
     sederId, isActive=False, participants=None,
     city=None, matzahXY=None, winner=-1, finders=None,
-    creationTime=None):
+    creationTime=None, startTime = None):
 
     return {
         'sederId': sederId,
@@ -40,7 +40,8 @@ def HuntData(
         'matzahXY': matzahXY or (0,0),
         'winner': winner,
         'finders': finders or [],
-        'creationTime': creationTime or datetime.now()
+        'creationTime': creationTime or datetime.now(),
+        'startTime': startTime
     }
 
 if DEBUG:
@@ -159,7 +160,7 @@ def joinSeder():
 
     # Check that the seder exists
     if sederData is None:
-        response = {'ok': False, 'message': 'Seder not found', 'sederCode': sederCode}
+        response = {'ok': False, 'message': 'Seder not found'}
         return (response, status.HTTP_400_BAD_REQUEST)
     
     # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
@@ -217,11 +218,21 @@ def startHunt():
 
     if(not huntId):
         response = {'Error': "Whoops! Bad args"}
-        error_result = (response, status.HTTP_400_BAD_REQUEST)
-        return error_result
+        return (response, status.HTTP_400_BAD_REQUEST)
 
-    # 1. Grab the hunt by hunt id and update it 
-    hunt = db.hunts.find_one({'_id': huntId})
+    # 1. Get the hunt and update it
+    hunt = db.hunts.find_one_and_update({'_id': huntId}, {'isActive': True, 'startTime': datetime.now()+10}, return_document=ReturnDocument.AFTER)
+
+    if hunt is None:
+        response = {'ok': False, 'message': 'Hunt not found'}
+        return (response, status.HTTP_400_BAD_REQUEST)
+
+    response = {'ok:': True, 'participants': hunt['participants']}
+    return (response, status.HTTP_200_OK)
+
+
+def concludeHuntAndStartNewHunt():
+    # this guy takes people off the seder queue and puts them in this hunt
 
 
 
