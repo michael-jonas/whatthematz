@@ -1,8 +1,9 @@
 import os
+import io
 from datetime import datetime
+from imaging import *
 
-
-from flask import Flask, redirect, url_for, request, render_template, jsonify
+from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
 
 from pymongo import MongoClient, ReturnDocument
@@ -77,6 +78,13 @@ def get_image_id(huntDoc):
     """Finds the image_id needed for loading an image from db"""
     return -1
 
+def parseIdArg(idArg):
+    try:
+        result = ObjectId(idArg)
+    except:
+        result = None
+    return result
+
 @app.route('/check_location', methods=['GET'])
 def checkLocation():
     """User hits this endpoint when they click on a location.
@@ -84,7 +92,6 @@ def checkLocation():
     The result is whether the location is found or not
     Also any additional info needed for the follow up GET
     in the event that they are correct"""
-
 
     # get parameters and sanitize
     huntIdArg = request.args.get('huntId')
@@ -124,6 +131,40 @@ def checkLocation():
         }
 
     return (response, status.HTTP_200_OK)
+
+@app.route('/get_image')
+def getImage():
+
+    response = {'Error': "Whoops! invalid hunt"}
+    error_result = (response, status.HTTP_400_BAD_REQUEST)
+
+    huntIdArg = request.args.get('huntId')
+    huntId = parseIdArg(huntIdArg)
+
+    if not huntId:
+        return error_result
+
+    result = db.hunts.find_one({'_id': huntId})
+
+    if not result or not result['city']:
+        return error_result
+
+    # TODO don't just do a random image?
+    img = getRandomImage(result['city'])
+    matzahImg = getMatzahImage()
+    randomHide(img, matzahImg)
+    if not img:
+        response = {'Error': "Whoops! couldn't find an image"}
+        error_result = (response, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return error_result
+
+    imgByteArr = io.BytesIO()
+    img.save(imgByteArr, format='JPEG')
+    imgByteArr = imgByteArr.getvalue()
+    return send_file(
+        io.BytesIO(imgByteArr),
+        mimetype='image/jpg',
+    )
 
 @app.route('/join_seder', methods=['PUT'])
 def joinSeder():
@@ -215,8 +256,7 @@ def startHunt():
 
 def concludeHuntAndStartNewHunt():
     # this guy takes people off the seder queue and puts them in this hunt
-
-
+    return None
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
