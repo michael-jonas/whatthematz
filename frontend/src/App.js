@@ -17,7 +17,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentPage: Pages.HUNT,
+      currentPage: Pages.LANDING,
       name: "",
       sederCode: "",
       huntId: "",
@@ -150,6 +150,7 @@ class App extends React.Component {
             />
           )}
         </Navbar>
+        <div style={{ height: 0, border: "1px solid #EDEDED" }} />
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
         )}
@@ -175,7 +176,6 @@ class App extends React.Component {
             players={this.playerList}
             sederCode={this.state.sederCode}
             sederName={this.state.sederName}
-            goToLanding={this.goToLanding}
             goToHunt={this.goToHunt}
           />
         )}
@@ -183,8 +183,7 @@ class App extends React.Component {
           <HuntPage
             name={this.state.name}
             sederCode={this.state.sederCode}
-            goToLanding={this.goToLanding}
-            goToLobby={this.goToLobby}
+            sederName={this.state.sederName}
           />
         )}
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>
