@@ -1,5 +1,6 @@
 import React from "react";
 import logo from "./logo.svg";
+import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
 
@@ -49,13 +50,29 @@ class App extends React.Component {
     this.setState({ currentPage: Pages.HUNT });
   };
 
+  handleBackButton = () => {
+    switch (this.state.currentPage) {
+      case Pages.LOBBY:
+        // Warn leaving lobby
+        break;
+      case Pages.CREATE:
+      case Pages.JOIN:
+        this.goToLanding();
+        break;
+      case Pages.HUNT:
+        // unsure
+        break;
+      default:
+        break;
+    }
+  };
+
   updateJoinedSeder = (name, sederCode) => {
     this.setState({
       name: name,
       sederCode: sederCode,
     });
   };
-
   updateCreatedSeder = (name, sederCode, sederName) => {
     this.setState({
       name: name,
@@ -69,12 +86,18 @@ class App extends React.Component {
       <div>
         <Navbar
           expand="xs"
-          bg="dark"
-          variant="dark"
+          //bg="dark"
+          variant="light"
           style={{ marginBottom: 20 }}
         >
           <Navbar.Toggle />
-          <Navbar.Brand style={{ textAlign: "center" }}>
+          <Navbar.Brand
+            style={{
+              position: "absolute",
+              left: "50%",
+              transform: "translatex(-50%)",
+            }}
+          >
             <img
               alt=""
               src={logo}
@@ -84,7 +107,14 @@ class App extends React.Component {
             />
             UnleavenTheCurve
           </Navbar.Brand>
-          <Navbar.Collapse></Navbar.Collapse>
+          {this.state.currentPage != Pages.LANDING && (
+            <input
+              style={{ width: 40, height: 40 }}
+              type="image"
+              src={backButton}
+              onClick={() => this.handleBackButton()}
+            />
+          )}
         </Navbar>
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
@@ -92,7 +122,7 @@ class App extends React.Component {
         {this.state.currentPage === Pages.CREATE && (
           <CreatePage
             name={this.state.name}
-            sederCode={this.state.sederCode}
+            sederName={this.state.sederName}
             goToLobby={this.goToLobby}
             updateJoinedSeder={this.updateJoinedSeder}
           />
