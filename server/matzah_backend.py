@@ -2,14 +2,14 @@ import os
 import io
 from datetime import datetime
 import random
-from imaging import *
-
+import json
 
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
-
 from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
+
+from imaging import *
 
 DEBUG = True
 DEFAULT_WIN_COUNT = 0
@@ -36,8 +36,8 @@ def SederData(
 def HuntData(
     sederId, isActive=False, participants=None,
     city=None, matzahXY=None, winner=-1, finders=None,
-    creationTime=None, startTime = None, isFinished=False):
-
+    creationTime=None, startTime=None, isFinished=False):
+    
     return {
         'sederId': sederId,
         'isActive': isActive,
@@ -47,19 +47,21 @@ def HuntData(
         'winner': winner,
         'creationTime': creationTime or datetime.now(),
         'startTime': startTime,
-        'isFinished': finished
+        'isFinished': isFinished,
     }
 
 if DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = [123, 321, 222, 666]
-    for name, room in zip(names, rooms):
+    idxs = range(len(names))
+    for i, name, room in zip(idxs, names, rooms):
+        startTime = datetime.now() if i == 2 else None
+
         # create a seder
         result = db.seders.insert_one(SederData(
             name=f"{name}'s seder",
             roomCode=room,
             huntIds=[],
-
         ))
         # create the hunt
         seder_uid = result.inserted_id
@@ -67,6 +69,7 @@ if DEBUG:
             sederId=seder_uid,
             isActive=True,
             city='toronto',
+            startTime=startTime,
         ))
         updated_fields = {'huntIds': [huntResult.inserted_id]}
         db.seders.update_one(
@@ -90,6 +93,65 @@ def parseIdArg(idArg):
         result = None
     return result
 
+def getHuntById(huntId):
+    if isinstance(huntId, str):
+        huntId = parseIdArg(huntId)
+
+    if not huntId or not isinstance(huntId, ObjectId):
+        return None
+
+    return db.hunts.find_one({'_id': huntId})
+
+def badResponse(bad='Bad args'):
+    error = f'Whoops! {bad}.'
+    response = {'Error': error}
+    error_result = (response, status.HTTP_400_BAD_REQUEST)
+    return error_result
+
+def goodResponse(result):
+    if not isinstance(result, dict):
+        result = {'result': result}
+
+    return (result, status.HTTP_200_OK)
+
+@app.route('/hunt_start_time', methods=['GET'])
+def huntStartTime():
+    # get parameters and sanitize
+    huntId = request.args.get('huntId')
+    hunt = getHuntById(huntId)
+    startTime = hunt['startTime'] if hunt else None
+
+    if not hunt:
+        return badResponse('Bad args')
+    if not startTime:
+        return badResponse('Invalid Hunt, hunt has no city associated')
+
+    return goodResponse(startTime.isoformat())
+
+@app.route('/get_hints', methods=['GET'])
+def getHints():
+    # get parameters and sanitize
+    huntId = request.args.get('huntId')
+    hunt = getHuntById(huntId)
+    city = hunt['city'] if hunt else ''
+
+    if not hunt:
+        return badResponse('Bad args')
+
+    if not city:
+        return badResponse('Invalid Hunt, hunt has no city associated')
+
+    # open the json
+    fpath = os.path.join('cities', city + '.json')
+    if os.path.exists(fpath) and os.path.isfile(fpath):
+        with open(fpath) as f:
+            data = json.load(f)
+        hints = data['easyHints'] + data['mediumHints'] + data['hardHints']
+        return goodResponse(hints)
+    else:
+        # return bad if no json found
+        return badResponse('Invalid Resource, city JSON not found')
+
 @app.route('/check_location', methods=['GET'])
 def checkLocation():
     """User hits this endpoint when they click on a location.
@@ -101,13 +163,7 @@ def checkLocation():
     # get parameters and sanitize
     huntIdArg = request.args.get('huntId')
     locationName = request.args.get('locationName')
-
-    try:
-        huntId = ObjectId(huntIdArg)
-        failedToParse = False
-    except:
-        huntId = None
-        failedToParse = True
+    huntId = parseIdArg(huntIdArg)
 
     if(not huntId or not locationName):
         response = {'Error': "Whoops! Bad args"}
