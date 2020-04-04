@@ -24,6 +24,8 @@ M_NICKNAME = 0
 M_WINS = 1
 M_AVATAR = 2
 
+L_ROOMCODES = 4
+
 # I think this is the default port for mongodb
 client = MongoClient(os.environ['DB_PORT_27017_TCP_ADDR'], 27017)
 db = client.tododb
@@ -31,6 +33,9 @@ db = client.tododb
 def SederData(
     name, roomCode='', huntIds=None,
     creationTime=None, members=None):
+
+    if roomCode:
+        assert len(roomCode) == L_ROOMCODES
 
     return {
         'name': name,
@@ -77,7 +82,7 @@ def ImageData(imgOrBytes, rect):
 
 if DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
-    rooms = [123, 321, 222, 666]
+    rooms = [1234, 4321, 2222, 6666]
     idxs = range(len(names))
     for i, name, room in zip(idxs, names, rooms):
         startTime = datetime.now() if i == 2 else None
