@@ -2,8 +2,10 @@ import os
 import io
 from datetime import datetime
 import random
+import string
 from imaging import *
-
+from profanityfilter import ProfanityFilter
+pf = ProfanityFilter()
 
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
@@ -47,7 +49,7 @@ def HuntData(
         'winner': winner,
         'creationTime': creationTime or datetime.now(),
         'startTime': startTime,
-        'isFinished': finished
+        'isFinished': isFinished
     }
 
 if DEBUG:
@@ -196,37 +198,42 @@ def joinSeder():
 
     # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
     currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
-
     # Get unique mongo _id of the hunt
     currentHuntId = currentHunt['_id']
     avatar = random.randint(0,9)
     user_uuid = ObjectId()
-    sederUpdates = {"$push": {"huntQueue": user_uuid}, {'members': {user_uuid: [nickname, DEFAULT_WIN_COUNT, avatar] } } }
+    
 
     # Check to see if the hunt has started
     if currentHunt['isActive'] is True:
         # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
+        sederUpdates = { "$push": {"huntQueue": user_uuid}, '$set': {'members.'+str(user_uuid): [nickname, DEFAULT_WIN_COUNT, avatar] } }
         sederData = db.seders.find_one_and_update({"_id": sederId}, sederUpdates, return_document=ReturnDocument.AFTER)
         response = {
             'queued': True,
-            'hunt_id': str(currentHuntId)
+            'huntId': str(currentHuntId),
+            'sederId': str(sederId),
+            'userId': str(user_uuid)
         }
         # response = db.seders.find_one({"_id": sederId})
 
     else:
         # Hunt hasn't started yet, add them as a participant in the hunt
-        currentHunt = db.hunts.find_one_and_update({"_id": currentHuntId}, { "$push": {"participants": user_uuid} }, return_document=ReturnDocument.AFTER)
+        sederUpdates = {'members': {user_uuid: [nickname, DEFAULT_WIN_COUNT, avatar] } } 
+        currentHunt = db.hunts.find_one_and_update({"_id": currentHuntId}, { "$push": {"participants": str(user_uuid)} }, return_document=ReturnDocument.AFTER)
         sederData = db.seders.find_one_and_update({"_id": sederId}, sederUpdates, return_document=ReturnDocument.AFTER)
         response = {
             'queued': False,
-            'hunt_id': str(currentHuntId)
+            'huntId': str(currentHuntId),
+            'sederId': str(sederId),
+            'userId': str(user_uuid)
         }
         # response = db.hunts.find_one({"_id": currentHuntId})
 
     return (response, status.HTTP_200_OK)
 
-@app.route('/start_hunt', methods=['PUT'])
-def startHunt():
+@app.route('/trigger_hunt', methods=['PUT'])
+def triggerHunt():
     """ 
     Owner of seder clicks start hunt
 
@@ -304,13 +311,38 @@ def concludeHuntAndCreateNewHunt():
     participantsToInsert = prevParticipants + newHuntParticipants
     city = CITIES[random.randint(0,len(CITIES)-1)]
 
-    updates = {"$set": {"huntQueue": []}, members}
+    updates = {'$set': {'huntQueue': []}, 'members':members}
     db.seders.update_one( {'_id': sederId}, updates)
 
     insertData = HuntData(sederId=sederId, participants=participantsToInsert, city=city)
     newHuntId = db.hunts.insert_one(insertData).inserted_id
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
+
+@app.route('/create_seder', methods=['POST'])
+def createSeder():
+    sederName        = request.args.get('sederName')
+    nickname         = request.args.get("nickname")
+
+    if( (sederName is None) or (nickname is None) ):
+        response = {'Error': "Whoops! Bad args"}
+        return (response, status.HTTP_400_BAD_REQUEST)
+
+    insertSederData = SederData(name=sederName) 
+    roomCode = get_room_code()
+    db.seders.insert_one
+
+
+
+def get_room_code(stringLength = 4):
+
+    letters = string.ascii_uppercase
+    roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
+    return roomCode
+
+
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
