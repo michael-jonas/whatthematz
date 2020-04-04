@@ -1,18 +1,18 @@
-react:
-  build: frontend
-  command: npm start
-  stdin_open: true
-  # tty: true
-  volumes:
-    - './frontend:/app'
-    - '/app/node_modules'
-  ports:
-    # so that I can hit web
-    - '3000:3000'
-  environment:
-    - NODE_ENV=development
-  links:
-    - flask
+# react:
+#   build: frontend
+#   command: npm start
+#   stdin_open: true
+#   # tty: true
+#   volumes:
+#     - './frontend:/app'
+#     - '/app/node_modules'
+#   ports:
+#     # so that I can hit web
+#     - '3000:3000'
+#   environment:
+#     - NODE_ENV=development
+#   links:
+#     - flask
 flask:
   build: docker/server
   command: python -u /usr/src/app/matzah_backend.py
