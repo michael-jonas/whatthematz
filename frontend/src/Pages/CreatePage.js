@@ -52,13 +52,13 @@ export default class CreatePage extends React.Component {
         json.sederId,
         json.sederCode,
         json.sederName,
-        huntId
+        json.huntId
       );
       this.props.goToLobby();
     } else if (response.status === 500 && retries < 3) {
       setTimeout(() => {
         this.tryCreateSeder(++retries);
-      });
+      }, 1000);
     } else {
       // Todo Toast a message?
     }

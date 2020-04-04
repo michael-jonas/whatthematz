@@ -36,7 +36,7 @@ export default class JoinPage extends React.Component {
   }
 
   // Actions
-  async tryJoinSeder() {
+  async tryJoinSeder(retries) {
     const response = await fetch(
       `/join_seder?roomCode=${this.state.sederCode}&nickname=${this.state.name}`,
       {
@@ -51,13 +51,13 @@ export default class JoinPage extends React.Component {
         json.sederId,
         json.sederCode,
         json.sederName,
-        huntId
+        json.huntId
       );
       this.props.goToLobby();
     } else if (response.status === 500 && retries < 3) {
       setTimeout(() => {
         this.tryJoinSeder(++retries);
-      });
+      }, 1000);
     } else {
       // Todo Toast a message?
     }
