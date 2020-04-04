@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from flask_api import status
 
-from pymongo import MongoClient
+from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
 
 DEBUG = True
@@ -143,7 +143,7 @@ def new():
     return redirect(url_for('todo'))
 
 @app.route('/join_seder', methods=['PUT'])
-def join_seder():
+def joinSeder():
 
     # Get data from the HTTP request
     sederCode = request.args.get('roomCode')
@@ -151,7 +151,7 @@ def join_seder():
 
     if nickname is None:
         response = {'ok': False, 'message': 'You need a nickname homie'}
-        return jsonify(response), 400
+        return (response, status.HTTP_400_BAD_REQUEST)
 
     # Grab the entire seder document that matches the roomcode
     sederData = db.seders.find_one({"roomCode": sederCode})
@@ -160,7 +160,7 @@ def join_seder():
     # Check that the seder exists
     if sederData is None:
         response = {'ok': False, 'message': 'Seder not found', 'sederCode': sederCode}
-        return jsonify(response), 400
+        return (response, status.HTTP_400_BAD_REQUEST)
     
     # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
     sederId = sederData['_id']
@@ -169,26 +169,61 @@ def join_seder():
     currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
 
     # Get unique mongo _id of the hunt
-    currentHuntId = str(currentHunt['_id'])
+    currentHuntId = currentHunt['_id']
 
     # Check to see if the hunt has started
     if currentHunt['isActive'] is True:
         # If the hunt has started, user is not allowed to join. Add them to the hunt queue.
-        db.seders.update_one({"_id": sederId}, {"$push": {"huntQueue": nickname} })
+        sederData = db.seders.find_one_and_update({"_id": sederId}, {"$push": {"huntQueue": nickname} }, return_document=ReturnDocument.AFTER)
         response = {
             'queued': True,
-            'hunt_id': currentHuntId
+            'hunt_id': str(currentHuntId),
+            'participants': currentHunt['participants'],
+            'hunt_queue': sederData['huntQueue']
         }
+        # response = db.seders.find_one({"_id": sederId})
 
     else:
         # Hunt hasn't started yet, add them as a participant in the hunt
-        db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": nickname} })
+        currentHunt = db.hunts.find_one_and_update({"_id": currentHuntId}, { "$push": {"participants": nickname} }, return_document=ReturnDocument.AFTER)
         response = {
             'queued': False,
-            'hunt_id': currentHuntId
+            'hunt_id': str(currentHuntId),
+            'participants': currentHunt['participants'],
+            'hunt_queue': sederData['huntQueue']
         }
+        # response = db.hunts.find_one({"_id": currentHuntId})
 
-    return jsonify(response), 400 
+    return (response, status.HTTP_200_OK)
+
+@app.route('/start_hunt', methods=['PUT'])
+def startHunt():
+    """ 
+    Owner of seder clicks start hunt
+
+    Input: hunt_id
+    Returns: 
+    """
+
+    # get parameters and sanitize
+    huntIdArg = request.args.get('huntId')
+
+    try:
+        huntId = ObjectId(huntIdArg)
+        failedToParse = False
+    except:
+        huntId = None
+        failedToParse = True
+
+    if(not huntId):
+        response = {'Error': "Whoops! Bad args"}
+        error_result = (response, status.HTTP_400_BAD_REQUEST)
+        return error_result
+
+    # 1. Grab the hunt by hunt id and update it 
+    hunt = db.hunts.find_one({'_id': huntId})
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=DEBUG)
