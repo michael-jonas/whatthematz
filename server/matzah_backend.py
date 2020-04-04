@@ -519,7 +519,7 @@ def createSeder():
 
     
     # 1. Create a seder
-    roomCode = get_room_code()
+    roomCode = getRoomCode()
     avatar = random.randint(0,9)
     userId = ObjectId()
     insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(userId): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
