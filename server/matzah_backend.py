@@ -3,11 +3,9 @@ import io
 from datetime import datetime
 import random
 import string
-from imaging import *
-from profanityfilter import ProfanityFilter
-pf = ProfanityFilter()
 import json
 
+from profanityfilter import ProfanityFilter
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
 from flask_api import status
 from pymongo import MongoClient, ReturnDocument
@@ -60,6 +58,12 @@ def HuntData(
         'creationTime': creationTime or datetime.now(),
         'startTime': startTime,
         'isFinished': isFinished,
+    }
+
+def ImageData(img, rect):
+    return {
+        'img': img,
+        'rect': rect,
     }
 
 if DEBUG:
@@ -358,6 +362,55 @@ def triggerHunt():
     response = {'ok:': True, 'participants': hunt['participants']}
     return (response, status.HTTP_200_OK)
 
+def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
+    sederId = sederData['_id']
+
+    # get the last hunt from DB if not given to us
+    if not currentHuntData and sederData['huntQueue']:
+        lastHuntId = sederData['huntQueue'][-1]
+        currentHuntData = db.hunts.find_one({"_id": currentHuntId})
+
+    # create players from previous and queued
+    prevPlayers = []
+    if currentHuntData:
+        prevPlayers = currentHuntData['participants']
+    participants = prevPlayers + list(queuedPlayers)
+
+    # create the new hunt and add it to the seder
+    insertData = HuntData(sederId=sederId, participants=participants)
+    newHuntId = db.hunts.insert_one(insertData).inserted_id
+    db.seders.find_one_and_update( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
+
+    return newHuntId
+
+def setupHunt(huntId, city=None, matzahXY=None):
+    """Sets up the hunt by generating the image based
+    on params and storing it in DB.
+
+    If city and matzahXY are None, generates a random image
+    Stores the result in the images DB
+    Returns the UID in the images DB for convenience?
+    """
+
+    # by default generate a random hunt
+    if not city and not matzahRect:
+        city = CITIES[random.randint(0,len(CITIES)-1)]
+        img, rect = getRandomHide(city)
+
+    # otherwise generate the hunt based on params
+    else:
+        img = getCityImage(city)
+        matzahImg = getMatzahImage()
+        img.paste(matzahImg, matzahXY, matzahImg)
+        x, y, w, h = matzahXY, matzahImg.size
+        rect = (x, y, w, h)
+
+    # put the image in the images db, and link to it from the hunt
+    image_id = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
+    db.hunts.find_one_and_update({'_id': huntId}, {'img_id': image_id})
+    return image_id
+
+
 @app.route('/conclude_hunt', methods=['PUT'])
 def concludeHuntAndCreateNewHunt():
     # this guy takes people off the seder queue and puts them in this hunt
@@ -367,20 +420,15 @@ def concludeHuntAndCreateNewHunt():
     sederCode        = request.args.get('roomCode')
     winner           = request.args.get('winnerName')
 
-    try:
-        huntToConcludeId = ObjectId(huntIdArg)
-        failedToParse = False
-    except:
-        huntId = None
-        failedToParse = True
-
-    if(not huntToConcludeId):
+    huntToConcludeId = parseIdArg(huntToConcludeId)
+    if not huntToConcludeId:
         response = {'Error': "Whoops! Bad args"}
         return (response, status.HTTP_400_BAD_REQUEST)
 
     # 1. Update the hunt that just concluded
     # # a) isActive = False
     # # b) isFinished = True
+    # @ Jonas you will need to use the winners UID not their nickname
     # # c) winner = winner_nickname
     updates = {'isActive': False, 'isFinished': True, 'winner': winner}
     hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
@@ -399,17 +447,26 @@ def concludeHuntAndCreateNewHunt():
 
     sederId = sederData['_id']
     members = sederData['members']
-    members.winner[1] += 1
-    newHuntParticipants = sederData['huntQueue']
-    participantsToInsert = prevParticipants + newHuntParticipants
-    city = CITIES[random.randint(0,len(CITIES)-1)]
+    # How does this work @Jonas
+    # sederData.members doesn't have an attribute winner?
+    # also get rid of magic numbers
+    members.winner[M_WINS] += 1
 
-    updates = {'$set': {'huntQueue': []}, 'members':members}
+    # pops the player queue for the next hunt
+    newHuntParticipants = tuple(sederData['huntQueue'])
+    # @Jonas why the difference in syntax here
+    # set one, pass the other one?
+    # we can probably aggregate this call to db.seders.update_one 
+    # with the later one
+    updates = {'$set': {'huntQueue': []}, 'members': members}
     db.seders.update_one( {'_id': sederId}, updates)
 
-    insertData = HuntData(sederId=sederId, participants=participantsToInsert, city=city)
-    newHuntId = db.hunts.insert_one(insertData).inserted_id
-    db.seders.find_one_and_update( {'_id': sederId}, { "$push": {"huntIds": newHuntId} })
+    newHuntId = createHuntInSeder(sederData, newHuntParticipants, hunt)
+    # sets up new hunt with random image (by setting args None)
+    setupHunt(newHuntId, city=None, matzahXY=None)
+
+    # updates the seder with the newest hunt
+    db.seders.update_one( {'_id': sederId}, { "$push": {"huntIds": newHuntId}})
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
 
@@ -442,6 +499,7 @@ def createSeder():
     return ( response, status.HTTP_200_OK)
 
 def get_room_code(stringLength = 4):
+    pf = ProfanityFilter()
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     while (pf.is_profane(roomCode)):
