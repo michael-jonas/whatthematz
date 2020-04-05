@@ -47,25 +47,24 @@ class App extends React.Component {
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
-      {method: "GET"}
+      { method: "GET" }
     );
-    const hResponseAwaiter = fetch(
-      `/get_hints?huntId=${this.state.huntId}`,
-      {method: "GET"}
-    );
+    const hResponseAwaiter = fetch(`/get_hints?huntId=${this.state.huntId}`, {
+      method: "GET",
+    });
 
-    let pResponse = (await pResponseAwaiter).json()
-    let hResponse = (await hResponseAwaiter).json()
+    let pResponse = (await pResponseAwaiter).json();
+    let hResponse = (await hResponseAwaiter).json();
 
-    let plist = (await pResponse).result
-    let hlist = (await hResponse).result
+    let plist = (await pResponse).result;
+    let hlist = (await hResponse).result;
 
     this.setState({
       currentPage: Pages.LOBBY,
       playerList: plist,
       hintList: hlist,
-    })
-  };
+    });
+  }
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
