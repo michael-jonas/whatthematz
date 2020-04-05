@@ -4,11 +4,9 @@ import cv2
 import random
 from PIL import Image
 
-city = cv2.imread("Toronto/img/nathan_phillip.jpg")
-matza = cv2.imread("../resources/matza_fix.jpg")
 
 
-def cartoonify(img, numDownSamples=0, numBilateralFilters=3):
+def cartoonify(img, numDownSamples=0, numBilateralFilters=1, skip=True):
 
 	# -- STEP 1 --
 	# downsample image using Gaussian pyramid
@@ -28,29 +26,34 @@ def cartoonify(img, numDownSamples=0, numBilateralFilters=3):
 
 	# -- STEPS 2 and 3 --
 	# convert to grayscale and apply median blur
-	img_gray = img_color #cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
-	img_blur = img_color #cv2.medianBlur(img_gray, 9)
+	if (skip is False):
+		return img_color
+	img_gray = cv2.cvtColor(img_rgb, cv2.COLOR_RGB2GRAY)
+	img_blur = cv2.medianBlur(img_gray, 3)
 
 	# -- STEP 4 --
 	# detect and enhance edges
-	img_edge = img_color #cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
+	img_edge = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
 
 	# -- STEP 5 --
 	# convert back to color so that it can be bit-ANDed
 	# with color image
-	img_edge = img_color #cv2.cvtColor(img_edge, cv2.COLOR_GRAY2RGB)
-	new_img = img_color #cv2.bitwise_and(img_rgb, img_edge)
+	img_edge = cv2.cvtColor(img_edge, cv2.COLOR_GRAY2RGB)
+	new_img = cv2.bitwise_and(img_rgb, img_edge)
 	return new_img
 
 
 if __name__ == '__main__':
-	city = cartoonify(city)
-	cv2.imwrite("Toronto/img/new_city.jpg", city)
-	matza = cartoonify(matza)
-	cv2.imwrite("Toronto/img/new_matza.jpg", matza)
+
+	city = cv2.imread("Toronto/img/nathan_phillip.jpg", cv2.IMREAD_UNCHANGED)
+	matza = cv2.imread("../resources/afikomen.png", cv2.IMREAD_UNCHANGED)
+	# city = cartoonify(city)
+	# cv2.imwrite("Toronto/img/new_city.jpg", city)
+	# matza = cartoonify(matza)
+	# cv2.imwrite("Toronto/img/new_matza.jpg", matza)
 
 	# Matza resizing 
-	scale_percent = 2 # percent of original size
+	scale_percent = 10 # percent of original size
 	width = int(matza.shape[1] * scale_percent / 100)
 	height = int(matza.shape[0] * scale_percent / 100)
 	dim = (width, height)
@@ -73,12 +76,18 @@ if __name__ == '__main__':
 	y1, y2 = y_offset, y_offset + matza.shape[0]
 	x1, x2 = x_offset, x_offset + matza.shape[1]
 
-	# This does some fancy channel stuff
-	# for c in range(0, 3):
-	#     city[y1:y2, x1:x2, c] = (matza[:, :, c] +
-	#                               city[y1:y2, x1:x2, c])
+	# Fancy channel stuff
+	if(matza.shape[2] == 4):
 
+		alpha_s = matza[:, :, 3] / 255.0
+		alpha_l = 1.0 - alpha_s
+
+		for c in range(0, 3):
+		    city[y1:y2, x1:x2, c] = (alpha_s * matza[:, :, c] +
+		                              alpha_l * city[y1:y2, x1:x2, c])
+	else:
 	# This doesnt do fancy channel stuff, adds city and matza
-	city[y_offset:y_offset+matza.shape[0], x_offset:x_offset+matza.shape[1]] = matza
+		city[y_offset:y_offset+matza.shape[0], x_offset:x_offset+matza.shape[1]] = matza
 
-	cv2.imwrite("Toronto/img/cartoon.jpg", city)
+	cv2.imshow("Toronto/img/cartoon.jpg", cartoonify(city))
+	cv2.waitKey()
