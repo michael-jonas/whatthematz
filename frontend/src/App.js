@@ -105,16 +105,9 @@ class App extends React.Component {
       // next hunt id
       // old player list conditionally
 
-      this.setState(function (state, props) {
-        let oldPlayerList =
-          state.oldPlayerList.length == 0
-            ? state.playerlist
-            : state.oldPlayerList;
-        return {
-          winnersList: data["winnersList"],
-          nextHuntId: data["newHuntId"],
-          oldPlayerList: state.playerList,
-        };
+      this.setState({
+        winnersList: data["winnersList"],
+        nextHuntId: data["newHuntId"],
       });
     });
   }

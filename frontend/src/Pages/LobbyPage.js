@@ -68,6 +68,7 @@ export default class LobbyPage extends React.Component {
     //     isBusy: false,
     //   });
     // }
+    console.log(this.props.huntId);
     this.props.socket.emit(
       "trigger_hunt_socket",
       { huntId: this.props.huntId },
