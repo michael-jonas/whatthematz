@@ -1,9 +1,9 @@
 {
     "name": "Jerusalem", 
     "country": "Israel", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["The holy site for all three Abrahamic faiths."], 
+    "mediumHints": ["A great miracle happened here."], 
+    "hardHints": ["In 2016, a formerly ranked #1 basketball player in America joined this city's basketball team and won a championship."], 
     "latitude": 31.778345, 
     "longitude": 35.2250786
 }
