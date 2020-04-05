@@ -45,7 +45,7 @@ export default class LobbyPage extends React.Component {
   }
 
   async startHunt(retries) {
-    const response = await fetch(`/trigger_seder?huntId=${this.props.huntId}`, {
+    const response = await fetch(`/trigger_hunt?huntId=${this.props.huntId}`, {
       method: "PUT",
     });
 
