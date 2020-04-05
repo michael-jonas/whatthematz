@@ -128,7 +128,7 @@ class App extends React.Component {
     },
   ];
 
-  async concludeHunt() {
+  concludeHunt = () => {
     this.state.socket.emit("trigger_win", {
       huntId: this.state.huntId,
       userId: this.state.userId,
@@ -136,12 +136,12 @@ class App extends React.Component {
   }
 
   async goToLobby(skipLobby) {
-    // this.state.socket.emit("new_user", {
-    //   username: this.state.name,
-    //   room: this.state.roomCode,
-    //   seder_id: this.state.sederId,
-    //   hunt_id: this.state.huntId,
-    // });
+    this.state.socket.emit("new_user", {
+      username: this.state.name,
+      room: this.state.roomCode,
+      seder_id: this.state.sederId,
+      hunt_id: this.state.huntId,
+    });
     // load the players in the lobby
     // TODO SPINNER HERE
 
@@ -467,7 +467,7 @@ class App extends React.Component {
               huntId={this.state.huntId}
               goToPostGame={this.goToPostGame}
               boundingBox={this.state.boundingBox}
-              // concludeHuntHandler={this.concludeHunt}
+              concludeHuntHandler={this.concludeHunt}
             />
           )}
           {this.state.currentPage === Pages.POSTGAME && (

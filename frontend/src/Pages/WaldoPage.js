@@ -9,67 +9,23 @@ export default class WaldoPage extends React.Component {
 
   handleClickEvent = (e) => {
 
-//     const img = document.getElementById("waldoImg");
-//     // this.width = img.width;
-//     // this.height = img.height;
-//     // this.offsetLeft = img.offsetLeft;
-//     // this.offsetTop = img.offsetTop;
+    const img = document.getElementById("waldoImg");
 
-//     this.xMin = img.width * this.props.boundingBox[0];
-//     this.yMin = img.height * this.props.boundingBox[1];
-//     this.xMax = img.width * (this.props.boundingBox[0] + this.props.boundingBox[2]);
-//     this.yMax = img.height * (this.props.boundingBox[1] + this.props.boundingBox[3]);
+    this.xMin = img.width * this.props.boundingBox[0];
+    this.yMin = img.height * this.props.boundingBox[1];
+    this.xMax = img.width * (this.props.boundingBox[0] + this.props.boundingBox[2]);
+    this.yMax = img.height * (this.props.boundingBox[1] + this.props.boundingBox[3]);
+    
+    const x = e.pageX - img.offsetLeft;
+    const y = e.pageY - img.offsetTop;
 
-// // <<<<<<< HEAD
-// //   async concludeHunt() {
-// //     const response = await fetch(
-// //       `/conclude_hunt?huntId=${this.props.huntId}&winnerId=${this.props.userId}`,
-// //       {
-// //         method: "PUT",
-// //       }
-// //     );
-// //     if (response.ok) {
-// //       this.props.goToPostGame();
-// //     } else if (response.status !== 400) {
-// //     } else {
-// //       // toast an error?
-// // =======
-//     const x = e.pageX - img.offsetLeft;
-//     const y = e.pageY - img.offsetTop;
-
-//     if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
-//       this.props.concludeHuntHandler()
-// // >>>>>>> d422f14... first pass trigger win
-//     }
+    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
+      this.props.concludeHuntHandler();
+      this.props.goToPostGame();
+    }
   };
 
-  onImageLoad() {
-    // const img = document.getElementById("waldoImg");
-    // this.width = img.width;
-    // this.height = img.height;
-    // this.offsetLeft = img.offsetLeft;
-    // this.offsetTop = img.offsetTop;
-    // this.xMin = img.width * this.props.boundingBox[0];
-    // this.yMin = img.height * this.props.boundingBox[1];
-    // this.xMax = img.width * (this.props.boundingBox[0] + this.props.boundingBox[2]);
-    // this.yMax = img.height * (this.props.boundingBox[1] + this.props.boundingBox[3]);
-  }
-
-  // async concludeHunt() {
-  //   this.props.concludeHuntHandler()
-  //   const response = await fetch(
-  //     `/conclude_hunt?huntId=${this.props.huntId}&winnerId=${this.props.userId}`,
-  //     {
-  //       method: "PUT",
-  //     }
-  //   );
-  //   if (response.ok) {
-  //     this.props.goToLobby();
-  //   } else if (response.status !== 400) {
-  //   } else {
-  //     // toast an error?
-  //   }
-  // }
+  onImageLoad() {}
 
   render() {
     return (
