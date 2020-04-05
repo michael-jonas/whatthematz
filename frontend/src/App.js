@@ -14,13 +14,14 @@ import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
 
 import { Pages } from "./Globals/Enums";
-
-import socketIOClient from "socket.io-client";
+import io from 'socket.io-client'
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
+
+    const _socket = io('http://localhost:3000');
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -33,14 +34,32 @@ class App extends React.Component {
       hintList: ["help me", "im so cold"],
       backModal: false,
       isOwner: false,
+      socket: _socket
     };
   }
   endpoint = ":5000";
 
   componentDidMount() {
-    // const socket = socketIOClient(this.endpoint);
-    // socket.on("test", (data) => console.log(data));
-    // socket.emit("join");
+    // verify our websocket connection is established
+    this.state.socket.on('message', (data) => {
+      console.log('Got message:');
+      console.log(data);
+    })
+    this.state.socket.on('player_list', (data) => {
+      console.log('Got player list:');
+      console.log(data['player_list']);
+      this.setState({
+        playerList: data['player_list'],
+      })
+    })
+    this.state.socket.on('start_time_update', (data) => {
+      console.log('Got start time update:');
+      console.log(data['startTime']);
+    })
+    this.state.socket.on('hint_update', (data) => {
+      console.log('Got hint update:');
+      console.log(data['hint']);
+    })
   }
 
   playerList = [
@@ -55,6 +74,7 @@ class App extends React.Component {
   ];
 
   async goToLobby(skipLobby) {
+    this.state.socket.emit('new_user', { 'username': this.state.name, 'room': this.state.roomCode, 'seder_id': this.state.sederId, 'hunt_id': this.state.huntId });
     // load the players in the lobby
     // TODO SPINNER HERE
 
@@ -248,6 +268,7 @@ class App extends React.Component {
               huntId={this.state.huntId}
               goToHunt={this.goToHunt}
               isOwner={this.state.isOwner}
+              socket={this.state.socket}
             />
           )}
           {this.state.currentPage === Pages.HUNT && (

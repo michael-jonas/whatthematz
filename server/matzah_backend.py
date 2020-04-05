@@ -18,8 +18,7 @@ from enum import Enum
 import PIL
 from profanityfilter import ProfanityFilter
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
-from flask_socketio import SocketIO
-from flask_socketio import join_room, leave_room
+from flask_socketio import SocketIO, emit, join_room, leave_room
 from flask_api import status
 from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
@@ -53,8 +52,7 @@ CITIES = [
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(app)
-
+socket = SocketIO(app)
 
 L_ROOMCODES = 4
 
@@ -84,12 +82,13 @@ def SederData(
     }
 
 def HuntData(
-        sederId, isActive=False, participants=None,
+        sederId, roomCode, isActive=False, participants=None,
         city=None, imageId=None, winner=-1,
         creationTime=None, startTime=None, isFinished=False):
     
     return {
         'sederId': sederId,
+        'roomCode': roomCode,
         'isActive': isActive,
         # a list of Unique Ids (nicknames stored in Seder)
         'participants': participants or [],
@@ -185,6 +184,7 @@ if __name__ == '__main__' and DEBUG:
         seder_uid = _seder_result.inserted_id
         huntResult = db.hunts.insert_one(HuntData(
             sederId=seder_uid,
+            roomCode=room,
             isActive=True,
             city='toronto',
             startTime=_startTime,
@@ -239,19 +239,101 @@ class BEVENTS(Enum):
     USER_JOINED = 1
     USER_LEFT = 2
 
-# @socketio.on('join')
-# def on_join(data):
-#     username = data['username']
-#     room = data['room']
-#     join_room(room)
-#     send(username + ' has entered the room.', room=room)
 
-# @socketio.on('leave')
+@socket.on('connect')
+def on_connect():
+    print('User connected')
+
+lookup_table = {}
+
+@socket.on('new_user')
+def on_new_user(data):
+    clientId = request.sid
+    username = data['username']
+    room = data['room']
+    sederId = data['seder_id']
+    huntId = data['hunt_id']
+
+    print(f'User {username} just joined room {room}')
+
+    join_room(room)
+    emit('message', {'message': f'User {username} just joined room {room}'}, room=room)
+
+    sederData = getSederDataByRoomCode(room)
+
+    # Check that the seder exists
+    if sederData is None:
+        # TODO: Error handling
+        return
+
+    avatar = random.randint(0,9)
+    user_uuid = db.users.insert_one(User(username, 0, avatar)).inserted_id
+    str_uid = str(user_uuid)
+    data.update({'uid': str_uid})
+    lookup_table.update({clientId: data})
+
+    db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
+    db.hunts.update_one({"_id": huntId}, { "$push": {"participants": str_uid}})  
+
+    player_list = generatePlayerList(huntId)
+    if player_list is None:
+        return
+
+    emit('player_list', {'n': len(player_list), 'player_list': player_list}, room=room)
+
+@socket.on('trigger_hunt_socket')
+def on_trigger_hunt(data):
+    if not 'huntId' in data:
+        return badResponse('No huntId passed')
+
+    huntId = ObjectId(data['huntId'])
+
+    # 1. Get the hunt and update it
+    huntStart = datetime.now() + timedelta(seconds=10)
+    hunt = db.hunts.find_one_and_update(
+        {'_id': huntId},
+        {'$set': {'isActive': True, 'startTime': huntStart}},
+        return_document=ReturnDocument.AFTER,
+    )
+
+    if hunt is None:
+        response = {'ok': False, 'message': 'Hunt not found'}
+        return (response, status.HTTP_400_BAD_REQUEST)
+
+    roomCode = hunt['roomCode']
+    emit('start_time_update', {'startTime': huntStart.isoformat()}, room=roomCode)
+
+    response = {'ok:': True}
+    return (response, status.HTTP_200_OK)
+
+@socket.on('disconnect')
+def on_disconnect():
+    clientId = request.sid
+    if not(clientId in lookup_table):
+        return
+
+    data = lookup_table[clientId]
+    room = data['room']
+    huntId = data['hunt_id']
+    sederId = data['seder_id']
+    uid = data['uid']
+
+    db.seders.update_one({'_id': sederId}, {"$pull": {'members': uid}})
+    db.hunts.update_one({"_id": huntId}, { "$pull": {"participants": uid}})
+
+    player_list = generatePlayerList(huntId)
+    if player_list is None:
+        emit('player_list', {'n': 0, 'player_list': []}, room=room)
+        return
+
+    emit('player_list', {'n': len(player_list), 'player_list': player_list}, room=room)
+
+# @socket.on('leave')
 # def on_leave(data):
 #     username = data['username']
 #     room = data['room']
 #     leave_room(room)
-#     send(username + ' has left the room.', room=room)
+#     emit(username + ' has left the room.', room=room)
 
 @app.route('/get_seder_details', methods=['GET'])
 def getSederDetails():
@@ -277,13 +359,10 @@ def getSederDetails():
 
     return goodResponse(response)
 
-@app.route('/get_player_list', methods=['GET'])
-def getPlayerList():
-    # get parameters and sanitize
-    huntId = request.args.get('huntId')
+def generatePlayerList(huntId):
     hunt = getHuntById(huntId)
     if not hunt:
-        return badResponse('Bad args')
+        return None
 
     # sederId = hunt['sederId']
     # if isinstance(sederId, str):
@@ -306,7 +385,18 @@ def getPlayerList():
         }
 
     result = [_foo(pid) for pid in players]
-    return goodResponse(result)
+    return result
+
+@app.route('/get_player_list', methods=['GET'])
+def getPlayerList():
+    # get parameters and sanitize
+    huntId = request.args.get('huntId')
+    playerList = generatePlayerList(huntId)
+
+    if playerList is None:
+        return badResponse('Bad args')
+
+    return goodResponse(playerList)
 
 @app.route('/hunt_start_time', methods=['GET'])
 def huntStartTime():
@@ -437,6 +527,10 @@ def getBoundingBox():
         mimetype='image/jpg',
     )
 
+def getSederDataByRoomCode(roomCode):
+    # TODO: Get most recent seder with roomCode
+    return db.seders.find_one({"roomCode": roomCode})
+
 @app.route('/join_seder', methods=['POST'])
 def joinSeder():
 
@@ -449,7 +543,7 @@ def joinSeder():
         return (response, status.HTTP_400_BAD_REQUEST)
 
     # Grab the seder document that matches the roomcode
-    sederData = db.seders.find_one({"roomCode": roomCode})
+    sederData = getSederDataByRoomCode(roomCode)
 
     # Check that the seder exists
     if sederData is None:
@@ -537,11 +631,15 @@ def triggerHunt():
         response = {'ok': False, 'message': 'Hunt not found'}
         return (response, status.HTTP_400_BAD_REQUEST)
 
+    roomCode = hunt['roomCode']
+    emit('start_time_update', {'startTime': huntStart}, room=roomCode)
+
     response = {'ok:': True, 'participants': hunt['participants']}
     return (response, status.HTTP_200_OK)
 
 def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
     sederId = sederData['_id']
+    roomCode = sederData['roomCode']
 
     # get the last hunt from DB if not given to us
     if not currentHuntData and sederData['huntIds']:
@@ -555,7 +653,7 @@ def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
     participants = prevPlayers + list(queuedPlayers)
 
     # create the new hunt and add it to the seder
-    insertData = HuntData(sederId=sederId, participants=participants)
+    insertData = HuntData(sederId=sederId, roomCode=roomCode, participants=participants)
     newHuntId = db.hunts.insert_one(insertData).inserted_id
     db.seders.update_one({'_id': sederId}, { "$push": {"huntIds": newHuntId}})
 
@@ -637,7 +735,7 @@ def createSeder():
     city = CITIES[random.randint(0,len(CITIES)-1)]
     if DEBUG:
         city = 'Toronto'
-    insertHuntData = HuntData(sederId=sederId, participants=baseUsers, city=city)
+    insertHuntData = HuntData(sederId=sederId, roomCode=roomCode, participants=baseUsers, city=city)
     newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
     setupHunt(newHuntId, city)
     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
@@ -697,4 +795,4 @@ def getCities():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=DEBUG)
-    # socketio.run(app)
+    socket.run(app, debug=DEBUG)
