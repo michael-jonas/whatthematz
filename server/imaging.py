@@ -12,7 +12,7 @@ def getMatzahImage():
 	imgPath = join('resources', 'afikomen.png')
 	img = Image.open(imgPath)
 	W, H = img.size
-	scale = 3
+	scale = 10
 	img = img.resize((int(W/scale), int(H/scale)), Image.ANTIALIAS)
 	return img
 
