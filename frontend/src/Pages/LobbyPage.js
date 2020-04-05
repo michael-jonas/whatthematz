@@ -45,7 +45,7 @@ export default class LobbyPage extends React.Component {
   }
 
   async startHunt(retries) {
-    const response = await fetch(`/trigger_seder?huntId=${this.props.huntId}`, {
+    const response = await fetch(`/trigger_hunt?huntId=${this.props.huntId}`, {
       method: "PUT",
     });
 
@@ -72,9 +72,6 @@ export default class LobbyPage extends React.Component {
             ROOM CODE:{" "}
             <span style={{ color: "blue" }}>{this.props.roomCode}</span>
           </h6>
-          {this.props.isOwner && (
-            <Button onClick={() => this.startHunt()}>Start Hunt!</Button>
-          )}
         </div>
         {this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
@@ -85,6 +82,12 @@ export default class LobbyPage extends React.Component {
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
+        <div><span>
+            {this.props.isOwner && (
+            <Button onClick={() => this.startHunt()}>Start Hunt!</Button>
+          )}
+        </span>
+        </div>
         <h4 style={{ marginTop: 30 }}>How to play</h4>
         <Nav variant="pills" defaultActiveKey="map">
           <Nav.Item>

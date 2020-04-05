@@ -190,6 +190,7 @@ def getHuntById(huntId):
 def badResponse(bad='Bad args'):
     error = f'Whoops! {bad}.'
     response = {'Error': error}
+    print(response)
     error_result = (response, status.HTTP_400_BAD_REQUEST)
     return error_result
 
@@ -486,7 +487,7 @@ def triggerHunt():
     huntStart = datetime.now() + timedelta(seconds=10)
     hunt = db.hunts.find_one_and_update(
         {'_id': huntId},
-        {'isActive': True, 'startTime': huntStart},
+        {'$set': {'isActive': True, 'startTime': huntStart}},
         return_document=ReturnDocument.AFTER,
     )
 
@@ -658,9 +659,9 @@ def getCities():
             lon = data['longitude']
             cityLatLon = (city, lat, lon)
             cities.append(cityLatLon)
-        else:
+        # else:
             # return bad if no json found
-            return badResponse('Invalid Resource, city JSON not found')
+            # return badResponse('Invalid Resource, city JSON not found')
     return goodResponse(cities)
 
 # @app.route('/get_hunts', methods=['GET'])
