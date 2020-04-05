@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, Marker, ZoomControl } from "react-leaflet";
 import { HuntStage } from "../Globals/Enums";
+import logo from "../logo.svg";
 
 export default class HuntPage extends React.Component {
   constructor(props) {
@@ -12,16 +13,16 @@ export default class HuntPage extends React.Component {
     this.state = {
       markersLoaded: false,
       showMarkers: false,
-      lat: 0,
-      lng: 0,
-      zoom: 1,
       curZoom: 1,
-      numberOfHints: 1,
+      numberOfHints: 2,
       curStage: HuntStage.MAP,
     };
   }
   markerLayer = [];
   minZoom = 10;
+  lat = 0;
+  lng = 0;
+  zoom = 1;
 
   async loadMarkers(retries) {
     // fetch list of cities
@@ -104,14 +105,15 @@ export default class HuntPage extends React.Component {
   }
 
   render() {
-    const position = [this.state.lat, this.state.lng];
+    const position = [this.lat, this.lng];
     const carouselHints = this.props.hintList.slice(
       0,
       this.state.numberOfHints
     );
     const carouselItems = carouselHints.map((hint, index) => (
-      <Carousel.Item key={hint}>
-        <span style={{ color: "blue" }}>Hint {index}:</span> {hint}
+      <Carousel.Item style={{ height: 80, maxWidth: "90%" }} key={hint}>
+        <img alt="" src={logo} width="30" height="30" />
+        <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
       </Carousel.Item>
     ));
 
@@ -121,7 +123,7 @@ export default class HuntPage extends React.Component {
           Find the location of the Afikoman!
         </h5>
         <h6>zoom level {this.state.curZoom}</h6>
-        <div style={{ position: "relative" }}>
+        <div style={{ position: "relative", textAlign: "center" }}>
           <div
             style={{
               position: "absolute",
@@ -131,29 +133,35 @@ export default class HuntPage extends React.Component {
               width: "100%",
               zIndex: 500,
             }}
-          ></div>
-          <Carousel
-            style={{
-              textAlign: "center",
-              position: "absolute",
-              backgroundColor: "white",
-              borderRadius: "1rem",
-              margin: "auto",
-              top: "10px",
-              left: "10px",
-              height: "50px",
-              width: "100%",
-              opacity: 1,
-              zIndex: 501,
-            }}
-          >
-            {carouselItems}
-          </Carousel>
+          />
+          <div style={{ margin: "auto" }}>
+            <Carousel
+              defaultActiveIndex={this.state.numberOfHints - 1}
+              interval={null}
+              wrap={false}
+              style={{
+                padding: 10,
+                position: "absolute",
+                backgroundColor: "white",
+                borderRadius: "1rem",
+                margin: "auto",
+                top: "10px",
+                left: 0,
+                right: 0,
+                height: 60,
+                width: "80%",
+                opacity: 1,
+                zIndex: 501,
+              }}
+            >
+              {carouselItems}
+            </Carousel>
+          </div>
           <Map
             style={{ height: 450 }}
             ref={this.mapRef}
             center={position}
-            zoom={this.state.zoom}
+            zoom={this.zoom}
             onzoomend={() => this.updateZoomState()}
             zoomControl={false}
           >
