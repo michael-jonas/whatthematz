@@ -12,7 +12,6 @@ export default class HuntPage extends React.Component {
       markersLoaded: false,
       showMarkers: false,
       curZoom: 1,
-      numberOfHints: 2,
       isBusy: false,
     };
   }
@@ -92,32 +91,15 @@ export default class HuntPage extends React.Component {
     }
   };
 
-  async getHints(retries) {
-    const response = await fetch(`/get_hints?huntId=${this.props.huntId}`);
-    if (response.ok) {
-      const json = await response.json();
-      // load carousel
-    } else {
-      //retry loop, max timeouts? nahhh
-      if (retries < 3) {
-        setTimeout(() => {
-          this.getHints(++retries);
-        }, 1000);
-      }
-    }
-  }
-
   componentDidMount() {
     this.loadMarkers(0);
-    // todo - get hint timer here / websocket connect for hint updates
-    this.getHints(0);
   }
 
   render() {
     const position = [this.lat, this.lng];
     const carouselHints = this.props.hintList.slice(
       0,
-      this.state.numberOfHints
+      this.props.numberOfHints
     );
     const carouselItems = carouselHints.map((hint, index) => (
       <Carousel.Item
@@ -168,7 +150,7 @@ export default class HuntPage extends React.Component {
               />
               <div style={{ margin: "auto" }}>
                 <Carousel
-                  defaultActiveIndex={this.state.numberOfHints - 1}
+                  defaultActiveIndex={this.props.numberOfHints - 1}
                   interval={null}
                   wrap={false}
                   style={{

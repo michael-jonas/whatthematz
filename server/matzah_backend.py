@@ -114,16 +114,18 @@ def User(nickname, score, avatar):
 
 def ImageData(imgOrBytes, rect):
 
-    if isinstance(imgOrBytes, PIL.Image.Image):
-        imgByteArr = io.BytesIO()
-        imgOrBytes.save(imgByteArr, format='PNG')
-        imgByteArr = imgByteArr.getvalue()
-    else:
-        imgByteArr = imgOrBytes
+    assert isinstance(imgOrBytes, PIL.Image.Image)
+    imgByteArr = io.BytesIO()
+    imgOrBytes.save(imgByteArr, format='PNG')
+    imgByteArr = imgByteArr.getvalue()
 
+    W, H = imgOrBytes.size
+    x, y, w, h = rect
+    percentRect = (x/W, y/H, w/W, h/H)
     return {
         'imgBytes': imgByteArr,
         'rect': rect,
+        'percentRect': percentRect,
     }
 
 def setupHunt(huntId, city=None, matzahXY=None):
@@ -166,16 +168,16 @@ if __name__ == '__main__' and DEBUG:
 
     userIds = []
     for i, name in enumerate(names):
-        uid = db.users.insert_one(User(name, 0, i))
-        userIds.append(uid)
+        _uid = db.users.insert_one(User(name, 0, i))
+        userIds.append(_uid)
 
-    for i, name, room in zip(idxs, names, rooms):
+    for i, name, _room in zip(idxs, names, rooms):
         _startTime = datetime.now() if i == 2 else None
 
         # create a seder
         _seder_result = db.seders.insert_one(SederData(
             sederName=f"{name}'s seder",
-            roomCode=room,
+            roomCode=_room,
             huntIds=[],
             members=[],
             # members=userIds if i == 1 else None,
@@ -184,7 +186,7 @@ if __name__ == '__main__' and DEBUG:
         seder_uid = _seder_result.inserted_id
         huntResult = db.hunts.insert_one(HuntData(
             sederId=seder_uid,
-            roomCode=room,
+            roomCode=_room,
             isActive=True,
             city='toronto',
             startTime=_startTime,
@@ -197,7 +199,7 @@ if __name__ == '__main__' and DEBUG:
 
         setupHunt(huntResult.inserted_id)
 
-        print(name, room, _seder_result.inserted_id, huntResult.inserted_id)
+        print(name, _room, _seder_result.inserted_id, huntResult.inserted_id)
 
 
 PROJECT_PATH = '/usr/src/app'
@@ -289,7 +291,8 @@ def on_trigger_hunt(data):
     huntId = ObjectId(data['huntId'])
 
     # 1. Get the hunt and update it
-    huntStart = datetime.now() + timedelta(seconds=10)
+    huntStart = datetime.utcnow()
+ # + timedelta(seconds=5)
     hunt = db.hunts.find_one_and_update(
         {'_id': huntId},
         {'$set': {'isActive': True, 'startTime': huntStart}},
@@ -301,7 +304,7 @@ def on_trigger_hunt(data):
         return (response, status.HTTP_400_BAD_REQUEST)
 
     roomCode = hunt['roomCode']
-    emit('start_time_update', {'startTime': huntStart.isoformat()}, room=roomCode)
+    emit('start_time_update', {'startTime': huntStart.isoformat() + '+00:00'}, room=roomCode)
 
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
@@ -494,7 +497,6 @@ def getImage():
         return badResponse('Could not find image in DB')
 
     imgBytes = hidden_image['imgBytes']
-    rect = hidden_image['rect']
 
     return send_file(
         io.BytesIO(imgBytes),
@@ -516,16 +518,17 @@ def getBoundingBox():
 
     imageId = hunt['imageId']
     hidden_image = db.hidden_images.find_one({'_id': imageId})
+    # TODO optimization
+            # projection={'rect': True, 'percentRect': True}
+    # )
+
     if not hidden_image:
         return badResponse('Could not find image in DB')
 
     rect = hidden_image['rect']
-    return goodResponse({'boundingBox': rect})
+    percentRect = hidden_image['percentRect']
 
-    return send_file(
-        io.BytesIO(imgBytes),
-        mimetype='image/jpg',
-    )
+    return goodResponse({'boundingBox': percentRect, 'originalBox': rect})
 
 def getSederDataByRoomCode(roomCode):
     # TODO: Get most recent seder with roomCode
@@ -681,7 +684,6 @@ def concludeHuntAndCreateNewHunt():
     # # c) winner = winner_nickname
     updates = {'$set': {'isActive': False, 'isFinished': True, 'winner': winnerId}}
     hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
-    prevParticipants = hunt['participants']
 
     # 2. Create a new hunt
     # # a) increment winner count

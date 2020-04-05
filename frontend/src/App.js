@@ -14,14 +14,14 @@ import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
 
 import { Pages } from "./Globals/Enums";
-import io from 'socket.io-client'
+import io from "socket.io-client";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
 
-    const _socket = io('http://localhost:3000');
+    const _socket = io("http://localhost:3000");
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -32,34 +32,73 @@ class App extends React.Component {
       sederName: "",
       playerList: [],
       hintList: ["help me", "im so cold"],
+      numberOfHints: 1,
       backModal: false,
       isOwner: false,
-      socket: _socket
+      boundingBox: null,
+      socket: _socket,
+      showCountdown: false,
     };
   }
   endpoint = ":5000";
 
+  setPage(page) {
+    this.setState({currentPage: page});
+  }
+
   componentDidMount() {
     // verify our websocket connection is established
-    this.state.socket.on('message', (data) => {
-      console.log('Got message:');
+    this.state.socket.on("message", (data) => {
+      console.log("Got message:");
       console.log(data);
-    })
-    this.state.socket.on('player_list', (data) => {
-      console.log('Got player list:');
-      console.log(data['player_list']);
+    });
+    this.state.socket.on("player_list", (data) => {
+      console.log("Got player list:");
+      console.log(data["player_list"]);
       this.setState({
         playerList: data['player_list'],
       })
     })
     this.state.socket.on('start_time_update', (data) => {
-      console.log('Got start time update:');
-      console.log(data['startTime']);
+      // console.log('Got start time update:');
+      let dt_str = data['startTime'];
+      // console.log('dt string: ' + dt_str);
+      let datetime_start = new Date(dt_str);
+      let datetime_now = Date.now();
+      let diff = datetime_start - datetime_now;
+      // console.log('diff: ')
+      // console.log(datetime_start)
+      // console.log(datetime_now)
+      // console.log(diff)
+
+      let diff_seconds = 3
+
+      let callbackGen = (nHints) => {
+        return () => {
+          this.setState({numberOfHints: nHints});
+        }
+      }
+
+      const INTERVAL = 30; // 30 seconds between each
+      for(let i = 2; i <= this.state.hintList.length; i++) {
+        let myCallback = callbackGen(i);
+        let seconds = (i-1)*INTERVAL;
+        setTimeout(myCallback, (diff_seconds + seconds) * 1000);
+      }
+
+      setTimeout(
+        () => { this.setPage(Pages.HUNT); }, 
+        diff_seconds * 1000);
+
+      this.setState({showCountdown: true});
+
+
     })
-    this.state.socket.on('hint_update', (data) => {
-      console.log('Got hint update:');
-      console.log(data['hint']);
-    })
+    // I think this is being used, handling all on front end
+    // this.state.socket.on('hint_update', (data) => {
+    //   console.log('Got hint update:');
+    //   console.log(data['hint']);
+    // })
   }
 
   playerList = [
@@ -74,7 +113,12 @@ class App extends React.Component {
   ];
 
   async goToLobby(skipLobby) {
-    this.state.socket.emit('new_user', { 'username': this.state.name, 'room': this.state.roomCode, 'seder_id': this.state.sederId, 'hunt_id': this.state.huntId });
+    this.state.socket.emit("new_user", {
+      username: this.state.name,
+      room: this.state.roomCode,
+      seder_id: this.state.sederId,
+      hunt_id: this.state.huntId,
+    });
     // load the players in the lobby
     // TODO SPINNER HERE
 
@@ -83,6 +127,7 @@ class App extends React.Component {
     // hintlist is necessary if joining mid game - cant show empty block
 
     this.preloadWaldoImage();
+    this.loadBoundingBox(0);
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -98,10 +143,15 @@ class App extends React.Component {
     let plist = (await pResponse).result;
     let hlist = (await hResponse).result;
 
-    this.setState({
-      playerList: plist,
-      hintList: hlist,
-    });
+    let update = {}
+    if(hlist != null) {
+      update.hintList = hlist;
+    }
+    if(plist != null) {
+      update.playerList = plist;
+    }
+
+    this.setState(update);
 
     if (skipLobby) {
       this.setState({
@@ -119,6 +169,27 @@ class App extends React.Component {
     // this element isnt even used - it just loads the cache
     const img = new Image();
     img.src = `http://localhost:3000/get_image?huntId=${this.state.huntId}`;
+  }
+  async loadBoundingBox(retries) {
+    const boundingBoxResponse = await fetch(
+      `/get_bounding_box?huntId=${this.state.huntId}`,
+      { method: "GET" }
+    );
+
+    if (boundingBoxResponse.ok) {
+      const json = await boundingBoxResponse.json();
+      this.setState({
+        boundingBox: json.boundingBox,
+      });
+    } else if (boundingBoxResponse.status === 400) {
+      // hunt not found? todo
+    } else if (boundingBoxResponse.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.loadBoundingBox(++retries);
+      }, 1000);
+    } else {
+      // Todo Toast a fail message?
+    }
   }
 
   goToLanding = () => {
@@ -269,6 +340,7 @@ class App extends React.Component {
               goToHunt={this.goToHunt}
               isOwner={this.state.isOwner}
               socket={this.state.socket}
+              showCountdown={this.state.showCountdown}
             />
           )}
           {this.state.currentPage === Pages.HUNT && (
@@ -281,6 +353,7 @@ class App extends React.Component {
               goToLobby={this.goToLobby}
               goToWaldo={this.goToWaldo}
               hintList={this.state.hintList}
+              numberOfHints={this.state.numberOfHints}
             />
           )}
           {this.state.currentPage === Pages.WALDO && (
@@ -291,6 +364,7 @@ class App extends React.Component {
               sederName={this.state.sederName}
               huntId={this.state.huntId}
               goToLobby={this.goToLobby}
+              boundingBox={this.state.boundingBox}
               xMin={40}
               xMax={60}
               yMin={100}
