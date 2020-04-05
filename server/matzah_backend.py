@@ -4,10 +4,11 @@
 #pylint:disable=missing-function-docstring
 #pylint:disable=missing-class-docstring
 #pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
+#pylint:disable=unused-import
 
 import os
 import io
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import string
 import json
@@ -83,7 +84,7 @@ def SederData(
 
 def HuntData(
         sederId, isActive=False, participants=None,
-        city=None, imageId=None, winner=-1, finders=None,
+        city=None, imageId=None, winner=-1,
         creationTime=None, startTime=None, isFinished=False):
     
     return {
@@ -140,10 +141,10 @@ if __name__ == '__main__' and DEBUG:
         userIds.append(uid)
 
     for i, name, room in zip(idxs, names, rooms):
-        startTime = datetime.now() if i == 2 else None
+        _startTime = datetime.now() if i == 2 else None
 
         # create a seder
-        result = db.seders.insert_one(SederData(
+        _seder_result = db.seders.insert_one(SederData(
             sederName=f"{name}'s seder",
             roomCode=room,
             huntIds=[],
@@ -151,12 +152,12 @@ if __name__ == '__main__' and DEBUG:
             # members=userIds if i == 1 else None,
         ))
         # create the hunt
-        seder_uid = result.inserted_id
+        seder_uid = _seder_result.inserted_id
         huntResult = db.hunts.insert_one(HuntData(
             sederId=seder_uid,
             isActive=True,
             city='toronto',
-            startTime=startTime,
+            startTime=_startTime,
         ))
         updated_fields = {'huntIds': [huntResult.inserted_id]}
         db.seders.update_one(
@@ -164,14 +165,10 @@ if __name__ == '__main__' and DEBUG:
             update={'$set': updated_fields},
         )
 
-        print(name, room, result.inserted_id, huntResult.inserted_id)
+        print(name, room, _seder_result.inserted_id, huntResult.inserted_id)
 
 
 PROJECT_PATH = '/usr/src/app'
-
-def get_image_id(huntDoc):
-    """Finds the image_id needed for loading an image from db"""
-    return -1
 
 def parseIdArg(idArg):
     try:
@@ -269,7 +266,7 @@ def getPlayerList():
         uuid = ObjectId(pid)
         l = db.users.find_one({'_id': uuid})
         return {
-            'uuid': str(uuid)
+            'uuid': str(uuid),
             'name': l[M_NICKNAME],
             'score': l[M_SCORE],
             'avatar': l[M_AVATAR],
@@ -312,9 +309,9 @@ def getHints():
             data = json.load(f)
         hints = data['easyHints'] + data['mediumHints'] + data['hardHints']
         return goodResponse(hints)
-    else:
-        # return bad if no json found
-        return badResponse('Invalid Resource, city JSON not found')
+
+    # return bad if no json found
+    return badResponse('Invalid Resource, city JSON not found')
 
 @app.route('/check_location', methods=['GET'])
 def checkLocation():
@@ -338,15 +335,15 @@ def checkLocation():
 
     # check if they got the right one
     if hunt['city'].lower() == locationName.lower():
-        image_id = get_image_id(result)
+        # image_id = hunt['imageId']
         response = {
             'found': True,
-            'image_id': image_id,
+            # 'image_id': image_id,
         }
     else:
         response = {
             'found': False,
-            'image_id': -1,
+            # 'image_id': -1,
         }
 
     return goodResponse(response)
@@ -377,7 +374,7 @@ def getImage():
     if not hidden_image:
         return badResponse('Could not find image in DB')
 
-    imageBytes = hidden_images['imgBytes']
+    imgBytes = hidden_image['imgBytes']
     rect = hidden_image['rect']
 
     # # TODO don't just do a random image?
@@ -396,7 +393,7 @@ def getImage():
         return goodResponse(rect)
 
     return send_file(
-        io.BytesIO(imgByteArr),
+        io.BytesIO(imgBytes),
         mimetype='image/jpg',
     )
 
@@ -447,7 +444,7 @@ def joinSeder():
     #     # response = db.seders.find_one({"_id": sederId})
 
     # else:
-    if True:
+    if True: #pylint:disable=using-constant-test
         # Hunt hasn't started yet, add them as a participant in the hunt
         print(sederData['members'])
         str_uid = str(user_uuid)
@@ -474,14 +471,18 @@ def triggerHunt():
 
     # get parameters and sanitize
     huntIdArg = request.args.get('huntId')
-    hunt = getHuntById(huntIdArg)
+    huntId = parseIdArg(huntIdArg)
 
     if not huntId:
-        response = {'Error': "Whoops! Bad args"}
-        return (response, status.HTTP_400_BAD_REQUEST)
+        return badResponse('Bad Args')
 
     # 1. Get the hunt and update it
-    hunt = db.hunts.find_one_and_update({'_id': huntId}, {'isActive': True, 'startTime': datetime.now()+10}, return_document=ReturnDocument.AFTER)
+    huntStart = datetime.now() + timedelta(seconds=10)
+    hunt = db.hunts.find_one_and_update(
+        {'_id': huntId},
+        {'isActive': True, 'startTime': huntStart},
+        return_document=ReturnDocument.AFTER,
+    )
 
     if hunt is None:
         response = {'ok': False, 'message': 'Hunt not found'}
@@ -530,7 +531,8 @@ def setupHunt(huntId, city=None, matzahXY=None):
         img = getCityImage(city)
         matzahImg = getMatzahImage()
         img.paste(matzahImg, matzahXY, matzahImg)
-        x, y, w, h = matzahXY, matzahImg.size
+        x, y = matzahXY
+        w, h = matzahImg.size
         rect = (x, y, w, h)
 
     # put the image in the images db, and link to it from the hunt
