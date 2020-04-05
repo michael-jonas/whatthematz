@@ -5,6 +5,7 @@ import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
+import mapExample from "../Images/lobbyMapExample.png";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -82,14 +83,13 @@ export default class LobbyPage extends React.Component {
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
-        <div><span>
+        <div style={{ textAlign: "center", paddingTop: '10px'}}>
             {this.props.isOwner && (
             <Button onClick={() => this.startHunt()}>Start Hunt!</Button>
           )}
-        </span>
         </div>
         <h4 style={{ marginTop: 30 }}>How to play</h4>
-        <Nav variant="pills" defaultActiveKey="map">
+        <Nav className="justify-content-center" variant="pills" defaultActiveKey="map">
           <Nav.Item>
             <Nav.Link
               onSelect={() => this.showMapInstructions()}
@@ -107,7 +107,16 @@ export default class LobbyPage extends React.Component {
             </Nav.Link>
           </Nav.Item>
         </Nav>
-        {this.state.mapInstructions ? "map" : "notMap"}
+        <div style={{textAlign: "center", marginTop: '10px'}}>
+          {this.state.mapInstructions && (
+            <input
+              style={{ width: 300, height: 300 }}
+              type="image"
+              alt="map"
+              src={mapExample}
+            />)}
+          {this.state.mapInstructions || "notMap"}
+        </div>
       </Container>
     );
   }
