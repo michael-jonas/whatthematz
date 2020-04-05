@@ -99,11 +99,22 @@ class App extends React.Component {
 
       this.setState({ showCountdown: true });
     });
-    // I think this is being used, handling all on front end
-    // this.state.socket.on('hint_update', (data) => {
-    //   console.log('Got hint update:');
-    //   console.log(data['hint']);
-    // })
+    this.state.socket.on("winners_list_update", (data) => {
+      console.log("got winner list:");
+      // Updates:
+        // winners list
+        // next hunt id
+        // old player list conditionally
+
+      this.setState(function(state, props) {
+        let oldPlayerList = state.oldPlayerList.length == 0 ? state.playerlist : state.oldPlayerList
+        return {
+          winnersList: data["winnersList"],
+          nextHuntId: data["newHuntId"],
+          oldPlayerList: state.playerList,
+        };
+      });
+    });
   }
 
   playerList = [
@@ -117,23 +128,26 @@ class App extends React.Component {
     },
   ];
 
-  async goToLobby(skipLobby) {
-    this.state.socket.emit("new_user", {
-      username: this.state.name,
-      room: this.state.roomCode,
-      seder_id: this.state.sederId,
-      hunt_id: this.state.huntId,
+  async concludeHunt() {
+    this.state.socket.emit("trigger_win", {
+      huntId: this.state.huntId,
+      userId: this.state.userId,
     });
+  }
+
+  async goToLobby(skipLobby) {
+    // this.state.socket.emit("new_user", {
+    //   username: this.state.name,
+    //   room: this.state.roomCode,
+    //   seder_id: this.state.sederId,
+    //   hunt_id: this.state.huntId,
+    // });
     // load the players in the lobby
     // TODO SPINNER HERE
 
     // fire off non-blocking calls
     // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
-
-    this.preloadWaldoImage();
-    this.loadBoundingBox(0);
-    this.loadMarkers();
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -168,6 +182,10 @@ class App extends React.Component {
         currentPage: Pages.LOBBY,
       });
     }
+
+    this.preloadWaldoImage();
+    this.loadBoundingBox(0);
+    this.loadMarkers();
   }
 
   async loadMarkers(retries) {
@@ -449,10 +467,7 @@ class App extends React.Component {
               huntId={this.state.huntId}
               goToPostGame={this.goToPostGame}
               boundingBox={this.state.boundingBox}
-              xMin={40}
-              xMax={60}
-              yMin={100}
-              yMax={120}
+              // concludeHuntHandler={this.concludeHunt}
             />
           )}
           {this.state.currentPage === Pages.POSTGAME && (
