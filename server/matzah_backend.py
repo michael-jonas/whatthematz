@@ -127,6 +127,35 @@ def ImageData(imgOrBytes, rect):
         'rect': rect,
     }
 
+def setupHunt(huntId, city=None, matzahXY=None):
+    """Sets up the hunt by generating the image based
+    on params and storing it in DB.
+
+    If city and matzahXY are None, generates a random image
+    Stores the result in the images DB
+    Returns the UID in the images DB for convenience?
+    """
+
+    # by default generate a random hunt
+    if not city:
+        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
+
+    if not matzahXY:
+        img, rect = getRandomHide(city)
+    # otherwise generate the hunt based on params
+    else:
+        img = getCityImage(city)
+        matzahImg = getMatzahImage()
+        img.paste(matzahImg, matzahXY, matzahImg)
+        x, y = matzahXY
+        w, h = matzahImg.size
+        rect = (x, y, w, h)
+
+    # put the image in the images db, and link to it from the hunt
+    imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
+    db.hunts.update_one({'_id': huntId}, {'$set': {'imageId': imageId}})
+    return imageId
+
 if __name__ == '__main__' and DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = ['ADCD', 'DCBA', 'AAAA', 'BBBB']
@@ -165,6 +194,8 @@ if __name__ == '__main__' and DEBUG:
             filter={'_id': seder_uid},
             update={'$set': updated_fields},
         )
+
+        setupHunt(huntResult.inserted_id)
 
         print(name, room, _seder_result.inserted_id, huntResult.inserted_id)
 
@@ -357,25 +388,17 @@ def checkLocation():
 @app.route('/get_image', methods=['GET'])
 def getImage():
 
-    response = {'Error': "Whoops! invalid hunt"}
-    error_result = (response, status.HTTP_400_BAD_REQUEST)
-
     huntIdArg = request.args.get('huntId')
-    huntId = parseIdArg(huntIdArg)
+    hunt = getHuntById(huntIdArg)
+    # returnsRect = bool(request.args.get('getRect'))
 
-    returnsRect = bool(request.args.get('getRect'))
+    if not hunt:
+        return badResponse('Invalid Hunt')
 
-    if not huntId:
-        return error_result
-
-    result = db.hunts.find_one({'_id': huntId})
-
-    if not result:
-        return badResponse('Could not find hunt')
-    if not result['imageId']:
+    if not hunt['imageId']:
         return badResponse('Hunt has no image associated')
 
-    imageId = result['imageId']
+    imageId = hunt['imageId']
     hidden_image = db.hidden_images.find_one({'_id': imageId})
     if not hidden_image:
         return badResponse('Could not find image in DB')
@@ -383,20 +406,31 @@ def getImage():
     imgBytes = hidden_image['imgBytes']
     rect = hidden_image['rect']
 
-    # # TODO don't just do a random image?
-    # img = getRandomImage(result['city'])
-    # matzahImg = getMatzahImage()
-    # randomHide(img, matzahImg)
-    # if not img:
-    #     response = {'Error': "Whoops! couldn't find an image"}
-    #     error_result = (response, status.HTTP_500_INTERNAL_SERVER_ERROR)
-    #     return error_result
+    return send_file(
+        io.BytesIO(imgBytes),
+        mimetype='image/jpg',
+    )
 
-    # imgByteArr = io.BytesIO()
-    # img.save(imgByteArr, format='JPEG')
-    # imgByteArr = imgByteArr.getvalue()
-    if returnsRect:
-        return goodResponse(rect)
+@app.route('/get_bounding_box', methods=['GET'])
+def getBoundingBox():
+
+    huntIdArg = request.args.get('huntId')
+    hunt = getHuntById(huntIdArg)
+    # returnsRect = bool(request.args.get('getRect'))
+
+    if not hunt:
+        return badResponse('Invalid Hunt')
+
+    if not hunt['imageId']:
+        return badResponse('Hunt has no image associated')
+
+    imageId = hunt['imageId']
+    hidden_image = db.hidden_images.find_one({'_id': imageId})
+    if not hidden_image:
+        return badResponse('Could not find image in DB')
+
+    rect = hidden_image['rect']
+    return goodResponse({'boundingBox': rect})
 
     return send_file(
         io.BytesIO(imgBytes),
@@ -456,9 +490,17 @@ def joinSeder():
         print(sederData['members'])
         str_uid = str(user_uuid)
         db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
-        db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": str_uid}})
+
+        hunt = db.hunts.find_one_and_update(
+            {'_id': currentHuntId},
+            { "$push": {"participants": str_uid}},
+            return_document=ReturnDocument.AFTER,
+        )
+        isActive = hunt['isActive']
+
+        # db.hunts.find_update_one({"_id": currentHuntId}, )
         response = {
-            'queued': False,
+            'isActive': isActive,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
             SEDER_NAME: sederData[SEDER_NAME],
@@ -519,34 +561,6 @@ def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
 
     return newHuntId
 
-def setupHunt(huntId, city=None, matzahXY=None):
-    """Sets up the hunt by generating the image based
-    on params and storing it in DB.
-
-    If city and matzahXY are None, generates a random image
-    Stores the result in the images DB
-    Returns the UID in the images DB for convenience?
-    """
-
-    # by default generate a random hunt
-    if not city:
-        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
-
-    if not matzahXY:
-        img, rect = getRandomHide(city)
-    # otherwise generate the hunt based on params
-    else:
-        img = getCityImage(city)
-        matzahImg = getMatzahImage()
-        img.paste(matzahImg, matzahXY, matzahImg)
-        x, y = matzahXY
-        w, h = matzahImg.size
-        rect = (x, y, w, h)
-
-    # put the image in the images db, and link to it from the hunt
-    imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
-    db.hunts.update_one({'_id': huntId}, {'$set': {'imageId': imageId}})
-    return imageId
 
 
 @app.route('/conclude_hunt', methods=['PUT'])
@@ -633,6 +647,7 @@ def createSeder():
         SEDER_NAME: sederName,
         'roomCode': roomCode,
         'huntId': newHuntId,
+        'userId': userId,
     }
     return goodResponse(response)
 
@@ -641,7 +656,7 @@ def getRoomCode(stringLength = 4):
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     # need to check also whether the room code is already being used
-    while pf.is_profane(roomCode):
+    while pf.is_profane(roomCode) or db.seders.count_documents({'roomCode': roomCode}) > 0:
         roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
 
