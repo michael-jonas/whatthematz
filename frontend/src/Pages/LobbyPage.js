@@ -7,6 +7,7 @@ import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
 import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
+import Countdown from "../Components/Countdown.js"
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -96,7 +97,11 @@ export default class LobbyPage extends React.Component {
             <span style={{ color: "blue" }}>{this.props.roomCode}</span>
           </h6>
         </div>
-        {this.state.justJoined ? (
+        {this.props.showCountdown ? (
+          <div>
+            <span>Starting in <Countdown startingCount={3}/> seconds!</span>
+          </div>
+        ) : this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
         ) : (
           <WaitingAnnouncement sederName={this.props.sederName} />

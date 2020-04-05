@@ -12,7 +12,6 @@ export default class HuntPage extends React.Component {
       markersLoaded: false,
       showMarkers: false,
       curZoom: 1,
-      numberOfHints: 2,
       isBusy: false,
     };
   }
@@ -100,7 +99,7 @@ export default class HuntPage extends React.Component {
     const position = [this.lat, this.lng];
     const carouselHints = this.props.hintList.slice(
       0,
-      this.state.numberOfHints
+      this.props.numberOfHints
     );
     const carouselItems = carouselHints.map((hint, index) => (
       <Carousel.Item
@@ -151,7 +150,7 @@ export default class HuntPage extends React.Component {
               />
               <div style={{ margin: "auto" }}>
                 <Carousel
-                  defaultActiveIndex={this.state.numberOfHints - 1}
+                  defaultActiveIndex={this.props.numberOfHints - 1}
                   interval={null}
                   wrap={false}
                   style={{

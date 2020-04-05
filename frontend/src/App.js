@@ -32,13 +32,19 @@ class App extends React.Component {
       sederName: "",
       playerList: [],
       hintList: ["help me", "im so cold"],
+      numberOfHints: 1,
       backModal: false,
       isOwner: false,
       boundingBox: null,
       socket: _socket,
+      showCountdown: false,
     };
   }
   endpoint = ":5000";
+
+  setPage(page) {
+    this.setState({currentPage: page});
+  }
 
   componentDidMount() {
     // verify our websocket connection is established
@@ -50,17 +56,49 @@ class App extends React.Component {
       console.log("Got player list:");
       console.log(data["player_list"]);
       this.setState({
-        playerList: data["player_list"],
-      });
-    });
-    this.state.socket.on("start_time_update", (data) => {
-      console.log("Got start time update:");
-      console.log(data["startTime"]);
-    });
-    this.state.socket.on("hint_update", (data) => {
-      console.log("Got hint update:");
-      console.log(data["hint"]);
-    });
+        playerList: data['player_list'],
+      })
+    })
+    this.state.socket.on('start_time_update', (data) => {
+      // console.log('Got start time update:');
+      let dt_str = data['startTime'];
+      // console.log('dt string: ' + dt_str);
+      let datetime_start = new Date(dt_str);
+      let datetime_now = Date.now();
+      let diff = datetime_start - datetime_now;
+      // console.log('diff: ')
+      // console.log(datetime_start)
+      // console.log(datetime_now)
+      // console.log(diff)
+
+      let diff_seconds = 3
+
+      let callbackGen = (nHints) => {
+        return () => {
+          this.setState({numberOfHints: nHints});
+        }
+      }
+
+      const INTERVAL = 30; // 30 seconds between each
+      for(let i = 2; i <= this.state.hintList.length; i++) {
+        let myCallback = callbackGen(i);
+        let seconds = (i-1)*INTERVAL;
+        setTimeout(myCallback, (diff_seconds + seconds) * 1000);
+      }
+
+      setTimeout(
+        () => { this.setPage(Pages.HUNT); }, 
+        diff_seconds * 1000);
+
+      this.setState({showCountdown: true});
+
+
+    })
+    // I think this is being used, handling all on front end
+    // this.state.socket.on('hint_update', (data) => {
+    //   console.log('Got hint update:');
+    //   console.log(data['hint']);
+    // })
   }
 
   playerList = [
@@ -297,6 +335,7 @@ class App extends React.Component {
               goToHunt={this.goToHunt}
               isOwner={this.state.isOwner}
               socket={this.state.socket}
+              showCountdown={this.state.showCountdown}
             />
           )}
           {this.state.currentPage === Pages.HUNT && (
@@ -309,6 +348,7 @@ class App extends React.Component {
               goToLobby={this.goToLobby}
               goToWaldo={this.goToWaldo}
               hintList={this.state.hintList}
+              numberOfHints={this.state.numberOfHints}
             />
           )}
           {this.state.currentPage === Pages.WALDO && (
