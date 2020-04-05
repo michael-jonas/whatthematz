@@ -34,7 +34,6 @@ class App extends React.Component {
       nextHuntId: "",
       sederName: "",
       playerList: [],
-      oldPlayerList: [],
       winnerList: [],
       hintList: ["help me", "im so cold"],
       numberOfHints: 1,
@@ -102,12 +101,15 @@ class App extends React.Component {
     this.state.socket.on("winners_list_update", (data) => {
       console.log("got winner list:");
       // Updates:
-        // winners list
-        // next hunt id
-        // old player list conditionally
+      // winners list
+      // next hunt id
+      // old player list conditionally
 
-      this.setState(function(state, props) {
-        let oldPlayerList = state.oldPlayerList.length == 0 ? state.playerlist : state.oldPlayerList
+      this.setState(function (state, props) {
+        let oldPlayerList =
+          state.oldPlayerList.length == 0
+            ? state.playerlist
+            : state.oldPlayerList;
         return {
           winnersList: data["winnersList"],
           nextHuntId: data["newHuntId"],
@@ -133,7 +135,7 @@ class App extends React.Component {
       huntId: this.state.huntId,
       userId: this.state.userId,
     });
-  }
+  };
 
   async goToLobby(skipLobby) {
     this.state.socket.emit("new_user", {
@@ -363,11 +365,14 @@ class App extends React.Component {
     // fetch
 
     this.setState({
-      huntId: this.nextHundId,
+      huntId: nextHuntId,
+      nextHuntId: "",
       winnerList: [],
-      oldPlayerList: [],
       hintList: [],
+      numberOfHints: 1,
       boundingBox: [],
+      showCountdown: false,
+      gameEndTime: Date.now(),
     });
     this.preloadWaldoImage();
     this.setState({
