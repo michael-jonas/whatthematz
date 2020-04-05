@@ -119,7 +119,6 @@ class App extends React.Component {
           expand="xs"
           //bg="dark"
           variant="light"
-          style={{ marginBottom: 20 }}
         >
           <Navbar.Toggle />
           <Navbar.Brand
@@ -138,7 +137,8 @@ class App extends React.Component {
             />
             UnleavenTheCurve
           </Navbar.Brand>
-          {this.state.currentPage !== Pages.LANDING && (
+          {(this.state.currentPage === Pages.CREATE ||
+            this.state.currentPage === Pages.JOIN) && (
             <input
               style={{ width: 40, height: 40 }}
               type="image"
@@ -148,7 +148,9 @@ class App extends React.Component {
             />
           )}
         </Navbar>
-        <div style={{ height: 0, border: "1px solid #EDEDED" }} />
+        <div
+          style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
+        />
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
         )}

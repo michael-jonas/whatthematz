@@ -38,7 +38,9 @@ export default class JoinPage extends React.Component {
   // Actions
   async tryJoinSeder(retries) {
     const response = await fetch(
-      `/join_seder?roomCode=${this.state.roomCode}&nickname=${this.state.name}`,
+      `/join_seder?roomCode=${this.state.roomCode.toUpperCase()}&nickname=${
+        this.state.name
+      }`,
       {
         method: "POST",
       }
@@ -55,6 +57,7 @@ export default class JoinPage extends React.Component {
       );
       this.props.goToLobby();
     } else if (response.status === 400) {
+      // Todo Toast "room code not found"
     } else if (response.status === 500 && retries < 3) {
       setTimeout(() => {
         this.tryJoinSeder(++retries);
