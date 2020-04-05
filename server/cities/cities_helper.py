@@ -40,12 +40,12 @@ def generate_city_json():
 			("latitude", geolocator.geocode(city).latitude),
 			("longitude", geolocator.geocode(city).longitude)
 		])
+		city.lower().replace(" ", "_")
 		if not os.path.exists(city):
 			os.makedirs(city)
 			os.makedirs(city+'/img')
-
-		with open(city+'/' + city + '.json', 'w') as file:
-			json.dump(city_json, file, indent=4)
+			with open(city+'/' + city + '.json', 'w') as file:
+				json.dump(city_json, file, indent=4)
 
 if __name__ == '__main__':
 	generate_city_json()
