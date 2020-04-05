@@ -361,14 +361,14 @@ def trigger_win(data):
         return_document=ReturnDocument.BEFORE,
     )
 
-    sederId = huntId['sederId']
+    sederId = hunt['sederId']
 
     # update the player only if they were the first to finish
     if not hunt['isFinished']:
-        db.users.update_one({
+        db.users.update_one(
             {'_id': userId},
             {'$inc': {M_SCORE: 1}}
-        })
+        )
         sederData = db.seders.find_one({"_id": hunt['sederId']})
         # create a new hunt!
         newHuntId = createHuntInSeder(sederData, [])
@@ -379,10 +379,26 @@ def trigger_win(data):
     winners_list = hunt['winners'] + [str(userId)]
     roomCode = hunt['roomCode']
 
+    # fill out winners list (effectively a join)
+    winner_list_ids = [ObjectId(x) for x in winners_list]
+
+    winner_docs = db.users.find({
+        '_id': { '$in': winner_list_ids }
+    })
+
+    def _foo(doc):
+        return {
+            '_id': str(doc['_id']),
+            M_NICKNAME: str(doc[M_NICKNAME]),
+            M_SCORE: str(doc[M_SCORE]),
+            M_AVATAR: str(doc[M_AVATAR]),
+        }
+
+    winners = [_foo(doc) for doc in winner_docs]
     # emit that the winners list is updated
     response = {
-        'winnersList': winners_list,
-        'newHuntId': newHuntId
+        'winnerList': winners,
+        'newHuntId': str(newHuntId),
     }
 
     emit('winners_list_update', response, roomCode=roomCode)
