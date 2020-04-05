@@ -1,9 +1,9 @@
 {
     "name": "Toronto", 
     "country": "Canada", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["test hint 1"], 
+    "mediumHints": ["test hint 2"], 
+    "hardHints": ["test hint 3"], 
     "latitude": 43.6534817, 
     "longitude": -79.3839347
 }
