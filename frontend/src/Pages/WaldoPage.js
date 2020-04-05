@@ -10,7 +10,9 @@ export default class HuntPage extends React.Component {
   render() {
     return (
       <Container>
-        <div>im a little girl</div>
+        <h5 style={{ marginTop: 10, marginBottom: 20 }}>
+          Spot the Afikoman hidden away!
+        </h5>
       </Container>
     );
   }
