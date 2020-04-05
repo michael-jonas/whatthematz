@@ -51,7 +51,7 @@ export default class JoinPage extends React.Component {
       this.props.updateSederInfo(
         this.state.name,
         json.sederId,
-        json.roomCode,
+        this.state.roomCode.toUpperCase(),
         json.sederName,
         json.huntId
       );

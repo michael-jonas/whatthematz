@@ -42,7 +42,7 @@ export default class LobbyPage extends React.Component {
 
   render() {
     const playerList = this.props.players?.map((player) => (
-      <Player key={player.name} name={player.name} score={player.score} />
+      <Player key={player.uuid} name={player.name} score={player.score} />
     ));
 
     return (

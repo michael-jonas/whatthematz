@@ -2,7 +2,6 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, Marker, ZoomControl } from "react-leaflet";
-import { HuntStage } from "../Globals/Enums";
 import logo from "../logo.svg";
 
 export default class HuntPage extends React.Component {
@@ -15,7 +14,6 @@ export default class HuntPage extends React.Component {
       showMarkers: false,
       curZoom: 1,
       numberOfHints: 2,
-      curStage: HuntStage.MAP,
     };
   }
   markerLayer = [];
@@ -63,6 +61,7 @@ export default class HuntPage extends React.Component {
       const json = await response.json();
       if (json.found === true) {
         // complete hunt, navigate away TODO
+        this.props.goToWaldo();
       } else {
         // toast hunt not complete
       }

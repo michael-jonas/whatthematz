@@ -11,6 +11,8 @@ import CreatePage from "./Pages/CreatePage";
 import JoinPage from "./Pages/JoinPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
+import WaldoPage from "./Pages/WaldoPage";
+
 import { Pages } from "./Globals/Enums";
 
 class App extends React.Component {
@@ -76,6 +78,9 @@ class App extends React.Component {
   };
   goToHunt = () => {
     this.setState({ currentPage: Pages.HUNT });
+  };
+  goToWaldo = () => {
+    this.setState({ currentPage: Pages.WALDO });
   };
 
   openBackModal = () => {
@@ -207,10 +212,29 @@ class App extends React.Component {
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToLobby={this.goToLobby}
+            goToWaldo={this.goToWaldo}
             hintList={this.state.hintList}
           />
         )}
-        <div style={{textAlign:'center'}}><span>Check out this <a href="/">project</a></span></div>
+        {this.state.currentPage === Pages.WALDO && (
+          <WaldoPage
+            name={this.state.name}
+            players={this.state.playerList}
+            roomCode={this.state.roomCode}
+            sederName={this.state.sederName}
+            huntId={this.state.huntId}
+            goToLobby={this.goToLobby}
+          />
+        )}
+        <div
+          style={{
+            textAlign: "center",
+          }}
+        >
+          <span>
+            Learn more about this <a href="/">project</a>
+          </span>
+        </div>
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>
           <Modal.Header closeButton>
             <Modal.Title>Are you sure you want to go back?</Modal.Title>
