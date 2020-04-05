@@ -13,7 +13,31 @@ export default class HuntPage extends React.Component {
     const x = e.pageX - img.offsetLeft;
     const y = e.pageY - img.offsetTop;
     console.log(`(${x}, ${y})`);
+    if (
+      x > this.props.xMin &&
+      x < this.props.xMax &&
+      y > this.props.yMin &&
+      y < this.props.yMax
+    ) {
+      this.concludeHunt();
+    }
   };
+
+  async concludeHunt() {
+    const response = await fetch(
+      `/conclude_hunt?huntId=${this.props.huntId}&winnerId=${this.props.userId}`,
+      {
+        method: "PUT",
+      }
+    );
+    if (response.ok) {
+      this.props.goToLobby();
+    } else if (response.status !== 400) {
+    } else {
+      // toast an error?
+    }
+  }
+
   render() {
     return (
       <Container>

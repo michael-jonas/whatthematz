@@ -53,8 +53,9 @@ export default class JoinPage extends React.Component {
 
     if (response.ok) {
       const json = await response.json();
-      this.props.updateSederInfo(
+      this.props.updateInfo(
         this.state.name,
+        json.userId,
         json.sederId,
         this.state.roomCode.toUpperCase(),
         json.sederName,
