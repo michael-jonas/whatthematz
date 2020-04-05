@@ -24,7 +24,6 @@ cities = [
 'Philadelphia',
 'Buenos Aires',
 'London',
-'Addis Ababa',
 'Paris',
 'Melbourne'
 ]
