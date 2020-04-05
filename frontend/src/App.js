@@ -143,10 +143,15 @@ class App extends React.Component {
     let plist = (await pResponse).result;
     let hlist = (await hResponse).result;
 
-    this.setState({
-      playerList: plist,
-      hintList: hlist,
-    });
+    let update = {}
+    if(hlist != null) {
+      update.hintList = hlist;
+    }
+    if(plist != null) {
+      update.playerList = plist;
+    }
+
+    this.setState(update);
 
     if (skipLobby) {
       this.setState({
