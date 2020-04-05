@@ -1,12 +1,7 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
-import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
-import WaitingAnnouncement from "../Components/WaitingAnnouncement";
-import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
-import mapExample from "../Images/lobbyMapExample.png";
-import Spinner from "react-bootstrap/Spinner";
 
 export default class PostGamePage extends React.Component {
   constructor(props) {

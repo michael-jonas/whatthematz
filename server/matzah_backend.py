@@ -305,7 +305,7 @@ def on_trigger_hunt(data):
     roomCode = hunt['roomCode']
     emit('start_time_update', {'startTime': huntStart.isoformat() + '+00:00'}, room=roomCode)
 
-    response = {'ok:': True}
+    response = {'ok': True}
     return (response, status.HTTP_200_OK)
 
 def createHuntInSeder(sederData):
