@@ -8,9 +8,9 @@ export default class JoinPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.name,
-      roomCode: props.roomCode,
-      canJoin: props.roomCode.length === 4 && props.name.length > 0,
+      name: "",
+      roomCode: "",
+      canJoin: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleRoomCodeChange = this.handleRoomCodeChange.bind(this);

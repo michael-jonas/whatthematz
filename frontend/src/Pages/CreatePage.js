@@ -8,9 +8,9 @@ export default class CreatePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.name,
-      sederName: props.sederName,
-      canCreate: props.sederName.length > 0 && props.name.length > 0,
+      name: "",
+      sederName: "",
+      canCreate: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSederNameChange = this.handleSederNameChange.bind(this);

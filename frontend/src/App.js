@@ -156,16 +156,12 @@ class App extends React.Component {
         )}
         {this.state.currentPage === Pages.CREATE && (
           <CreatePage
-            name={this.state.name}
-            sederName={this.state.sederName}
             goToLobby={this.goToLobby}
             updateSederInfo={this.updateSederInfo}
           />
         )}
         {this.state.currentPage === Pages.JOIN && (
           <JoinPage
-            name={this.state.name}
-            roomCode={this.state.roomCode}
             goToLobby={this.goToLobby}
             updateSederInfo={this.updateSederInfo}
           />
