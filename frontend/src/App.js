@@ -202,30 +202,20 @@ class App extends React.Component {
     }
   }
   async checkRightCity(name, retries) {
-    if (this.state.isBusy) return;
-    this.setState({
-      isBusy: true,
-    });
     const response = await fetch(
-      `/check_location?huntId=${this.state.huntId}&locationName=${this.state.name}`
+      `/check_location?huntId=${this.state.huntId}&locationName=${name}`
     );
     if (response.ok) {
       const json = await response.json();
       if (json.found === true) {
         // complete hunt, navigate away TODO
-        this.props.goToWaldo();
+        this.goToWaldo();
       } else {
         // toast hunt not complete
       }
     } else if (response.status === 400) {
-      this.setState({
-        isBusy: false,
-      });
       // be sad, maybe check if hunt still active?
     } else if (retries < 3) {
-      this.setState({
-        isBusy: false,
-      });
       setTimeout(() => {
         this.checkRightCity(name, ++retries);
       }, 1000);
@@ -452,6 +442,7 @@ class App extends React.Component {
           {this.state.currentPage === Pages.WALDO && (
             <WaldoPage
               name={this.state.name}
+              userId={this.state.userId}
               players={this.state.playerList}
               roomCode={this.state.roomCode}
               sederName={this.state.sederName}
