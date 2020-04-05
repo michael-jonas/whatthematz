@@ -92,25 +92,8 @@ export default class HuntPage extends React.Component {
     }
   };
 
-  async getHints(retries) {
-    const response = await fetch(`/get_hints?huntId=${this.props.huntId}`);
-    if (response.ok) {
-      const json = await response.json();
-      // load carousel
-    } else {
-      //retry loop, max timeouts? nahhh
-      if (retries < 3) {
-        setTimeout(() => {
-          this.getHints(++retries);
-        }, 1000);
-      }
-    }
-  }
-
   componentDidMount() {
     this.loadMarkers(0);
-    // todo - get hint timer here / websocket connect for hint updates
-    this.getHints(0);
   }
 
   render() {
