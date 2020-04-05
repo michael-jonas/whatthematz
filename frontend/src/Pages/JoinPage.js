@@ -53,7 +53,8 @@ export default class JoinPage extends React.Component {
         json.sederId,
         this.state.roomCode.toUpperCase(),
         json.sederName,
-        json.huntId
+        json.huntId,
+        false
       );
       this.props.goToLobby();
     } else if (response.status === 400) {

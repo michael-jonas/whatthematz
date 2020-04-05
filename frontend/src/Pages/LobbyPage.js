@@ -16,16 +16,20 @@ export default class LobbyPage extends React.Component {
   }
 
   componentDidMount() {
-    this.timeout = setTimeout(
-      () =>
-        this.setState({
-          justJoined: false,
-        }),
-      5000
-    );
+    if (!this.props.isOwner) {
+      this.timeout = setTimeout(
+        () =>
+          this.setState({
+            justJoined: false,
+          }),
+        5000
+      );
+    }
   }
   componentWillUnmount() {
-    clearTimeout(this.timeout);
+    if (!this.props.isOwner) {
+      clearTimeout(this.timeout);
+    }
   }
 
   showMapInstructions() {
@@ -40,6 +44,21 @@ export default class LobbyPage extends React.Component {
     });
   }
 
+  async startHunt(retries) {
+    const response = await fetch(`/trigger_seder?huntId=${this.props.huntId}`, {
+      method: "PUT",
+    });
+
+    if (response.ok) {
+      // TODO countdown timer
+      this.props.goToHunt();
+    } else if (response.status !== 400 && retries < 3) {
+      setTimeout(() => {
+        this.startHunt(++retries);
+      }, 1000);
+    }
+  }
+
   render() {
     const playerList = this.props.players?.map((player) => (
       <Player key={player.uuid} name={player.name} score={player.score} />
@@ -47,11 +66,16 @@ export default class LobbyPage extends React.Component {
 
     return (
       <Container>
-        <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button>
-        <h6>
-          ROOM CODE:{" "}
-          <span style={{ color: "blue" }}>{this.props.roomCode}</span>
-        </h6>
+        {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
+        <div>
+          <h6>
+            ROOM CODE:{" "}
+            <span style={{ color: "blue" }}>{this.props.roomCode}</span>
+          </h6>
+          {this.props.isOwner && (
+            <Button onClick={() => this.startHunt()}>Start Hunt!</Button>
+          )}
+        </div>
         {this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
         ) : (

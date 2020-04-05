@@ -29,6 +29,7 @@ class App extends React.Component {
       playerList: [],
       hintList: ["help me", "im so cold"],
       backModal: false,
+      isOwner: false,
     };
   }
 
@@ -130,13 +131,14 @@ class App extends React.Component {
     }
   };
 
-  updateSederInfo = (name, sederId, roomCode, sederName, huntId) => {
+  updateSederInfo = (name, sederId, roomCode, sederName, huntId, isOwner) => {
     this.setState({
       name: name,
       sederId: sederId,
       roomCode: roomCode,
       sederName: sederName,
       huntId: huntId,
+      isOwner: isOwner,
     });
   };
 
@@ -202,6 +204,7 @@ class App extends React.Component {
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToHunt={this.goToHunt}
+            isOwner={this.state.isOwner}
           />
         )}
         {this.state.currentPage === Pages.HUNT && (
