@@ -1,7 +1,8 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
-import startSeder from "../logo.svg";
+import startSeder from "../Images/Landing/start.png";
+import joinSeder from "../Images/Landing/join.png";
 
 export default class LandingPage extends React.Component {
   render() {
@@ -13,14 +14,31 @@ export default class LandingPage extends React.Component {
         <div style={{ margin: "auto", textAlign: "center" }}>
           <Button
             onClick={() => this.props.goToCreate()}
-            style={{ margin: 20 }}
+            style={{
+              margin: 10,
+              backgroundColor: "white",
+              color: "black",
+              height: "140px",
+              width: "140px",
+              borderRadius: "8px",
+            }}
           >
-            <img src={startSeder} alt="" />
-            <div>Start a New Seder</div>
+            <img src={startSeder} style={{}} alt="" />
+            <div style={{ fontSize: "12px" }}>Start a New Seder</div>
           </Button>
-          <Button onClick={() => this.props.goToJoin()} style={{ margin: 20 }}>
-            <img src={startSeder} alt="" />
-            <div>Join a Seder</div>
+          <Button
+            onClick={() => this.props.goToJoin()}
+            style={{
+              margin: 10,
+              backgroundColor: "white",
+              color: "black",
+              height: "140px",
+              width: "140px",
+              borderRadius: "8px",
+            }}
+          >
+            <img src={joinSeder} alt="" />
+            <div style={{ fontSize: "12px" }}>Join a Seder</div>
           </Button>
         </div>
       </Container>
