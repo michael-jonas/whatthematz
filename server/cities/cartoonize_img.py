@@ -2,6 +2,7 @@
 #Use bilateral filter for edge-aware smoothing.
 import cv2
 import random
+from PIL import Image
 
 city = cv2.imread("Toronto/img/nathan_phillip.jpg")
 matza = cv2.imread("../resources/matza_fix.jpg")
