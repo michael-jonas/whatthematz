@@ -2,7 +2,16 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 
 export default class WaldoPage extends React.Component {
-  componentDidMount() {
+  handleClickEvent = (e) => {
+    const x = e.pageX - this.offsetLeft;
+    const y = e.pageY - this.offsetTop;
+
+    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
+      this.concludeHunt();
+    }
+  };
+
+  onImageLoad() {
     const img = document.getElementById("waldoImg");
     this.width = img.width;
     this.height = img.height;
@@ -16,14 +25,6 @@ export default class WaldoPage extends React.Component {
     this.yMax =
       img.height * (this.props.boundingBox[1] + this.props.boundingBox[3]);
   }
-  handleClickEvent = (e) => {
-    const x = e.pageX - this.offsetLeft;
-    const y = e.pageY - this.offsetTop;
-
-    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
-      this.concludeHunt();
-    }
-  };
 
   async concludeHunt() {
     const response = await fetch(
@@ -49,6 +50,7 @@ export default class WaldoPage extends React.Component {
         <div style={{ textAlign: "center" }}>
           <img
             id="waldoImg"
+            onLoad={() => this.onImageLoad()}
             src={`http://localhost:3000/get_image?huntId=${this.props.huntId}`}
             style={{
               maxWidth: "95%",
