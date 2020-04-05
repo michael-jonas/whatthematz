@@ -46,10 +46,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-# MEMBERS idxs of components
-M_NICKNAME = 0
-M_WINS = 1
-M_AVATAR = 2
 
 L_ROOMCODES = 4
 
@@ -96,11 +92,16 @@ def HuntData(
         'isFinished': isFinished,
     }
 
+# MEMBERS idxs of components
+M_NICKNAME = 'nickname'
+M_WINS = 'score'
+M_AVATAR = 'avatar'
+
 def User(nickname, score, avatar):
     return {
-        'nickname': nickname,
-        'score': score,
-        'avatar': avatar,
+        M_NICKNAME: nickname,
+        M_SCORE: score,
+        M_AVATAR: avatar,
     }
 
 def ImageData(imgOrBytes, rect):
@@ -247,26 +248,27 @@ def getPlayerList():
     if not hunt:
         return badResponse('Bad args')
 
-    sederId = hunt['sederId']
-    if isinstance(sederId, str):
-        sederId = ObjectId(sederId)
+    # sederId = hunt['sederId']
+    # if isinstance(sederId, str):
+    #     sederId = ObjectId(sederId)
 
     players = hunt['participants']
-    sederData = db.seders.find_one({"_id": sederId})
-    members = sederData['members']
+    # sederData = db.seders.find_one({"_id": sederId})
+    # members = sederData['members']
 
     # convert our data format into a dictionary
-    # TODO update this to use db.users
-    def _foo(l):
+    def _foo(pid):
+        # helper that just reformats the db result
+        uuid = ObjectId(pid)
+        l = db.users.find_one({'_id': uuid})
         return {
-            'nickname': l[M_NICKNAME],
-            'wins': l[M_WINS],
+            'name': l[M_NICKNAME],
+            'score': l[M_SCORE],
             'avatar': l[M_AVATAR],
         }
 
-    result = dict((pid, _foo(members[str(pid)])) for pid in players)
+    result = [_foo(pid) for pid in players]
     return goodResponse(members)
-
 
 @app.route('/hunt_start_time', methods=['GET'])
 def huntStartTime():

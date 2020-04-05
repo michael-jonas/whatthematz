@@ -41,7 +41,28 @@ class App extends React.Component {
   ];
 
   goToLobby = () => {
-    this.setState({ currentPage: Pages.LOBBY });
+    // load the players in the lobby
+    // TODO SPINNER HERE
+    const pResponseAwaiter = fetch(
+      `/get_player_list?huntId=${this.state.huntId}`,
+      {method: "GET"}
+    );
+    const hResponseAwaiter = fetch(
+      `/get_hints?huntId=${this.state.huntId}`,
+      {method: "GET"}
+    );
+
+    pResponse = (await pResponseAwaiter).json()
+    hResponse = (await hResponseAwaiter).json()
+
+    plist = (await pResponse.json()).result
+    hlist = (await hResponse.json()).result
+
+    this.setState({
+      currentPage: Pages.LOBBY,
+      playerList: plist,
+      hintList: hlist,
+    })
   };
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
