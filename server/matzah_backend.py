@@ -1,3 +1,10 @@
+#pylint:disable=invalid-name
+#pylint:disable=line-too-long
+#pylint:disable=missing-module-docstring
+#pylint:disable=missing-function-docstring
+#pylint:disable=missing-class-docstring
+#pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
+
 import os
 import io
 from datetime import datetime
@@ -15,31 +22,31 @@ from flask_api import status
 from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
 
-from imaging import *
+from imaging import getRandomHide, getCityImage, getMatzahImage
 
 DEBUG = True
 DEFAULT_WIN_COUNT = 0
 CITIES = [
-'Toronto',
-'Montreal',
-'Tel Aviv',
-'Amsterdam',
-'New York City',
-'Los Angeles',
-'Kiev',
-'Vancouver',
-'Berlin',
-'Prague',
-'Florence',
-'Warsaw',
-'Jerusalem',
-'Chicago',
-'Philadelphia',
-'Buenos Aires',
-'London',
-'Addis Ababa',
-'Paris',
-'Melbourne'
+    'Toronto',
+    'Montreal',
+    'Tel Aviv',
+    'Amsterdam',
+    'New York City',
+    'Los Angeles',
+    'Kiev',
+    'Vancouver',
+    'Berlin',
+    'Prague',
+    'Florence',
+    'Warsaw',
+    'Jerusalem',
+    'Chicago',
+    'Philadelphia',
+    'Buenos Aires',
+    'London',
+    'Addis Ababa',
+    'Paris',
+    'Melbourne'
 ]
 
 app = Flask(__name__)
@@ -56,8 +63,8 @@ db = client.tododb
 SEDER_NAME = 'sederName'
 
 def SederData(
-    sederName, roomCode='', huntIds=None,
-    creationTime=None, members=None):
+        sederName, roomCode='', huntIds=None,
+        creationTime=None, members=None):
 
     assert sederName
     roomCode = str(roomCode)
@@ -67,7 +74,7 @@ def SederData(
     return {
         SEDER_NAME: sederName,
         'roomCode': roomCode,
-        'huntIds': [],
+        'huntIds': huntIds or [],
         'creationTime': creationTime or datetime.now(),
         # 'huntQueue': [],
         # a list of UIDs to the users table
@@ -75,9 +82,9 @@ def SederData(
     }
 
 def HuntData(
-    sederId, isActive=False, participants=None,
-    city=None, imageId=None, winner=-1, finders=None,
-    creationTime=None, startTime=None, isFinished=False):
+        sederId, isActive=False, participants=None,
+        city=None, imageId=None, winner=-1, finders=None,
+        creationTime=None, startTime=None, isFinished=False):
     
     return {
         'sederId': sederId,
@@ -262,6 +269,7 @@ def getPlayerList():
         uuid = ObjectId(pid)
         l = db.users.find_one({'_id': uuid})
         return {
+            'uuid': str(uuid)
             'name': l[M_NICKNAME],
             'score': l[M_SCORE],
             'avatar': l[M_AVATAR],
@@ -468,7 +476,7 @@ def triggerHunt():
     huntIdArg = request.args.get('huntId')
     hunt = getHuntById(huntIdArg)
 
-    if(not huntId):
+    if not huntId:
         response = {'Error': "Whoops! Bad args"}
         return (response, status.HTTP_400_BAD_REQUEST)
 
@@ -618,7 +626,7 @@ def getRoomCode(stringLength = 4):
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     # need to check also whether the room code is already being used
-    while (pf.is_profane(roomCode)):
+    while pf.is_profane(roomCode):
         roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
 
