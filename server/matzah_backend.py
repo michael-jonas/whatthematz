@@ -94,7 +94,7 @@ def HuntData(
 
 # MEMBERS idxs of components
 M_NICKNAME = 'nickname'
-M_WINS = 'score'
+M_SCORE = 'score'
 M_AVATAR = 'avatar'
 
 def User(nickname, score, avatar):
@@ -268,7 +268,7 @@ def getPlayerList():
         }
 
     result = [_foo(pid) for pid in players]
-    return goodResponse(members)
+    return goodResponse(result)
 
 @app.route('/hunt_start_time', methods=['GET'])
 def huntStartTime():
@@ -298,7 +298,7 @@ def getHints():
         return badResponse('Invalid Hunt, hunt has no city associated')
 
     # open the json
-    fpath = os.path.join('cities', city.lower() + '.json')
+    fpath = os.path.join('cities', city.lower(), city.lower() + '.json')
     if os.path.exists(fpath) and os.path.isfile(fpath):
         with open(fpath) as f:
             data = json.load(f)

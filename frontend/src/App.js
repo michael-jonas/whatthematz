@@ -16,6 +16,7 @@ import { Pages } from "./Globals/Enums";
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.goToLobby = this.goToLobby.bind(this);
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -40,9 +41,10 @@ class App extends React.Component {
     },
   ];
 
-  goToLobby = () => {
+  async goToLobby() {
     // load the players in the lobby
     // TODO SPINNER HERE
+
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
       {method: "GET"}
@@ -52,11 +54,11 @@ class App extends React.Component {
       {method: "GET"}
     );
 
-    pResponse = (await pResponseAwaiter).json()
-    hResponse = (await hResponseAwaiter).json()
+    let pResponse = (await pResponseAwaiter).json()
+    let hResponse = (await hResponseAwaiter).json()
 
-    plist = (await pResponse.json()).result
-    hlist = (await hResponse.json()).result
+    let plist = (await pResponse).result
+    let hlist = (await hResponse).result
 
     this.setState({
       currentPage: Pages.LOBBY,
