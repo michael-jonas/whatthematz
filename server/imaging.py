@@ -5,7 +5,8 @@ import random
 import time
 
 def getImageDirPath(cityName):
-	return join('cities', cityName, 'img')
+	x = cityName.lower().replace(' ', '_')
+	return join('cities', x, 'img')
 
 def getMatzahImage():
 	imgPath = join('resources', 'afikomen.png')
