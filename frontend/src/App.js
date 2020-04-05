@@ -24,6 +24,7 @@ class App extends React.Component {
       huntId: "",
       sederName: "",
       playerList: [],
+      hintList: ["help me", "im so cold"],
       backModal: false,
     };
   }
@@ -184,6 +185,7 @@ class App extends React.Component {
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToLobby={this.goToLobby}
+            hintList={this.state.hintList}
           />
         )}
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>

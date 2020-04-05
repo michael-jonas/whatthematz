@@ -48,12 +48,16 @@ export default class LobbyPage extends React.Component {
     return (
       <Container>
         <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button>
+        <h6>
+          ROOM CODE:{" "}
+          <span style={{ color: "blue" }}>{this.props.roomCode}</span>
+        </h6>
         {this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
         ) : (
           <WaitingAnnouncement sederName={this.props.sederName} />
         )}
-        <h4>Players in the room</h4>
+        <h4 style={{ marginTop: 20 }}>Players in the room</h4>
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
