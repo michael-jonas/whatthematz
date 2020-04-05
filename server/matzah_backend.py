@@ -52,7 +52,7 @@ CITIES = [
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socket = SocketIO(app)
+socket = SocketIO(app, cors_allowed_origins="*")
 
 L_ROOMCODES = 4
 
@@ -794,5 +794,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=DEBUG)
-    socket.run(app, debug=DEBUG)
+    app.run(host='0.0.0.0', debug=False)
+    socket.run(app, debug=False)
