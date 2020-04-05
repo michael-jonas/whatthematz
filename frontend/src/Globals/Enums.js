@@ -15,4 +15,5 @@ export const Pages = {
   LOBBY: "lobby",
   HUNT: "hunt",
   WALDO: "waldo",
+  POSTGAME: "postgame",
 };

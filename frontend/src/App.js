@@ -5,6 +5,7 @@ import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { Marker } from "react-leaflet";
 
 import LandingPage from "./Pages/LandingPage";
 import CreatePage from "./Pages/CreatePage";
@@ -12,6 +13,7 @@ import JoinPage from "./Pages/JoinPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
+import PostGamePage from "./Pages/PostGamePage";
 
 import { Pages } from "./Globals/Enums";
 import io from "socket.io-client";
@@ -29,8 +31,11 @@ class App extends React.Component {
       roomCode: "",
       sederId: "",
       huntId: "",
+      nextHuntId: "",
       sederName: "",
       playerList: [],
+      oldPlayerList: [],
+      winnerList: [],
       hintList: ["help me", "im so cold"],
       numberOfHints: 1,
       backModal: false,
@@ -38,12 +43,14 @@ class App extends React.Component {
       boundingBox: null,
       socket: _socket,
       showCountdown: false,
+      gameEndTime: Date.now(),
+      markerLayer: <></>,
     };
   }
   endpoint = ":5000";
 
   setPage(page) {
-    this.setState({currentPage: page});
+    this.setState({ currentPage: page });
   }
 
   componentDidMount() {
@@ -56,12 +63,12 @@ class App extends React.Component {
       console.log("Got player list:");
       console.log(data["player_list"]);
       this.setState({
-        playerList: data['player_list'],
-      })
-    })
-    this.state.socket.on('start_time_update', (data) => {
+        playerList: data["player_list"],
+      });
+    });
+    this.state.socket.on("start_time_update", (data) => {
       // console.log('Got start time update:');
-      let dt_str = data['startTime'];
+      let dt_str = data["startTime"];
       // console.log('dt string: ' + dt_str);
       let datetime_start = new Date(dt_str);
       let datetime_now = Date.now();
@@ -71,29 +78,27 @@ class App extends React.Component {
       // console.log(datetime_now)
       // console.log(diff)
 
-      let diff_seconds = 3
+      let diff_seconds = 3;
 
       let callbackGen = (nHints) => {
         return () => {
-          this.setState({numberOfHints: nHints});
-        }
-      }
+          this.setState({ numberOfHints: nHints });
+        };
+      };
 
       const INTERVAL = 30; // 30 seconds between each
-      for(let i = 2; i <= this.state.hintList.length; i++) {
+      for (let i = 2; i <= this.state.hintList.length; i++) {
         let myCallback = callbackGen(i);
-        let seconds = (i-1)*INTERVAL;
+        let seconds = (i - 1) * INTERVAL;
         setTimeout(myCallback, (diff_seconds + seconds) * 1000);
       }
 
-      setTimeout(
-        () => { this.setPage(Pages.HUNT); }, 
-        diff_seconds * 1000);
+      setTimeout(() => {
+        this.setPage(Pages.HUNT);
+      }, diff_seconds * 1000);
 
-      this.setState({showCountdown: true});
-
-
-    })
+      this.setState({ showCountdown: true });
+    });
     // I think this is being used, handling all on front end
     // this.state.socket.on('hint_update', (data) => {
     //   console.log('Got hint update:');
@@ -128,6 +133,7 @@ class App extends React.Component {
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
+    this.loadMarkers();
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -143,11 +149,11 @@ class App extends React.Component {
     let plist = (await pResponse).result;
     let hlist = (await hResponse).result;
 
-    let update = {}
-    if(hlist != null) {
+    let update = {};
+    if (hlist != null) {
       update.hintList = hlist;
     }
-    if(plist != null) {
+    if (plist != null) {
       update.playerList = plist;
     }
 
@@ -161,6 +167,68 @@ class App extends React.Component {
       this.setState({
         currentPage: Pages.LOBBY,
       });
+    }
+  }
+
+  async loadMarkers(retries) {
+    // fetch list of cities
+    const response = await fetch(`/get_cities`);
+    if (response.ok) {
+      const json = await response.json();
+
+      const markerLayer = json.result.map((marker) => {
+        let latlng = { lat: marker[1], lng: marker[2] };
+        return (
+          <Marker
+            key={marker[0]}
+            position={latlng}
+            onclick={() => this.checkRightCity(marker[0])}
+          >
+            {/* <Tooltip>{marker[0]}</Tooltip> */}
+          </Marker>
+        );
+      });
+
+      this.setState({
+        markerLayer: markerLayer,
+      });
+    } else {
+      //retry loop, max timeouts? nahhh
+      if (retries < 3) {
+        setTimeout(() => {
+          this.loadMarkers(++retries);
+        }, 1000);
+      }
+    }
+  }
+  async checkRightCity(name, retries) {
+    if (this.state.isBusy) return;
+    this.setState({
+      isBusy: true,
+    });
+    const response = await fetch(
+      `/check_location?huntId=${this.state.huntId}&locationName=${this.state.name}`
+    );
+    if (response.ok) {
+      const json = await response.json();
+      if (json.found === true) {
+        // complete hunt, navigate away TODO
+        this.props.goToWaldo();
+      } else {
+        // toast hunt not complete
+      }
+    } else if (response.status === 400) {
+      this.setState({
+        isBusy: false,
+      });
+      // be sad, maybe check if hunt still active?
+    } else if (retries < 3) {
+      this.setState({
+        isBusy: false,
+      });
+      setTimeout(() => {
+        this.checkRightCity(name, ++retries);
+      }, 1000);
     }
   }
 
@@ -206,6 +274,9 @@ class App extends React.Component {
   };
   goToWaldo = () => {
     this.setState({ currentPage: Pages.WALDO });
+  };
+  goToPostGame = () => {
+    this.setState({ currentPage: Pages.POSTGAME });
   };
 
   openBackModal = () => {
@@ -272,6 +343,27 @@ class App extends React.Component {
       sederName: sederName,
       huntId: huntId,
       isOwner: isOwner,
+    });
+  };
+
+  joinNextLobby = () => {
+    // todo
+    // join next hunt with "next hunt id" from "conclude_hunt" socket
+    // set huntId state to be the nexthuntid
+    // clear winnerList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
+    const nextHuntId = this.state.nextHuntId;
+    // fetch
+
+    this.setState({
+      huntId: this.nextHundId,
+      winnerList: [],
+      oldPlayerList: [],
+      hintList: [],
+      boundingBox: [],
+    });
+    this.preloadWaldoImage();
+    this.setState({
+      currentPage: Pages.LOBBY,
     });
   };
 
@@ -354,6 +446,7 @@ class App extends React.Component {
               goToWaldo={this.goToWaldo}
               hintList={this.state.hintList}
               numberOfHints={this.state.numberOfHints}
+              markerLayer={this.state.markerLayer}
             />
           )}
           {this.state.currentPage === Pages.WALDO && (
@@ -363,12 +456,23 @@ class App extends React.Component {
               roomCode={this.state.roomCode}
               sederName={this.state.sederName}
               huntId={this.state.huntId}
-              goToLobby={this.goToLobby}
+              goToPostGame={this.goToPostGame}
               boundingBox={this.state.boundingBox}
               xMin={40}
               xMax={60}
               yMin={100}
               yMax={120}
+            />
+          )}
+          {this.state.currentPage === Pages.POSTGAME && (
+            <PostGamePage
+              name={this.state.name}
+              players={this.state.oldPlayerList}
+              winnerList={this.state.winnerList}
+              roomCode={this.state.roomCode}
+              sederName={this.state.sederName}
+              huntId={this.state.huntId}
+              joinNextLobby={this.joinNextLobby}
             />
           )}
         </div>

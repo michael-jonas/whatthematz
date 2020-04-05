@@ -1,7 +1,7 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
-import { Map, TileLayer, Marker, ZoomControl } from "react-leaflet";
+import { Map, TileLayer, ZoomControl } from "react-leaflet";
 
 export default class HuntPage extends React.Component {
   constructor(props) {
@@ -21,67 +21,6 @@ export default class HuntPage extends React.Component {
   lng = 0;
   zoom = 1;
 
-  async loadMarkers(retries) {
-    // fetch list of cities
-    const response = await fetch(`/get_cities`);
-    if (response.ok) {
-      const json = await response.json();
-
-      this.markerLayer = json.result.map((marker) => {
-        let latlng = { lat: marker[1], lng: marker[2] };
-        return (
-          <Marker
-            key={marker[0]}
-            position={latlng}
-            onclick={() => this.checkRightCity(marker[0])}
-          >
-            {/* <Tooltip>{marker[0]}</Tooltip> */}
-          </Marker>
-        );
-      });
-
-      this.setState({
-        markersLoaded: true,
-      });
-    } else {
-      //retry loop, max timeouts? nahhh
-      if (retries < 3) {
-        setTimeout(() => {
-          this.loadMarkers(++retries);
-        }, 1000);
-      }
-    }
-  }
-  async checkRightCity(name, retries) {
-    if (this.state.isBusy) return;
-    this.setState({
-      isBusy: true,
-    });
-    const response = await fetch(
-      `/check_location?huntId=${this.props.huntId}&locationName=${name}`
-    );
-    if (response.ok) {
-      const json = await response.json();
-      if (json.found === true) {
-        // complete hunt, navigate away TODO
-        this.props.goToWaldo();
-      } else {
-        // toast hunt not complete
-      }
-    } else if (response.status === 400) {
-      this.setState({
-        isBusy: false,
-      });
-      // be sad, maybe check if hunt still active?
-    } else if (retries < 3) {
-      this.setState({
-        isBusy: false,
-      });
-      setTimeout(() => {
-        this.checkRightCity(name, ++retries);
-      }, 1000);
-    }
-  }
   updateZoomState = () => {
     const map = this.mapRef.current;
     if (map != null) {
@@ -90,10 +29,6 @@ export default class HuntPage extends React.Component {
       });
     }
   };
-
-  componentDidMount() {
-    this.loadMarkers(0);
-  }
 
   render() {
     const position = [this.lat, this.lng];
@@ -185,9 +120,7 @@ export default class HuntPage extends React.Component {
               attribution="Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
               url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
             />
-            {this.state.markersLoaded &&
-              this.state.curZoom >= this.minZoom &&
-              this.markerLayer}
+            {this.state.curZoom >= this.minZoom && this.props.markerLayer}
             <ZoomControl position="topleft" />
           </Map>
           <div
