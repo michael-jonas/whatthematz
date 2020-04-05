@@ -320,7 +320,7 @@ def on_trigger_hunt(data):
     response = {'ok:': True}
     return (response, status.HTTP_200_OK)
 
-def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
+def createHuntInSeder(sederData):
     sederId = sederData['_id']
     roomCode = sederData['roomCode']
 
@@ -371,8 +371,12 @@ def trigger_win(data):
         )
         sederData = db.seders.find_one({"_id": hunt['sederId']})
         # create a new hunt!
-        newHuntId = createHuntInSeder(sederData, [])
+        print('creating a new hunt in the seder')
+        newHuntId = createHuntInSeder(sederData)
+        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
+        setupHunt(newHuntId, city)
     else:
+        print('finding latest hunt id a new hunt in the seder')
         newHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
 
     # returned winners list is from BEFORE, so we manually add here userid
@@ -426,6 +430,7 @@ def join_hunt(data):
 
     response = {
         'participants': participants,
+        'ok': True,
     }
 
     roomCode = hunt['roomCode']

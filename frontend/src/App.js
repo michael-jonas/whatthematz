@@ -354,22 +354,34 @@ class App extends React.Component {
     // join next hunt with "next hunt id" from "conclude_hunt" socket
     // set huntId state to be the nexthuntid
     // clear winnerList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-    const nextHuntId = this.state.nextHuntId;
-    // fetch
 
-    this.setState({
-      huntId: nextHuntId,
-      nextHuntId: "",
-      winnerList: [],
-      hintList: [],
-      numberOfHints: 1,
-      boundingBox: [],
-      showCountdown: false,
-      gameEndTime: Date.now(),
-    });
-    this.preloadWaldoImage();
-    this.setState({
-      currentPage: Pages.LOBBY,
+    const nextHuntId = this.state.nextHuntId;
+
+    let onSuccess = () => {
+      // fetch
+      this.setState({
+        huntId: nextHuntId,
+        nextHuntId: "",
+        winnerList: [],
+        hintList: [],
+        numberOfHints: 1,
+        boundingBox: [],
+        showCountdown: false,
+        gameEndTime: Date.now(),
+      });
+      this.preloadWaldoImage();
+      this.setState({
+        currentPage: Pages.LOBBY,
+      });
+    }
+
+    this.state.socket.emit("join_hunt", {
+      huntId: this.state.huntId,
+      userId: this.state.userId,
+    }, (data) => {
+      if(data.ok) {
+        onSuccess();
+      }
     });
   };
 
