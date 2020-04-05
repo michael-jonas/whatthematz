@@ -4,10 +4,13 @@ from datetime import datetime
 import random
 import string
 import json
+from enum import Enum
 
 import PIL
 from profanityfilter import ProfanityFilter
 from flask import Flask, redirect, url_for, request, render_template, jsonify, send_file
+from flask_socketio import SocketIO
+from flask_socketio import join_room, leave_room
 from flask_api import status
 from pymongo import MongoClient, ReturnDocument
 from bson.objectid import ObjectId
@@ -38,7 +41,10 @@ CITIES = [
 'Paris',
 'Melbourne'
 ]
+
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'secret!'
+socketio = SocketIO(app)
 
 # MEMBERS idxs of components
 M_NICKNAME = 0
@@ -102,7 +108,7 @@ def ImageData(imgOrBytes, rect):
         'rect': rect,
     }
 
-if DEBUG:
+if __name__ == '__main__' and DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = ['ADCD', 'DCBA', 'AAAA', 'BBBB']
     idxs = range(len(names))
@@ -169,7 +175,29 @@ def goodResponse(result):
     if not isinstance(result, dict):
         result = {'result': result}
 
+    for k, v in result.items():
+        if isinstance(v, ObjectId):
+            result[k] = str(v)
+
     return (result, status.HTTP_200_OK)
+
+class BEVENTS(Enum):
+    USER_JOINED = 1
+    USER_LEFT = 2
+
+# @socketio.on('join')
+# def on_join(data):
+#     username = data['username']
+#     room = data['room']
+#     join_room(room)
+#     send(username + ' has entered the room.', room=room)
+
+# @socketio.on('leave')
+# def on_leave(data):
+#     username = data['username']
+#     room = data['room']
+#     leave_room(room)
+#     send(username + ' has left the room.', room=room)
 
 @app.route('/get_seder_details', methods=['GET'])
 def getSederDetails():
@@ -355,7 +383,7 @@ def getImage():
 def joinSeder():
 
     # Get data from the HTTP request
-    sederCode = request.args.get('roomCode')
+    roomCode = request.args.get('roomCode')
     nickname = request.args.get('nickname')
 
     if nickname is None:
@@ -363,7 +391,7 @@ def joinSeder():
         return (response, status.HTTP_400_BAD_REQUEST)
 
     # Grab the entire seder document that matches the roomcode
-    sederData = db.seders.find_one({"roomCode": sederCode})
+    sederData = db.seders.find_one({"roomCode": roomCode})
 
 
     # Check that the seder exists
@@ -391,6 +419,7 @@ def joinSeder():
             'queued': True,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
+            'sederName': sederData['sederName'],
             'userId': str(user_uuid)
         }
         # response = db.seders.find_one({"_id": sederId})
@@ -404,6 +433,7 @@ def joinSeder():
             'queued': False,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
+            'sederName': sederData['sederName'],
             'userId': str(user_uuid)
         }
         # response = db.hunts.find_one({"_id": currentHuntId})
@@ -492,7 +522,7 @@ def concludeHuntAndCreateNewHunt():
 
     # get parameters and sanitize
     huntToConcludeId = request.args.get('huntId')
-    sederCode        = request.args.get('roomCode')
+    roomCode        = request.args.get('roomCode')
     winnerId           = request.args.get('winnerId')
 
     huntToConcludeId = parseIdArg(huntToConcludeId)
@@ -512,7 +542,7 @@ def concludeHuntAndCreateNewHunt():
     # # a) increment winner count
     # # b) Pop manz off the huntQueue from the seder and into the finders list
     # # c) Create new mongo hunt document
-    sederData = db.seders.find_one({"roomCode": sederCode} )
+    sederData = db.seders.find_one({"roomCode": roomCode} )
 
     # Check that the seder exists
     if sederData is None:
@@ -544,7 +574,6 @@ def createSeder():
         response = {'Error': "Whoops! Bad args"}
         return (response, status.HTTP_400_BAD_REQUEST)
 
-    
     # 1. Create a seder
     roomCode = getRoomCode()
     avatar = random.randint(0,9)
@@ -553,20 +582,26 @@ def createSeder():
     sederData = db.seders.insert_one(insertSederData)
     sederId = sederData.inserted_id
     
-
     # 2. Create a hunt and update seders to include the hunt
     city = CITIES[random.randint(0,len(CITIES)-1)]
     insertHuntData = HuntData(sederId=sederId, participants=[userId], city=city)
     newHunt = db.hunts.insert_one(insertHuntData)
     newHuntId = newHunt.inserted_id
-    result = db.seders.find_one_and_update( {'_id': sederId}, { "$push": {"huntIds": str(newHuntId)} }, return_document=ReturnDocument.AFTER)
-    response = {'ok:': True}
-    return ( response, status.HTTP_200_OK)
+    db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
+
+    response = {
+        'sederId': sederId,
+        'sederName': sederName,
+        'roomCode': roomCode,
+        'huntId': newHuntId,
+    }
+    return goodResponse(response)
 
 def getRoomCode(stringLength = 4):
     pf = ProfanityFilter()
     letters = string.ascii_uppercase
     roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
+    # need to check also whether the room code is already being used
     while (pf.is_profane(roomCode)):
         roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
@@ -605,5 +640,6 @@ def getSeders():
         sederList.append(seder)
     return str(sederList)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=DEBUG)
+    # socketio.run(app)

@@ -8,9 +8,9 @@ export default class CreatePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.name,
-      sederName: props.sederName,
-      canCreate: props.sederName.length > 0 && props.name.length > 0,
+      name: "",
+      sederName: "",
+      canCreate: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSederNameChange = this.handleSederNameChange.bind(this);
@@ -36,7 +36,7 @@ export default class CreatePage extends React.Component {
   }
 
   // Actions
-  async tryCreateSeder() {
+  async tryCreateSeder(retries) {
     const response = await fetch(
       `/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
       {
@@ -47,12 +47,20 @@ export default class CreatePage extends React.Component {
     if (response.ok) {
       const json = await response.json();
 
-      this.props.updateCreatedSeder(
+      this.props.updateSederInfo(
         this.state.name,
-        json.sederCode ? json.sederCode : "",
-        this.state.sederName
+        json.sederId,
+        json.roomCode,
+        json.sederName,
+        json.huntId
       );
       this.props.goToLobby();
+    } else if (response.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.tryCreateSeder(++retries);
+      }, 1000);
+    } else {
+      // Todo Toast a message?
     }
   }
 
@@ -85,7 +93,7 @@ export default class CreatePage extends React.Component {
             <Button
               disabled={!this.state.canCreate}
               variant="primary"
-              onClick={() => this.tryCreateSeder()}
+              onClick={() => this.tryCreateSeder(0)}
             >
               Create Seder
             </Button>

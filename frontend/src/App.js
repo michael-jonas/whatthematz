@@ -19,9 +19,11 @@ class App extends React.Component {
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
-      sederCode: "",
+      roomCode: "",
+      sederId: "",
       huntId: "",
-      sederName: "Weenie Hut Jr",
+      sederName: "",
+      playerList: [],
       backModal: false,
     };
   }
@@ -100,17 +102,13 @@ class App extends React.Component {
     }
   };
 
-  updateJoinedSeder = (name, sederCode) => {
+  updateSederInfo = (name, sederId, roomCode, sederName, huntId) => {
     this.setState({
       name: name,
-      sederCode: sederCode,
-    });
-  };
-  updateCreatedSeder = (name, sederCode, sederName) => {
-    this.setState({
-      name: name,
-      sederCode: sederCode,
+      sederId: sederId,
+      roomCode: roomCode,
       sederName: sederName,
+      huntId: huntId,
     });
   };
 
@@ -121,7 +119,6 @@ class App extends React.Component {
           expand="xs"
           //bg="dark"
           variant="light"
-          style={{ marginBottom: 20 }}
         >
           <Navbar.Toggle />
           <Navbar.Brand
@@ -140,7 +137,8 @@ class App extends React.Component {
             />
             UnleavenTheCurve
           </Navbar.Brand>
-          {this.state.currentPage !== Pages.LANDING && (
+          {(this.state.currentPage === Pages.CREATE ||
+            this.state.currentPage === Pages.JOIN) && (
             <input
               style={{ width: 40, height: 40 }}
               type="image"
@@ -150,40 +148,42 @@ class App extends React.Component {
             />
           )}
         </Navbar>
-        <div style={{ height: 0, border: "1px solid #EDEDED" }} />
+        <div
+          style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
+        />
         {this.state.currentPage === Pages.LANDING && (
           <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
         )}
         {this.state.currentPage === Pages.CREATE && (
           <CreatePage
-            name={this.state.name}
-            sederName={this.state.sederName}
             goToLobby={this.goToLobby}
-            updateCreatedSeder={this.updateCreatedSeder}
+            updateSederInfo={this.updateSederInfo}
           />
         )}
         {this.state.currentPage === Pages.JOIN && (
           <JoinPage
-            name={this.state.name}
-            sederCode={this.state.sederCode}
             goToLobby={this.goToLobby}
-            updateJoinedSeder={this.updateJoinedSeder}
+            updateSederInfo={this.updateSederInfo}
           />
         )}
         {this.state.currentPage === Pages.LOBBY && (
           <LobbyPage
             name={this.state.name}
-            players={this.playerList}
-            sederCode={this.state.sederCode}
+            players={this.state.playerList}
+            roomCode={this.state.roomCode}
             sederName={this.state.sederName}
+            huntId={this.state.huntId}
             goToHunt={this.goToHunt}
           />
         )}
         {this.state.currentPage === Pages.HUNT && (
           <HuntPage
             name={this.state.name}
-            sederCode={this.state.sederCode}
+            players={this.state.playerList}
+            roomCode={this.state.roomCode}
             sederName={this.state.sederName}
+            huntId={this.state.huntId}
+            goToLobby={this.goToLobby}
           />
         )}
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>

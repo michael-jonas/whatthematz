@@ -8,18 +8,18 @@ export default class JoinPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: props.name,
-      sederCode: props.sederCode,
-      canJoin: props.sederCode.length === 4 && props.name.length > 0,
+      name: "",
+      roomCode: "",
+      canJoin: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
-    this.handleSederCodeChange = this.handleSederCodeChange.bind(this);
+    this.handleRoomCodeChange = this.handleRoomCodeChange.bind(this);
   }
 
   // Basic Form State Handlers
   canJoin() {
     this.setState((state) => ({
-      canJoin: state.sederCode.length === 4 && state.name.length > 0,
+      canJoin: state.roomCode.length === 4 && state.name.length > 0,
     }));
   }
   handleNameChange(event) {
@@ -28,44 +28,59 @@ export default class JoinPage extends React.Component {
     });
     this.canJoin();
   }
-  handleSederCodeChange(event) {
+  handleRoomCodeChange(event) {
     this.setState({
-      sederCode: event.target.value,
+      roomCode: event.target.value,
     });
     this.canJoin();
   }
 
   // Actions
-  async tryJoinSeder() {
+  async tryJoinSeder(retries) {
     const response = await fetch(
-      `/join_seder?roomCode=${this.state.sederCode}&nickname=${this.state.name}`,
+      `/join_seder?roomCode=${this.state.roomCode.toUpperCase()}&nickname=${
+        this.state.name
+      }`,
       {
         method: "POST",
       }
     );
 
-    const json = await response.json();
-
-    console.log(json);
-
-    // wow no server guess we succeeded
-    this.props.updateJoinedSeder(this.state.name, this.state.sederCode);
-    this.props.goToLobby();
+    if (response.ok) {
+      const json = await response.json();
+      this.props.updateSederInfo(
+        this.state.name,
+        json.sederId,
+        json.roomCode,
+        json.sederName,
+        json.huntId
+      );
+      this.props.goToLobby();
+    } else if (response.status === 400) {
+      // Todo Toast "room code not found"
+    } else if (response.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.tryJoinSeder(++retries);
+      }, 1000);
+    } else {
+      // Todo Toast a fail message?
+    }
   }
 
   render() {
     return (
       <Container>
         <Form>
-          <Form.Group controlId="SederCode">
-            <Form.Label>Seder Code</Form.Label>
+          <Form.Group controlId="roomCode">
+            <Form.Label>Room Code</Form.Label>
             <Form.Control
+              style={{ textTransform: "uppercase" }}
               autoComplete="off"
               maxLength="4"
               type="text"
               placeholder="Enter your 4 letter room code"
-              value={this.state.sederCode}
-              onChange={this.handleSederCodeChange}
+              value={this.state.roomCode}
+              onChange={this.handleRoomCodeChange}
             />
           </Form.Group>
           <Form.Group controlId="Nickname">

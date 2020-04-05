@@ -18,6 +18,5 @@ export const Pages = {
 
 export const HuntStage = {
   MAP: "map",
-  HINTS: "hints", // for mobile if its tabinated
   WALDO: "waldo",
 };
