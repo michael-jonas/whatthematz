@@ -130,7 +130,8 @@ export default class HuntPage extends React.Component {
           }}
         >
           <div style={{ height: "auto", textAlign: "center" }}>
-            <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
+            <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
+            <span style={{ fontWeight: "normal" }}>{hint}</span>
           </div>
         </div>
       </Carousel.Item>
@@ -141,7 +142,7 @@ export default class HuntPage extends React.Component {
         <h5 style={{ marginTop: 10, marginBottom: 20 }}>
           Find the location of the Afikoman!
         </h5>
-        <h6>zoom level {this.state.curZoom}</h6>
+        {/* <h6>zoom level {this.state.curZoom}</h6> */}
         <div style={{ position: "relative", textAlign: "center" }}>
           <div
             style={{
@@ -177,7 +178,7 @@ export default class HuntPage extends React.Component {
             </Carousel>
           </div>
           <Map
-            style={{ height: 450 }}
+            style={{ height: 550 }}
             ref={this.mapRef}
             center={position}
             zoom={this.zoom}
@@ -193,6 +194,30 @@ export default class HuntPage extends React.Component {
               this.markerLayer}
             <ZoomControl position="topleft" />
           </Map>
+          <div
+            style={{
+              padding: 10,
+              position: "absolute",
+              backgroundColor: "white",
+              borderRadius: "1rem",
+              margin: "auto",
+              top: "430px",
+              left: 0,
+              right: 0,
+              height: "auto",
+              width: "60%",
+              opacity: 1,
+              zIndex: 501,
+              fontWeight: "normal",
+              fontSize: "12px",
+              boxShadow: "0px 1px 7px rgba(0, 0, 0, 0.13)",
+              minWidth: "190px",
+            }}
+          >
+            {this.state.curZoom >= this.minZoom
+              ? "Wow, it's toasty here. Maybe there's something baking nearby..."
+              : "It's hard to see anything from up here, let's look closer!"}
+          </div>
         </div>
       </Container>
     );
