@@ -110,9 +110,29 @@ export default class HuntPage extends React.Component {
       this.state.numberOfHints
     );
     const carouselItems = carouselHints.map((hint, index) => (
-      <Carousel.Item style={{ height: 80, maxWidth: "90%" }} key={hint}>
-        <img alt="" src={logo} width="30" height="30" />
-        <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
+      <Carousel.Item
+        style={{
+          height: 42,
+          width: "80%",
+          left: "10%",
+          lineHeight: 1.2,
+          textAlign: "center",
+        }}
+        key={hint}
+      >
+        <div
+          style={{
+            display: "flex",
+            height: "100%",
+            alignItems: "center",
+            flexDirection: "row",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ height: "auto", textAlign: "center" }}>
+            <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
+          </div>
+        </div>
       </Carousel.Item>
     ));
 
@@ -147,7 +167,7 @@ export default class HuntPage extends React.Component {
                 top: "10px",
                 left: 0,
                 right: 0,
-                height: 60,
+                minHeight: "auto",
                 width: "80%",
                 opacity: 1,
                 zIndex: 501,
