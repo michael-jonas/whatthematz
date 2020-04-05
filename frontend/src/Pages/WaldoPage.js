@@ -1,24 +1,26 @@
 import React from "react";
-import logo from "../logo.svg";
 import Container from "react-bootstrap/Container";
 
-export default class HuntPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {};
-  }
-
-  handleClickEvent = (e) => {
+export default class WaldoPage extends React.Component {
+  componentDidMount() {
     const img = document.getElementById("waldoImg");
-    const x = e.pageX - img.offsetLeft;
-    const y = e.pageY - img.offsetTop;
-    console.log(`(${x}, ${y})`);
-    if (
-      x > this.props.xMin &&
-      x < this.props.xMax &&
-      y > this.props.yMin &&
-      y < this.props.yMax
-    ) {
+    this.width = img.width;
+    this.height = img.height;
+    this.offsetLeft = img.offsetLeft;
+    this.offsetTop = img.offsetTop;
+
+    this.xMin = img.width * this.props.boundingBox[0];
+    this.yMin = img.height * this.props.boundingBox[1];
+    this.xMax =
+      img.width * (this.props.boundingBox[0] + this.props.boundingBox[2]);
+    this.yMax =
+      img.height * (this.props.boundingBox[1] + this.props.boundingBox[3]);
+  }
+  handleClickEvent = (e) => {
+    const x = e.pageX - this.offsetLeft;
+    const y = e.pageY - this.offsetTop;
+
+    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
       this.concludeHunt();
     }
   };

@@ -34,6 +34,7 @@ class App extends React.Component {
       hintList: ["help me", "im so cold"],
       backModal: false,
       isOwner: false,
+      boundingBox: null,
       socket: _socket,
     };
   }
@@ -88,6 +89,7 @@ class App extends React.Component {
     // hintlist is necessary if joining mid game - cant show empty block
 
     this.preloadWaldoImage();
+    this.loadBoundingBox(0);
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -124,6 +126,27 @@ class App extends React.Component {
     // this element isnt even used - it just loads the cache
     const img = new Image();
     img.src = `http://localhost:3000/get_image?huntId=${this.state.huntId}`;
+  }
+  async loadBoundingBox(retries) {
+    const boundingBoxResponse = await fetch(
+      `/get_bounding_box?huntId=${this.state.huntId}`,
+      { method: "GET" }
+    );
+
+    if (boundingBoxResponse.ok) {
+      const json = await boundingBoxResponse.json();
+      this.setState({
+        boundingBox: json.boundingBox,
+      });
+    } else if (boundingBoxResponse.status === 400) {
+      // hunt not found? todo
+    } else if (boundingBoxResponse.status === 500 && retries < 3) {
+      setTimeout(() => {
+        this.loadBoundingBox(++retries);
+      }, 1000);
+    } else {
+      // Todo Toast a fail message?
+    }
   }
 
   goToLanding = () => {
@@ -296,6 +319,7 @@ class App extends React.Component {
               sederName={this.state.sederName}
               huntId={this.state.huntId}
               goToLobby={this.goToLobby}
+              boundingBox={this.state.boundingBox}
               xMin={40}
               xMax={60}
               yMin={100}
