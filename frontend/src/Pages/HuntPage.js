@@ -144,39 +144,43 @@ export default class HuntPage extends React.Component {
         </h5>
         {/* <h6>zoom level {this.state.curZoom}</h6> */}
         <div style={{ position: "relative", textAlign: "center" }}>
-          <div
-            style={{
-              position: "absolute",
-              backgroundColor: "white",
-              opacity: 0.5,
-              height: 90,
-              width: "100%",
-              zIndex: 500,
-            }}
-          />
-          <div style={{ margin: "auto" }}>
-            <Carousel
-              defaultActiveIndex={this.state.numberOfHints - 1}
-              interval={null}
-              wrap={false}
-              style={{
-                padding: 10,
-                position: "absolute",
-                backgroundColor: "white",
-                borderRadius: "1rem",
-                margin: "auto",
-                top: "10px",
-                left: 0,
-                right: 0,
-                minHeight: "auto",
-                width: "80%",
-                opacity: 1,
-                zIndex: 501,
-              }}
-            >
-              {carouselItems}
-            </Carousel>
-          </div>
+          {this.props.hintList.length > 0 && (
+            <>
+              <div
+                style={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  opacity: 0.5,
+                  height: 90,
+                  width: "100%",
+                  zIndex: 500,
+                }}
+              />
+              <div style={{ margin: "auto" }}>
+                <Carousel
+                  defaultActiveIndex={this.state.numberOfHints - 1}
+                  interval={null}
+                  wrap={false}
+                  style={{
+                    padding: 10,
+                    position: "absolute",
+                    backgroundColor: "white",
+                    borderRadius: "1rem",
+                    margin: "auto",
+                    top: "10px",
+                    left: 0,
+                    right: 0,
+                    minHeight: "auto",
+                    width: "80%",
+                    opacity: 1,
+                    zIndex: 501,
+                  }}
+                >
+                  {carouselItems}
+                </Carousel>
+              </div>
+            </>
+          )}
           <Map
             style={{ height: 550 }}
             ref={this.mapRef}
