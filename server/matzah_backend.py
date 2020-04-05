@@ -6,6 +6,7 @@
 #pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
 #pylint:disable=unused-import
 
+import time
 import os
 import io
 from datetime import datetime, timedelta
@@ -114,7 +115,7 @@ def User(nickname, score, avatar):
 
 def ImageData(imgOrBytes, rect):
 
-    if isinstance(imgOrBytes, PIL.Image):
+    if isinstance(imgOrBytes, PIL.Image.Image):
         imgByteArr = io.BytesIO()
         imgOrBytes.save(imgByteArr, format='PNG')
         imgByteArr = imgByteArr.getvalue()
@@ -496,26 +497,26 @@ def triggerHunt():
     response = {'ok:': True, 'participants': hunt['participants']}
     return (response, status.HTTP_200_OK)
 
-# def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
-#     sederId = sederData['_id']
+def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
+    sederId = sederData['_id']
 
-#     # get the last hunt from DB if not given to us
-#     if not currentHuntData and sederData['huntIds']:
-#         lastHuntId = sederData['huntIds'][-1]
-#         currentHuntData = db.hunts.find_one({"_id": currentHuntId})
+    # get the last hunt from DB if not given to us
+    if not currentHuntData and sederData['huntIds']:
+        lastHuntId = sederData['huntIds'][-1]
+        currentHuntData = db.hunts.find_one({"_id": lastHuntId})
 
-#     # create players from previous and queued
-#     prevPlayers = []
-#     if currentHuntData:
-#         prevPlayers = currentHuntData['participants']
-#     participants = prevPlayers + list(queuedPlayers)
+    # create players from previous and queued
+    prevPlayers = []
+    if currentHuntData:
+        prevPlayers = currentHuntData['participants']
+    participants = prevPlayers + list(queuedPlayers)
 
-#     # create the new hunt and add it to the seder
-#     insertData = HuntData(sederId=sederId, participants=participants)
-#     newHuntId = db.hunts.insert_one(insertData).inserted_id
-#     db.seders.update_one({'_id': sederId}, { "$push": {"huntIds": newHuntId}})
+    # create the new hunt and add it to the seder
+    insertData = HuntData(sederId=sederId, participants=participants)
+    newHuntId = db.hunts.insert_one(insertData).inserted_id
+    db.seders.update_one({'_id': sederId}, { "$push": {"huntIds": newHuntId}})
 
-#     return newHuntId
+    return newHuntId
 
 def setupHunt(huntId, city=None, matzahXY=None):
     """Sets up the hunt by generating the image based
@@ -527,10 +528,11 @@ def setupHunt(huntId, city=None, matzahXY=None):
     """
 
     # by default generate a random hunt
-    if not city and not matzahXY:
-        city = CITIES[random.randint(0,len(CITIES)-1)]
-        img, rect = getRandomHide(city)
+    if not city:
+        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
 
+    if not matzahXY:
+        img, rect = getRandomHide(city)
     # otherwise generate the hunt based on params
     else:
         img = getCityImage(city)
@@ -542,91 +544,96 @@ def setupHunt(huntId, city=None, matzahXY=None):
 
     # put the image in the images db, and link to it from the hunt
     imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
-    db.hunts.find_one_and_update({'_id': huntId}, {'imageId': imageId})
+    db.hunts.update_one({'_id': huntId}, {'$set': {'imageId': imageId}})
     return imageId
 
 
-# @app.route('/conclude_hunt', methods=['PUT'])
-# def concludeHuntAndCreateNewHunt():
-#     # this guy takes people off the seder queue and puts them in this hunt
+@app.route('/conclude_hunt', methods=['PUT'])
+def concludeHuntAndCreateNewHunt():
+    # this guy takes people off the seder queue and puts them in this hunt
 
-#     # get parameters and sanitize
-#     huntToConcludeId = request.args.get('huntId')
-#     roomCode        = request.args.get('roomCode')
-#     winnerId           = request.args.get('winnerId')
+    # get parameters and sanitize
+    huntToConcludeId = request.args.get('huntId')
+    roomCode         = request.args.get('roomCode')
+    winnerId         = request.args.get('winnerId')
 
-#     huntToConcludeId = parseIdArg(huntToConcludeId)
-#     if not huntToConcludeId:
-#         response = {'Error': "Whoops! Bad args"}
-#         return (response, status.HTTP_400_BAD_REQUEST)
+    huntToConcludeId = parseIdArg(huntToConcludeId)
+    if not huntToConcludeId:
+        response = {'Error': "Whoops! Bad args"}
+        return (response, status.HTTP_400_BAD_REQUEST)
 
-#     # 1. Update the hunt that just concluded
-#     # # a) isActive = False
-#     # # b) isFinished = True
-#     # # c) winner = winner_nickname
-#     updates = {'$set': {'isActive': False, 'isFinished': True, 'winner': winnerId}}
-#     hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
-#     prevParticipants = hunt['participants']
+    # 1. Update the hunt that just concluded
+    # # a) isActive = False
+    # # b) isFinished = True
+    # # c) winner = winner_nickname
+    updates = {'$set': {'isActive': False, 'isFinished': True, 'winner': winnerId}}
+    hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
+    prevParticipants = hunt['participants']
 
-#     # 2. Create a new hunt
-#     # # a) increment winner count
-#     # # b) Pop manz off the huntQueue from the seder and into the finders list
-#     # # c) Create new mongo hunt document
-#     sederData = db.seders.find_one({"roomCode": roomCode})
+    # 2. Create a new hunt
+    # # a) increment winner count
+    # # b) Pop manz off the huntQueue from the seder and into the finders list
+    # # c) Create new mongo hunt document
+    sederData = db.seders.find_one({"roomCode": roomCode})
 
-#     # Check that the seder exists
-#     if sederData is None:
-#         response = {'ok': False, 'message': 'Seder not found'}
-#         return (response, status.HTTP_400_BAD_REQUEST)
+    # Check that the seder exists
+    if sederData is None:
+        response = {'ok': False, 'message': 'Seder not found'}
+        return (response, status.HTTP_400_BAD_REQUEST)
 
-#     # TODO update to use db.users
-#     sederId = sederData['_id']
-#     members = sederData['members']
-#     members[winnerId][M_WINS] += 1
+    # TODO update to use db.users
+    sederId = sederData['_id']
+    members = sederData['members']
+    members[winnerId][M_SCORE] += 1
 
-#     # pops the player queue for the next hunt
-#     newHuntParticipants = tuple(sederData['huntQueue'])
-#     newHuntId = createHuntInSeder(sederData, newHuntParticipants, hunt)
-#     # sets up new hunt with random image (by setting args None)
-#     setupHunt(newHuntId, city=None, matzahXY=None)
+    # pops the player queue for the next hunt
+    newHuntParticipants = tuple(sederData['huntQueue'])
+    newHuntId = createHuntInSeder(sederData, newHuntParticipants, hunt)
+    # sets up new hunt with random image (by setting args None)
+    setupHunt(newHuntId, city=None, matzahXY=None)
 
-#     # updates the seder with the newest hunt
-#     updates = {'$set': {'huntQueue': []}, 'members': members, "$push": {"huntIds": newHuntId}}
-#     db.seders.update_one({'_id': sederId}, updates)
-#     response = {'ok:': True}
-#     return (response, status.HTTP_200_OK)
+    # updates the seder with the newest hunt
+    updates = {'$set': {'huntQueue': []}, 'members': members, "$push": {"huntIds": newHuntId}}
+    db.seders.update_one({'_id': sederId}, updates)
+    response = {'ok:': True}
+    return (response, status.HTTP_200_OK)
 
-# @app.route('/create_seder', methods=['POST'])
-# def createSeder():
-#     sederName        = request.args.get(SEDER_NAME)
-#     nickname         = request.args.get("nickname")
+@app.route('/create_seder', methods=['POST'])
+def createSeder():
+    sederName = request.args.get(SEDER_NAME)
+    nickname = request.args.get("nickname")
 
-#     if( (sederName is None) or (nickname is None) ):
-#         response = {'Error': "Whoops! Bad args"}
-#         return (response, status.HTTP_400_BAD_REQUEST)
+    if( (sederName is None) or (nickname is None) ):
+        response = {'Error': "Whoops! Bad args"}
+        return (response, status.HTTP_400_BAD_REQUEST)
 
-#     # 1. Create a seder
-#     roomCode = getRoomCode()
-#     avatar = random.randint(0,9)
-#     userId = ObjectId()
-#     insertSederData = SederData(name = sederName, roomCode = roomCode, members={str(userId): [nickname, DEFAULT_WIN_COUNT, avatar]}) 
-#     sederData = db.seders.insert_one(insertSederData)
-#     sederId = sederData.inserted_id
+    # Create a user
+    avatar = random.randint(0,9)
+    userId = db.users.insert_one(User(nickname, 0, avatar)).inserted_id
+    baseUsers = [str(userId)]
+
+    # Create a seder
+    roomCode = getRoomCode()
+    insertSederData = SederData(sederName=sederName, roomCode=roomCode, members=baseUsers)
+    insertionResult = db.seders.insert_one(insertSederData)
+    sederId = insertionResult.inserted_id
     
-#     # 2. Create a hunt and update seders to include the hunt
-#     city = CITIES[random.randint(0,len(CITIES)-1)]
-#     insertHuntData = HuntData(sederId=sederId, participants=[userId], city=city)
-#     newHunt = db.hunts.insert_one(insertHuntData)
-#     newHuntId = newHunt.inserted_id
-#     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
+    # Create a hunt and update seders to include the hunt
+    city = CITIES[random.randint(0,len(CITIES)-1)]
+    if DEBUG:
+        city = 'Toronto'
+    insertHuntData = HuntData(sederId=sederId, participants=baseUsers, city=city)
+    newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
+    setupHunt(newHuntId, city)
+    db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
 
-#     response = {
-#         'sederId': sederId,
-#         SEDER_NAME: sederName,
-#         'roomCode': roomCode,
-#         'huntId': newHuntId,
-#     }
-#     return goodResponse(response)
+    response = {
+        'sederId': sederId,
+        SEDER_NAME: sederName,
+        'roomCode': roomCode,
+        'huntId': newHuntId,
+    }
+    return goodResponse(response)
 
 def getRoomCode(stringLength = 4):
     pf = ProfanityFilter()
