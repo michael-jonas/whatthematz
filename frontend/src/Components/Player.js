@@ -10,8 +10,8 @@ export default class Player extends React.Component {
     return (
       <>
         <Row style={{ marginTop: 10, marginBottom: 10 }}>
-          <Col xs={"auto"} style={{ width: 50 }}>
-            <Avatar avatarUrl={this.props.avatarUrl} name={this.props.name} />
+          <Col xs={"auto"} style={{ width: 50, padding: 0 }}>
+            <Avatar avatarNum={this.props.avatarNum} name={this.props.name} />
           </Col>
           <Col>
             <Row>{this.props.name}</Row>
