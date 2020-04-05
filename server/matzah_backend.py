@@ -16,7 +16,28 @@ from imaging import *
 
 DEBUG = True
 DEFAULT_WIN_COUNT = 0
-CITIES = ['Toronto']
+CITIES = [
+'Toronto',
+'Montreal',
+'Tel Aviv',
+'Amsterdam',
+'New York City',
+'Los Angeles',
+'Kiev',
+'Vancouver',
+'Berlin',
+'Prague',
+'Florence',
+'Warsaw',
+'Jerusalem',
+'Chicago',
+'Philadelphia',
+'Buenos Aires',
+'London',
+'Addis Ababa',
+'Paris',
+'Melbourne'
+]
 app = Flask(__name__)
 
 # MEMBERS idxs of components

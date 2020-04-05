@@ -1,0 +1,8 @@
+HUNT
+
+{'_id': ObjectId('5e88ebef6096f0876f39c545'), 'sederId': ObjectId('5e88ebef6096f0876f39c544'), 'isActive': True, 'participants': [], 'city': 'toronto', 'imageId': None, 'winner': -1, 'creationTime': datetime.datetime(2020, 4, 4, 20, 19, 59, 615000), 'startTime': None, 'isFinished': False}
+
+
+SEDER
+
+{'_id': ObjectId('5e88ebef6096f0876f39c544'), 'name': "david's seder", 'roomCode': '321', 'huntIds': [ObjectId('5e88ebef6096f0876f39c545')], 'creationTime': datetime.datetime(2020, 4, 4, 20, 19, 59, 614000), 'huntQueue': [], 'members': {'0': ['jonas', 0, 0], '1': ['daniel', 0, 0], '2': ['allison', 0, 0]}}
