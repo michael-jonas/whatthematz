@@ -15,6 +15,8 @@ import WaldoPage from "./Pages/WaldoPage";
 
 import { Pages } from "./Globals/Enums";
 
+import socketIOClient from "socket.io-client";
+
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -31,6 +33,13 @@ class App extends React.Component {
       backModal: false,
       isOwner: false,
     };
+  }
+  endpoint = "http://127.0.0.1:5000";
+
+  componentDidMount() {
+    const socket = socketIOClient(this.endpoint);
+    socket.on("test", (data) => console.log(data));
+    socket.emit("join");
   }
 
   playerList = [
