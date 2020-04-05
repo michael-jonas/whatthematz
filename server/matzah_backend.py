@@ -624,7 +624,7 @@ def createSeder():
         city = 'Toronto'
     insertHuntData = HuntData(sederId=sederId, participants=baseUsers, city=city)
     newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
-    # setupHunt(newHuntId, city)
+    setupHunt(newHuntId, city)
     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
 
     response = {
@@ -633,7 +633,6 @@ def createSeder():
         'roomCode': roomCode,
         'huntId': newHuntId,
     }
-    # time.sleep(1000)
     return goodResponse(response)
 
 def getRoomCode(stringLength = 4):
