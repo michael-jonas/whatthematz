@@ -68,8 +68,8 @@ export default class LobbyPage extends React.Component {
     //   });
     // }
     this.props.socket.emit(
-      'trigger_hunt_socket',
-      {'huntId': this.props.huntId},
+      "trigger_hunt_socket",
+      { huntId: this.props.huntId },
       (data) => {
         console.log(data);
       }
@@ -79,7 +79,12 @@ export default class LobbyPage extends React.Component {
 
   render() {
     const playerList = this.props.players?.map((player) => (
-      <Player key={player.uuid} name={player.name} score={player.score} />
+      <Player
+        key={player.uuid}
+        name={player.name}
+        avatarNum={player.avatar}
+        score={player.score}
+      />
     ));
 
     return (

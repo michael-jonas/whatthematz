@@ -2,7 +2,6 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, Marker, ZoomControl } from "react-leaflet";
-import logo from "../logo.svg";
 
 export default class HuntPage extends React.Component {
   constructor(props) {
