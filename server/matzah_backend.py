@@ -289,6 +289,10 @@ def huntStartTime():
 
     return goodResponse(startTime.isoformat())
 
+def getJsonPath(city):
+    x = city.lower().replace(' ', '_')
+    return os.path.join('cities', x, x + '.json')
+
 @app.route('/get_hints', methods=['GET'])
 def getHints():
     # get parameters and sanitize
@@ -303,7 +307,7 @@ def getHints():
         return badResponse('Invalid Hunt, hunt has no city associated')
 
     # open the json
-    fpath = os.path.join('cities', city.lower(), city.lower() + '.json')
+    fpath = getJsonPath(city)
     if os.path.exists(fpath) and os.path.isfile(fpath):
         with open(fpath) as f:
             data = json.load(f)
@@ -420,7 +424,8 @@ def joinSeder():
 
     # Find a hunt in the database that corresponds to the seder that is being joined AND is the most recent.
     # @Jonas are you sure this works as expected? Sorting after the limit statement?
-    currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
+    # currentHunt = db.hunts.find({"sederId": sederId}).limit(1).sort([("$natural",-1)])[0]
+    currentHunt = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
     # Get unique mongo _id of the hunt
     currentHuntId = currentHunt['_id']
 
@@ -637,7 +642,7 @@ def getCities():
     # returns: list of tuples, each tuple contains (city name, lat, lon)
     cities = []
     for city in CITIES:
-        fpath = os.path.join('cities', city.lower() + '.json')
+        fpath = getJsonPath(city)
         print(fpath)
         if os.path.exists(fpath) and os.path.isfile(fpath):
             with open(fpath) as f:
