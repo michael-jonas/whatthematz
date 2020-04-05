@@ -18,7 +18,7 @@ def cartoonify(img, numDownSamples=0, numBilateralFilters=1, skip=True):
 	# repeatedly apply small bilateral filter instead of applying
 	# one large filter
 	for _ in range(numBilateralFilters):
-	    img_color = cv2.bilateralFilter(img_color, 3, 150, 150)
+	    img_color = cv2.bilateralFilter(img_color, 1, 1, 1)
 
 	# upsample image to original size
 	for _ in range(numDownSamples):
@@ -33,7 +33,7 @@ def cartoonify(img, numDownSamples=0, numBilateralFilters=1, skip=True):
 
 	# -- STEP 4 --
 	# detect and enhance edges
-	img_edge = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 9, 2)
+	img_edge = cv2.adaptiveThreshold(img_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 2)
 
 	# -- STEP 5 --
 	# convert back to color so that it can be bit-ANDed
@@ -45,7 +45,7 @@ def cartoonify(img, numDownSamples=0, numBilateralFilters=1, skip=True):
 
 if __name__ == '__main__':
 
-	city = cv2.imread("Toronto/img/nathan_phillip.jpg", cv2.IMREAD_UNCHANGED)
+	city = cv2.imread("berlin/img/berlin.jpg", cv2.IMREAD_UNCHANGED)
 	matza = cv2.imread("../resources/afikomen.png", cv2.IMREAD_UNCHANGED)
 	# city = cartoonify(city)
 	# cv2.imwrite("Toronto/img/new_city.jpg", city)
@@ -66,6 +66,7 @@ if __name__ == '__main__':
 	# rgba = [b,g,r, alpha]
 	# matza = cv2.merge(rgba,4)
 
+	# city = cartoonify(city)
 	
 	max_x_offset = city.shape[1]
 	max_y_offset = city.shape[0]
@@ -89,5 +90,6 @@ if __name__ == '__main__':
 	# This doesnt do fancy channel stuff, adds city and matza
 		city[y_offset:y_offset+matza.shape[0], x_offset:x_offset+matza.shape[1]] = matza
 
-	cv2.imshow("Toronto/img/cartoon.jpg", cartoonify(city))
+	city = cartoonify(city)
+	cv2.imshow("Toronto/img/cartoon.jpg", city)
 	cv2.waitKey()
