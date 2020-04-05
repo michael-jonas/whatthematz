@@ -3,6 +3,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 
 export default class CreatePage extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class CreatePage extends React.Component {
       name: "",
       sederName: "",
       canCreate: false,
+      isBusy: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleSederNameChange = this.handleSederNameChange.bind(this);
@@ -37,6 +39,9 @@ export default class CreatePage extends React.Component {
 
   // Actions
   async tryCreateSeder(retries) {
+    this.setState({
+      isBusy: true,
+    });
     const response = await fetch(
       `/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
       {
@@ -62,6 +67,9 @@ export default class CreatePage extends React.Component {
       }, 1000);
     } else {
       // Todo Toast a message?
+      this.setState({
+        isBusy: false,
+      });
     }
   }
 
@@ -92,11 +100,15 @@ export default class CreatePage extends React.Component {
 
           <div style={{ textAlign: "center" }}>
             <Button
-              disabled={!this.state.canCreate}
+              disabled={!this.state.canCreate || this.state.isBusy}
               variant="primary"
               onClick={() => this.tryCreateSeder(0)}
             >
-              Create Seder
+              {this.state.isBusy ? (
+                <Spinner animation="border" />
+              ) : (
+                "Create Seder"
+              )}
             </Button>
           </div>
         </Form>

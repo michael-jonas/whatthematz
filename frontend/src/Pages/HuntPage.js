@@ -14,6 +14,7 @@ export default class HuntPage extends React.Component {
       showMarkers: false,
       curZoom: 1,
       numberOfHints: 2,
+      isBusy: false,
     };
   }
   markerLayer = [];
@@ -54,6 +55,10 @@ export default class HuntPage extends React.Component {
     }
   }
   async checkRightCity(name, retries) {
+    if (this.state.isBusy) return;
+    this.setState({
+      isBusy: true,
+    });
     const response = await fetch(
       `/check_location?huntId=${this.props.huntId}&locationName=${name}`
     );
@@ -66,8 +71,14 @@ export default class HuntPage extends React.Component {
         // toast hunt not complete
       }
     } else if (response.status === 400) {
+      this.setState({
+        isBusy: false,
+      });
       // be sad, maybe check if hunt still active?
     } else if (retries < 3) {
+      this.setState({
+        isBusy: false,
+      });
       setTimeout(() => {
         this.checkRightCity(name, ++retries);
       }, 1000);
