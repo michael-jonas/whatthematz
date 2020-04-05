@@ -211,6 +211,7 @@ class App extends React.Component {
             hintList={this.state.hintList}
           />
         )}
+        <div style={{textAlign:'center'}}><span>Check out this <a href="/">project</a></span></div>
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>
           <Modal.Header closeButton>
             <Modal.Title>Are you sure you want to go back?</Modal.Title>

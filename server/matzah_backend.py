@@ -408,7 +408,7 @@ def joinSeder():
 
     # Check that the seder exists
     if sederData is None:
-        return badRequest('Seder not found!')
+        return badResponse('Seder not found!')
     
     # Mazel tov, it exists. Now get the unique mongo id (i.e. _id)
     sederId = sederData['_id']
@@ -444,15 +444,14 @@ def joinSeder():
         print(sederData['members'])
         str_uid = str(user_uuid)
         db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
-        # db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": str_uid}})
+        db.hunts.update_one({"_id": currentHuntId}, { "$push": {"participants": str_uid}})
         response = {
             'queued': False,
             'huntId': str(currentHuntId),
             'sederId': str(sederId),
-            # SEDER_NAME: sederData[SEDER_NAME],
+            SEDER_NAME: sederData[SEDER_NAME],
             'userId': str(user_uuid)
         }
-        # response = db.hunts.find_one({"_id": currentHuntId})
 
     return (response, status.HTTP_200_OK)
 
