@@ -335,7 +335,7 @@ def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
 @socket.on('trigger_win')
 def trigger_win(data):
 
-    if not 'huntId' in data or 'userId' not in data:
+    if 'huntId' not in data or 'userId' not in data:
         return badResponse('Bad args.')
 
     huntId = ObjectId(data['huntId'])
@@ -359,6 +359,7 @@ def trigger_win(data):
             {'$inc': {M_SCORE: 1}}
         })
         sederData = db.seders.find_one({"_id": hunt['sederId']})
+        # create a new hunt!
         newHuntId = createHuntInSeder(sederData, [])
     else:
         newHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
@@ -366,8 +367,6 @@ def trigger_win(data):
     # returned winners list is from BEFORE, so we manually add here userid
     winners_list = hunt['winners'] + [str(userId)]
     roomCode = hunt['roomCode']
-
-    # create a new hunt!
 
     # emit that the winners list is updated
     response = {
@@ -377,6 +376,36 @@ def trigger_win(data):
 
     emit('winners_list_update', response, roomCode=roomCode)
     return (response, status.HTTP_200_OK)
+
+
+@socket.on('join_hunt')
+def join_hunt(data):
+
+    if 'huntId' not in data or 'userId' not in data:
+        return badResponse('Bad args.')
+
+    huntId = ObjectId(data['huntId'])
+    userId = ObjectId(data['userId'])
+
+    hunt = db.hunts.find_one_and_update(
+        {'_id': huntId},
+        {
+            '$push': {'participants': str(userId)}
+        },
+        return_document=ReturnDocument.AFTER,
+    )
+
+    participants = hunt['participants']
+
+    response = {
+        'participants': participants,
+    }
+
+    roomCode = hunt['roomCode']
+    emit('hunt_player_list', response, roomCode=roomCode)
+    return (response, status.HTTP_200_OK)
+
+
 
 @socket.on('disconnect')
 def on_disconnect():
