@@ -56,7 +56,7 @@ export default class JoinPage extends React.Component {
         json.huntId,
         false
       );
-      this.props.goToLobby();
+      this.props.goToLobby(json?.queued ?? false);
     } else if (response.status === 400) {
       // Todo Toast "room code not found"
     } else if (response.status === 500 && retries < 3) {

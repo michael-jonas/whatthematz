@@ -53,9 +53,15 @@ class App extends React.Component {
     },
   ];
 
-  async goToLobby() {
+  async goToLobby(skipLobby) {
     // load the players in the lobby
     // TODO SPINNER HERE
+
+    // fire off non-blocking calls
+    // playerlist is necessary for lobby
+    // hintlist is necessary if joining mid game - cant show empty block
+
+    this.preloadWaldoImage();
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -72,11 +78,28 @@ class App extends React.Component {
     let hlist = (await hResponse).result;
 
     this.setState({
-      currentPage: Pages.LOBBY,
       playerList: plist,
       hintList: hlist,
     });
+
+    if (skipLobby) {
+      this.setState({
+        currentPage: Pages.HUNT,
+      });
+    } else {
+      this.setState({
+        currentPage: Pages.LOBBY,
+      });
+    }
   }
+
+  async preloadWaldoImage() {
+    // create an image element so it loads pic now and caches the image
+    // this element isnt even used - it just loads the cache
+    const img = new Image();
+    img.src = `http://localhost:3000/get_image?huntId=${this.state.huntId}`;
+  }
+
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
@@ -179,7 +202,7 @@ class App extends React.Component {
           {(this.state.currentPage === Pages.CREATE ||
             this.state.currentPage === Pages.JOIN) && (
             <input
-              style={{ width: 40, height: 40 }}
+              style={{ width: "40px", height: "40px" }}
               type="image"
               alt="Back"
               src={backButton}
@@ -190,54 +213,59 @@ class App extends React.Component {
         <div
           style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
         />
-        {this.state.currentPage === Pages.LANDING && (
-          <LandingPage goToCreate={this.goToCreate} goToJoin={this.goToJoin} />
-        )}
-        {this.state.currentPage === Pages.CREATE && (
-          <CreatePage
-            goToLobby={this.goToLobby}
-            updateSederInfo={this.updateSederInfo}
-          />
-        )}
-        {this.state.currentPage === Pages.JOIN && (
-          <JoinPage
-            goToLobby={this.goToLobby}
-            updateSederInfo={this.updateSederInfo}
-          />
-        )}
-        {this.state.currentPage === Pages.LOBBY && (
-          <LobbyPage
-            name={this.state.name}
-            players={this.state.playerList}
-            roomCode={this.state.roomCode}
-            sederName={this.state.sederName}
-            huntId={this.state.huntId}
-            goToHunt={this.goToHunt}
-            isOwner={this.state.isOwner}
-          />
-        )}
-        {this.state.currentPage === Pages.HUNT && (
-          <HuntPage
-            name={this.state.name}
-            players={this.state.playerList}
-            roomCode={this.state.roomCode}
-            sederName={this.state.sederName}
-            huntId={this.state.huntId}
-            goToLobby={this.goToLobby}
-            goToWaldo={this.goToWaldo}
-            hintList={this.state.hintList}
-          />
-        )}
-        {this.state.currentPage === Pages.WALDO && (
-          <WaldoPage
-            name={this.state.name}
-            players={this.state.playerList}
-            roomCode={this.state.roomCode}
-            sederName={this.state.sederName}
-            huntId={this.state.huntId}
-            goToLobby={this.goToLobby}
-          />
-        )}
+        <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+          {this.state.currentPage === Pages.LANDING && (
+            <LandingPage
+              goToCreate={this.goToCreate}
+              goToJoin={this.goToJoin}
+            />
+          )}
+          {this.state.currentPage === Pages.CREATE && (
+            <CreatePage
+              goToLobby={this.goToLobby}
+              updateSederInfo={this.updateSederInfo}
+            />
+          )}
+          {this.state.currentPage === Pages.JOIN && (
+            <JoinPage
+              goToLobby={this.goToLobby}
+              updateSederInfo={this.updateSederInfo}
+            />
+          )}
+          {this.state.currentPage === Pages.LOBBY && (
+            <LobbyPage
+              name={this.state.name}
+              players={this.state.playerList}
+              roomCode={this.state.roomCode}
+              sederName={this.state.sederName}
+              huntId={this.state.huntId}
+              goToHunt={this.goToHunt}
+              isOwner={this.state.isOwner}
+            />
+          )}
+          {this.state.currentPage === Pages.HUNT && (
+            <HuntPage
+              name={this.state.name}
+              players={this.state.playerList}
+              roomCode={this.state.roomCode}
+              sederName={this.state.sederName}
+              huntId={this.state.huntId}
+              goToLobby={this.goToLobby}
+              goToWaldo={this.goToWaldo}
+              hintList={this.state.hintList}
+            />
+          )}
+          {this.state.currentPage === Pages.WALDO && (
+            <WaldoPage
+              name={this.state.name}
+              players={this.state.playerList}
+              roomCode={this.state.roomCode}
+              sederName={this.state.sederName}
+              huntId={this.state.huntId}
+              goToLobby={this.goToLobby}
+            />
+          )}
+        </div>
         <div
           style={{
             textAlign: "center",

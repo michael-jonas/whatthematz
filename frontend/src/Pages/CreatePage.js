@@ -55,7 +55,7 @@ export default class CreatePage extends React.Component {
         json.huntId,
         true
       );
-      this.props.goToLobby();
+      this.props.goToLobby(false);
     } else if (response.status === 500 && retries < 3) {
       setTimeout(() => {
         this.tryCreateSeder(++retries);
