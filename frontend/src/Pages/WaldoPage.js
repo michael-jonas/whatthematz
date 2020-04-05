@@ -34,7 +34,7 @@ export default class WaldoPage extends React.Component {
       }
     );
     if (response.ok) {
-      this.props.goToLobby();
+      this.props.goToPostGame();
     } else if (response.status !== 400) {
     } else {
       // toast an error?

@@ -5,6 +5,7 @@ import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { Marker } from "react-leaflet";
 
 import LandingPage from "./Pages/LandingPage";
 import CreatePage from "./Pages/CreatePage";
@@ -24,7 +25,7 @@ class App extends React.Component {
 
     const _socket = io("http://localhost:3000");
     this.state = {
-      currentPage: Pages.POSTGAME,
+      currentPage: Pages.LANDING,
       name: "",
       userId: "",
       roomCode: "",
@@ -43,6 +44,7 @@ class App extends React.Component {
       socket: _socket,
       showCountdown: false,
       gameEndTime: Date.now(),
+      markerLayer: <></>,
     };
   }
   endpoint = ":5000";
@@ -131,6 +133,7 @@ class App extends React.Component {
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
+    this.loadMarkers();
 
     const pResponseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
@@ -164,6 +167,68 @@ class App extends React.Component {
       this.setState({
         currentPage: Pages.LOBBY,
       });
+    }
+  }
+
+  async loadMarkers(retries) {
+    // fetch list of cities
+    const response = await fetch(`/get_cities`);
+    if (response.ok) {
+      const json = await response.json();
+
+      const markerLayer = json.result.map((marker) => {
+        let latlng = { lat: marker[1], lng: marker[2] };
+        return (
+          <Marker
+            key={marker[0]}
+            position={latlng}
+            onclick={() => this.checkRightCity(marker[0])}
+          >
+            {/* <Tooltip>{marker[0]}</Tooltip> */}
+          </Marker>
+        );
+      });
+
+      this.setState({
+        markerLayer: markerLayer,
+      });
+    } else {
+      //retry loop, max timeouts? nahhh
+      if (retries < 3) {
+        setTimeout(() => {
+          this.loadMarkers(++retries);
+        }, 1000);
+      }
+    }
+  }
+  async checkRightCity(name, retries) {
+    if (this.state.isBusy) return;
+    this.setState({
+      isBusy: true,
+    });
+    const response = await fetch(
+      `/check_location?huntId=${this.state.huntId}&locationName=${this.state.name}`
+    );
+    if (response.ok) {
+      const json = await response.json();
+      if (json.found === true) {
+        // complete hunt, navigate away TODO
+        this.props.goToWaldo();
+      } else {
+        // toast hunt not complete
+      }
+    } else if (response.status === 400) {
+      this.setState({
+        isBusy: false,
+      });
+      // be sad, maybe check if hunt still active?
+    } else if (retries < 3) {
+      this.setState({
+        isBusy: false,
+      });
+      setTimeout(() => {
+        this.checkRightCity(name, ++retries);
+      }, 1000);
     }
   }
 
@@ -209,6 +274,9 @@ class App extends React.Component {
   };
   goToWaldo = () => {
     this.setState({ currentPage: Pages.WALDO });
+  };
+  goToPostGame = () => {
+    this.setState({ currentPage: Pages.POSTGAME });
   };
 
   openBackModal = () => {
@@ -378,6 +446,7 @@ class App extends React.Component {
               goToWaldo={this.goToWaldo}
               hintList={this.state.hintList}
               numberOfHints={this.state.numberOfHints}
+              markerLayer={this.state.markerLayer}
             />
           )}
           {this.state.currentPage === Pages.WALDO && (
@@ -387,7 +456,7 @@ class App extends React.Component {
               roomCode={this.state.roomCode}
               sederName={this.state.sederName}
               huntId={this.state.huntId}
-              goToLobby={this.goToLobby}
+              goToPostGame={this.goToPostGame}
               boundingBox={this.state.boundingBox}
               xMin={40}
               xMax={60}
