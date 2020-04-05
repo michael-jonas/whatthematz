@@ -1,9 +1,9 @@
 {
     "name": "Chicago", 
     "country": "USA", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["The windy city!"], 
+    "mediumHints": ["The river near this city flows backwards."], 
+    "hardHints": ["Open wide! No, not for the dentist, but for the first open heart surgery, performed here."], 
     "latitude": 41.8755616, 
     "longitude": -87.6244212
 }
