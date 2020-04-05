@@ -14,6 +14,7 @@ export default class HuntPage extends React.Component {
       showMarkers: false,
       curZoom: 1,
       numberOfHints: 2,
+      isBusy: false,
     };
   }
   markerLayer = [];
@@ -54,6 +55,10 @@ export default class HuntPage extends React.Component {
     }
   }
   async checkRightCity(name, retries) {
+    if (this.state.isBusy) return;
+    this.setState({
+      isBusy: true,
+    });
     const response = await fetch(
       `/check_location?huntId=${this.props.huntId}&locationName=${name}`
     );
@@ -66,8 +71,14 @@ export default class HuntPage extends React.Component {
         // toast hunt not complete
       }
     } else if (response.status === 400) {
+      this.setState({
+        isBusy: false,
+      });
       // be sad, maybe check if hunt still active?
     } else if (retries < 3) {
+      this.setState({
+        isBusy: false,
+      });
       setTimeout(() => {
         this.checkRightCity(name, ++retries);
       }, 1000);
@@ -110,9 +121,30 @@ export default class HuntPage extends React.Component {
       this.state.numberOfHints
     );
     const carouselItems = carouselHints.map((hint, index) => (
-      <Carousel.Item style={{ height: 80, maxWidth: "90%" }} key={hint}>
-        <img alt="" src={logo} width="30" height="30" />
-        <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
+      <Carousel.Item
+        style={{
+          height: 42,
+          width: "80%",
+          left: "10%",
+          lineHeight: 1.2,
+          textAlign: "center",
+        }}
+        key={hint}
+      >
+        <div
+          style={{
+            display: "flex",
+            height: "100%",
+            alignItems: "center",
+            flexDirection: "row",
+            textAlign: "center",
+          }}
+        >
+          <div style={{ height: "auto", textAlign: "center" }}>
+            <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
+            <span style={{ fontWeight: "normal" }}>{hint}</span>
+          </div>
+        </div>
       </Carousel.Item>
     ));
 
@@ -121,43 +153,47 @@ export default class HuntPage extends React.Component {
         <h5 style={{ marginTop: 10, marginBottom: 20 }}>
           Find the location of the Afikoman!
         </h5>
-        <h6>zoom level {this.state.curZoom}</h6>
+        {/* <h6>zoom level {this.state.curZoom}</h6> */}
         <div style={{ position: "relative", textAlign: "center" }}>
-          <div
-            style={{
-              position: "absolute",
-              backgroundColor: "white",
-              opacity: 0.5,
-              height: 90,
-              width: "100%",
-              zIndex: 500,
-            }}
-          />
-          <div style={{ margin: "auto" }}>
-            <Carousel
-              defaultActiveIndex={this.state.numberOfHints - 1}
-              interval={null}
-              wrap={false}
-              style={{
-                padding: 10,
-                position: "absolute",
-                backgroundColor: "white",
-                borderRadius: "1rem",
-                margin: "auto",
-                top: "10px",
-                left: 0,
-                right: 0,
-                height: 60,
-                width: "80%",
-                opacity: 1,
-                zIndex: 501,
-              }}
-            >
-              {carouselItems}
-            </Carousel>
-          </div>
+          {this.props.hintList.length > 0 && (
+            <>
+              <div
+                style={{
+                  position: "absolute",
+                  backgroundColor: "white",
+                  opacity: 0.5,
+                  height: 90,
+                  width: "100%",
+                  zIndex: 500,
+                }}
+              />
+              <div style={{ margin: "auto" }}>
+                <Carousel
+                  defaultActiveIndex={this.state.numberOfHints - 1}
+                  interval={null}
+                  wrap={false}
+                  style={{
+                    padding: 10,
+                    position: "absolute",
+                    backgroundColor: "white",
+                    borderRadius: "1rem",
+                    margin: "auto",
+                    top: "10px",
+                    left: 0,
+                    right: 0,
+                    minHeight: "auto",
+                    width: "80%",
+                    opacity: 1,
+                    zIndex: 501,
+                  }}
+                >
+                  {carouselItems}
+                </Carousel>
+              </div>
+            </>
+          )}
           <Map
-            style={{ height: 450 }}
+            style={{ height: 550 }}
             ref={this.mapRef}
             center={position}
             zoom={this.zoom}
@@ -173,6 +209,30 @@ export default class HuntPage extends React.Component {
               this.markerLayer}
             <ZoomControl position="topleft" />
           </Map>
+          <div
+            style={{
+              padding: 10,
+              position: "absolute",
+              backgroundColor: "white",
+              borderRadius: "1rem",
+              margin: "auto",
+              top: "430px",
+              left: 0,
+              right: 0,
+              height: "auto",
+              width: "60%",
+              opacity: 1,
+              zIndex: 501,
+              fontWeight: "normal",
+              fontSize: "12px",
+              boxShadow: "0px 1px 7px rgba(0, 0, 0, 0.13)",
+              minWidth: "190px",
+            }}
+          >
+            {this.state.curZoom >= this.minZoom
+              ? "Wow, it's toasty here. Maybe there's something baking nearby..."
+              : "It's hard to see anything from up here, let's look closer!"}
+          </div>
         </div>
       </Container>
     );

@@ -3,6 +3,7 @@ import React from "react";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Spinner from "react-bootstrap/Spinner";
 
 export default class JoinPage extends React.Component {
   constructor(props) {
@@ -11,6 +12,7 @@ export default class JoinPage extends React.Component {
       name: "",
       roomCode: "",
       canJoin: false,
+      isBusy: false,
     };
     this.handleNameChange = this.handleNameChange.bind(this);
     this.handleRoomCodeChange = this.handleRoomCodeChange.bind(this);
@@ -37,6 +39,9 @@ export default class JoinPage extends React.Component {
 
   // Actions
   async tryJoinSeder(retries) {
+    this.setState({
+      isBusy: true,
+    });
     const response = await fetch(
       `/join_seder?roomCode=${this.state.roomCode.toUpperCase()}&nickname=${
         this.state.name
@@ -48,23 +53,30 @@ export default class JoinPage extends React.Component {
 
     if (response.ok) {
       const json = await response.json();
-      this.props.updateSederInfo(
+      this.props.updateInfo(
         this.state.name,
+        json.userId,
         json.sederId,
         this.state.roomCode.toUpperCase(),
         json.sederName,
         json.huntId,
         false
       );
-      this.props.goToLobby();
+      this.props.goToLobby(json?.queued ?? false);
     } else if (response.status === 400) {
       // Todo Toast "room code not found"
+      this.setState({
+        isBusy: false,
+      });
     } else if (response.status === 500 && retries < 3) {
       setTimeout(() => {
         this.tryJoinSeder(++retries);
       }, 1000);
     } else {
       // Todo Toast a fail message?
+      this.setState({
+        isBusy: false,
+      });
     }
   }
 
@@ -98,11 +110,15 @@ export default class JoinPage extends React.Component {
           <div style={{ textAlign: "center" }}>
             <Button
               style={{ borderRadius: "1rem", width: 220 }}
-              disabled={!this.state.canJoin}
+              disabled={!this.state.canJoin || this.state.isBusy}
               variant="primary"
               onClick={() => this.tryJoinSeder()}
             >
-              Join the Seder
+              {this.state.isBusy ? (
+                <Spinner animation="border" />
+              ) : (
+                "Join the Seder"
+              )}
             </Button>
           </div>
         </Form>

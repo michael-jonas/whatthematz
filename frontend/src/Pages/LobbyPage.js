@@ -6,6 +6,7 @@ import WaitingAnnouncement from "../Components/WaitingAnnouncement";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
 import mapExample from "../Images/lobbyMapExample.png";
+import Spinner from "react-bootstrap/Spinner";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -13,6 +14,7 @@ export default class LobbyPage extends React.Component {
     this.state = {
       justJoined: true,
       mapInstructions: true,
+      isBusy: false,
     };
   }
 
@@ -46,18 +48,33 @@ export default class LobbyPage extends React.Component {
   }
 
   async startHunt(retries) {
-    const response = await fetch(`/trigger_hunt?huntId=${this.props.huntId}`, {
-      method: "PUT",
-    });
-
-    if (response.ok) {
-      // TODO countdown timer
-      this.props.goToHunt();
-    } else if (response.status !== 400 && retries < 3) {
-      setTimeout(() => {
-        this.startHunt(++retries);
-      }, 1000);
-    }
+    // this.setState({
+    //   isBusy: true,
+    // });
+    // // const response = await fetch(`/trigger_hunt?huntId=${this.props.huntId}`, {
+    // //   method: "PUT",
+    // // });
+    // if (response.ok) {
+    //   // TODO countdown timer
+    //   this.props.goToHunt();
+    // } else if (response.status !== 400 && retries < 3) {
+    //   setTimeout(() => {
+    //     this.startHunt(++retries);
+    //   }, 1000);
+    // } else {
+    //   // toast an error?
+    //   this.setState({
+    //     isBusy: false,
+    //   });
+    // }
+    this.props.socket.emit(
+      'trigger_hunt_socket',
+      {'huntId': this.props.huntId},
+      (data) => {
+        console.log(data);
+      }
+    );
+    this.props.goToHunt();
   }
 
   render() {
@@ -83,13 +100,26 @@ export default class LobbyPage extends React.Component {
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
-        <div style={{ textAlign: "center", paddingTop: '10px'}}>
-            {this.props.isOwner && (
-            <Button onClick={() => this.startHunt()}>Start Hunt!</Button>
+        <div style={{ textAlign: "center", paddingTop: "10px" }}>
+          {this.props.isOwner && (
+            <Button
+              disabled={this.state.isBusy}
+              onClick={() => this.startHunt()}
+            >
+              {this.state.isBusy ? (
+                <Spinner animation="border" />
+              ) : (
+                "Start Hunt!"
+              )}
+            </Button>
           )}
         </div>
         <h4 style={{ marginTop: 30 }}>How to play</h4>
-        <Nav className="justify-content-center" variant="pills" defaultActiveKey="map">
+        <Nav
+          className="justify-content-center"
+          variant="pills"
+          defaultActiveKey="map"
+        >
           <Nav.Item>
             <Nav.Link
               onSelect={() => this.showMapInstructions()}
@@ -107,14 +137,15 @@ export default class LobbyPage extends React.Component {
             </Nav.Link>
           </Nav.Item>
         </Nav>
-        <div style={{textAlign: "center", marginTop: '10px'}}>
+        <div style={{ textAlign: "center", marginTop: "10px" }}>
           {this.state.mapInstructions && (
             <input
               style={{ width: 300, height: 300 }}
               type="image"
               alt="map"
               src={mapExample}
-            />)}
+            />
+          )}
           {this.state.mapInstructions || "notMap"}
         </div>
       </Container>
