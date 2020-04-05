@@ -1,9 +1,9 @@
 {
     "name": "Chicago", 
-    "country": "", 
-    "longitude": -87.6244212, 
-    "mediumHints": [], 
+    "country": "USA", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 41.8755616, 
-    "hardHints": []
+    "longitude": -87.6244212
 }

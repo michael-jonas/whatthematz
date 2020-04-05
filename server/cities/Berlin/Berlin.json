@@ -1,9 +1,9 @@
 {
     "name": "Berlin", 
-    "country": "", 
-    "longitude": 13.3888599, 
-    "mediumHints": [], 
+    "country": "Germany", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 52.5170365, 
-    "hardHints": []
+    "longitude": 13.3888599
 }

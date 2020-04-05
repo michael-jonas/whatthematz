@@ -1,9 +1,9 @@
 {
     "name": "Jerusalem", 
-    "country": "", 
-    "longitude": 35.2250786, 
-    "mediumHints": [], 
+    "country": "Israel", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 31.778345, 
-    "hardHints": []
+    "longitude": 35.2250786
 }

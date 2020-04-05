@@ -1,6 +1,8 @@
 from geopy.geocoders import Nominatim
 import json
 import os
+from collections import OrderedDict
+
 geolocator = Nominatim(user_agent="test")
 
 
@@ -29,20 +31,21 @@ cities = [
 
 def generate_city_json():
 	for city in cities:
-		city_json = {
-			"name": city,
-			"country": '',
-			"easyHints": [],
-			"mediumHints": [],
-			"hardHints": [],
-			"latitude": geolocator.geocode(city).latitude,
-			"longitude": geolocator.geocode(city).longitude
-		}
+		city_json = OrderedDict([
+			("name", city),
+			("country", ''),
+			("easyHints", []),
+			("mediumHints", []),
+			("hardHints", []),
+			("latitude", geolocator.geocode(city).latitude),
+			("longitude", geolocator.geocode(city).longitude)
+		])
 		if not os.path.exists(city):
 			os.makedirs(city)
 			os.makedirs(city+'/img')
-			with open(city+'/' + city + '.json', 'w') as file:
-				json.dump(city_json, file, indent=4)
+
+		with open(city+'/' + city + '.json', 'w') as file:
+			json.dump(city_json, file, indent=4)
 
 if __name__ == '__main__':
 	generate_city_json()

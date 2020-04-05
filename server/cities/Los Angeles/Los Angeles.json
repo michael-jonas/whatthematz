@@ -1,9 +1,9 @@
 {
     "name": "Los Angeles", 
-    "country": "", 
-    "longitude": -118.2427666, 
-    "mediumHints": [], 
+    "country": "USA", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 34.0536909, 
-    "hardHints": []
+    "longitude": -118.2427666
 }

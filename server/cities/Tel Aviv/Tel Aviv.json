@@ -1,9 +1,9 @@
 {
     "name": "Tel Aviv", 
     "country": "", 
-    "longitude": 34.7805274, 
-    "mediumHints": [], 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 32.0804808, 
-    "hardHints": []
+    "longitude": 34.7805274
 }

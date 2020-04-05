@@ -1,9 +1,9 @@
 {
     "name": "Paris", 
-    "country": "", 
-    "longitude": 2.3514616, 
-    "mediumHints": [], 
+    "country": "France", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 48.8566969, 
-    "hardHints": []
+    "longitude": 2.3514616
 }

@@ -1,9 +1,9 @@
 {
     "name": "Montreal", 
-    "country": "", 
-    "longitude": -73.6103642, 
-    "mediumHints": [], 
+    "country": "Canada", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 45.4972159, 
-    "hardHints": []
+    "longitude": -73.6103642
 }

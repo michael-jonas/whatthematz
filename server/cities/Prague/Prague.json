@@ -1,9 +1,9 @@
 {
     "name": "Prague", 
-    "country": "", 
-    "longitude": 14.4212535, 
-    "mediumHints": [], 
+    "country": "Czhechia", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 50.0874654, 
-    "hardHints": []
+    "longitude": 14.4212535
 }

@@ -1,9 +1,9 @@
 {
     "name": "Philadelphia", 
-    "country": "", 
-    "longitude": -75.1635262, 
-    "mediumHints": [], 
+    "country": "USA", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 39.9527237, 
-    "hardHints": []
+    "longitude": -75.1635262
 }

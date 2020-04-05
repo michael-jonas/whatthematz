@@ -1,9 +1,9 @@
 {
     "name": "Melbourne", 
-    "country": "", 
-    "longitude": 144.9631608, 
-    "mediumHints": [], 
+    "country": "Australia", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": -37.8142176, 
-    "hardHints": []
+    "longitude": 144.9631608
 }

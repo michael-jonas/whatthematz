@@ -1,9 +1,9 @@
 {
     "name": "Addis Ababa", 
-    "country": "", 
-    "longitude": 38.7612525, 
+    "country": "Ethiopia", 
+    "easyHints": ["The capital of Ethiopia"], 
     "mediumHints": [], 
-    "easyHints": [], 
+    "hardHints": [], 
     "latitude": 9.0107934, 
-    "hardHints": []
+    "longitude": 38.7612525
 }

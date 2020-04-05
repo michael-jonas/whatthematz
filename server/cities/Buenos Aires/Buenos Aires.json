@@ -1,9 +1,9 @@
 {
     "name": "Buenos Aires", 
-    "country": "", 
-    "longitude": -58.4370894, 
-    "mediumHints": [], 
+    "country": "Argentina", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": -34.6075682, 
-    "hardHints": []
+    "longitude": -58.4370894
 }

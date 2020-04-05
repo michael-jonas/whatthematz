@@ -1,9 +1,9 @@
 {
     "name": "London", 
-    "country": "", 
-    "longitude": -0.1276474, 
-    "mediumHints": [], 
+    "country": "United Kingdom", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 51.5073219, 
-    "hardHints": []
+    "longitude": -0.1276474
 }

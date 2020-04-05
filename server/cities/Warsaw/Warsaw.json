@@ -1,9 +1,9 @@
 {
     "name": "Warsaw", 
-    "country": "", 
-    "longitude": 21.07141112883227, 
-    "mediumHints": [], 
+    "country": "Poland", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 52.2337172, 
-    "hardHints": []
+    "longitude": 21.07141112883227
 }

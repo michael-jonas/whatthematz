@@ -1,9 +1,9 @@
 {
     "name": "Florence", 
-    "country": "", 
-    "longitude": 11.2555757, 
-    "mediumHints": [], 
+    "country": "Italy", 
     "easyHints": [], 
+    "mediumHints": [], 
+    "hardHints": [], 
     "latitude": 43.7698712, 
-    "hardHints": []
+    "longitude": 11.2555757
 }
