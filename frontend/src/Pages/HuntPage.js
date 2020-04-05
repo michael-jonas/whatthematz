@@ -1,24 +1,26 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
-import { Map, TileLayer, Marker, Tooltip } from "react-leaflet";
-import { HuntStage } from "../Globals/Enums";
+import Carousel from "react-bootstrap/Carousel";
+import { Map, TileLayer, Marker, ZoomControl } from "react-leaflet";
+import logo from "../logo.svg";
 
 export default class HuntPage extends React.Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+
     this.state = {
       markersLoaded: false,
       showMarkers: false,
-      lat: 0,
-      lng: 0,
-      zoom: 1,
       curZoom: 1,
-      curStage: HuntStage.MAP,
+      numberOfHints: 2,
     };
   }
   markerLayer = [];
   minZoom = 10;
+  lat = 0;
+  lng = 0;
+  zoom = 1;
 
   async loadMarkers(retries) {
     // fetch list of cities
@@ -59,6 +61,7 @@ export default class HuntPage extends React.Component {
       const json = await response.json();
       if (json.found === true) {
         // complete hunt, navigate away TODO
+        this.props.goToWaldo();
       } else {
         // toast hunt not complete
       }
@@ -96,31 +99,81 @@ export default class HuntPage extends React.Component {
 
   componentDidMount() {
     this.loadMarkers(0);
+    // todo - get hint timer here / websocket connect for hint updates
     this.getHints(0);
   }
 
   render() {
-    const position = [this.state.lat, this.state.lng];
+    const position = [this.lat, this.lng];
+    const carouselHints = this.props.hintList.slice(
+      0,
+      this.state.numberOfHints
+    );
+    const carouselItems = carouselHints.map((hint, index) => (
+      <Carousel.Item style={{ height: 80, maxWidth: "90%" }} key={hint}>
+        <img alt="" src={logo} width="30" height="30" />
+        <span style={{ color: "blue" }}>Hint {index + 1}:</span> {hint}
+      </Carousel.Item>
+    ));
+
     return (
       <Container>
         <h5 style={{ marginTop: 10, marginBottom: 20 }}>
           Find the location of the Afikoman!
         </h5>
         <h6>zoom level {this.state.curZoom}</h6>
-        <Map
-          ref={this.mapRef}
-          center={position}
-          zoom={this.state.zoom}
-          onzoomend={() => this.updateZoomState()}
-        >
-          <TileLayer
-            attribution="Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+        <div style={{ position: "relative", textAlign: "center" }}>
+          <div
+            style={{
+              position: "absolute",
+              backgroundColor: "white",
+              opacity: 0.5,
+              height: 90,
+              width: "100%",
+              zIndex: 500,
+            }}
           />
-          {this.state.markersLoaded &&
-            this.state.curZoom >= this.minZoom &&
-            this.markerLayer}
-        </Map>
+          <div style={{ margin: "auto" }}>
+            <Carousel
+              defaultActiveIndex={this.state.numberOfHints - 1}
+              interval={null}
+              wrap={false}
+              style={{
+                padding: 10,
+                position: "absolute",
+                backgroundColor: "white",
+                borderRadius: "1rem",
+                margin: "auto",
+                top: "10px",
+                left: 0,
+                right: 0,
+                height: 60,
+                width: "80%",
+                opacity: 1,
+                zIndex: 501,
+              }}
+            >
+              {carouselItems}
+            </Carousel>
+          </div>
+          <Map
+            style={{ height: 450 }}
+            ref={this.mapRef}
+            center={position}
+            zoom={this.zoom}
+            onzoomend={() => this.updateZoomState()}
+            zoomControl={false}
+          >
+            <TileLayer
+              attribution="Tiles &copy; Esri &mdash; Source: Esri, DeLorme, NAVTEQ, USGS, Intermap, iPC, NRCAN, Esri Japan, METI, Esri China (Hong Kong), Esri (Thailand), TomTom, 2012"
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+            />
+            {this.state.markersLoaded &&
+              this.state.curZoom >= this.minZoom &&
+              this.markerLayer}
+            <ZoomControl position="topleft" />
+          </Map>
+        </div>
       </Container>
     );
   }

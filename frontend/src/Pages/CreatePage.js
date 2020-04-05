@@ -52,7 +52,8 @@ export default class CreatePage extends React.Component {
         json.sederId,
         json.roomCode,
         json.sederName,
-        json.huntId
+        json.huntId,
+        true
       );
       this.props.goToLobby();
     } else if (response.status === 500 && retries < 3) {

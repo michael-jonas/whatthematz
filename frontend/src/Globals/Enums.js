@@ -14,9 +14,5 @@ export const Pages = {
   CREATE: "create",
   LOBBY: "lobby",
   HUNT: "hunt",
-};
-
-export const HuntStage = {
-  MAP: "map",
   WALDO: "waldo",
 };

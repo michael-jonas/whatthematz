@@ -11,11 +11,14 @@ import CreatePage from "./Pages/CreatePage";
 import JoinPage from "./Pages/JoinPage";
 import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
+import WaldoPage from "./Pages/WaldoPage";
+
 import { Pages } from "./Globals/Enums";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.goToLobby = this.goToLobby.bind(this);
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -24,7 +27,9 @@ class App extends React.Component {
       huntId: "",
       sederName: "",
       playerList: [],
+      hintList: ["help me", "im so cold"],
       backModal: false,
+      isOwner: false,
     };
   }
 
@@ -39,9 +44,30 @@ class App extends React.Component {
     },
   ];
 
-  goToLobby = () => {
-    this.setState({ currentPage: Pages.LOBBY });
-  };
+  async goToLobby() {
+    // load the players in the lobby
+    // TODO SPINNER HERE
+
+    const pResponseAwaiter = fetch(
+      `/get_player_list?huntId=${this.state.huntId}`,
+      { method: "GET" }
+    );
+    const hResponseAwaiter = fetch(`/get_hints?huntId=${this.state.huntId}`, {
+      method: "GET",
+    });
+
+    let pResponse = (await pResponseAwaiter).json();
+    let hResponse = (await hResponseAwaiter).json();
+
+    let plist = (await pResponse).result;
+    let hlist = (await hResponse).result;
+
+    this.setState({
+      currentPage: Pages.LOBBY,
+      playerList: plist,
+      hintList: hlist,
+    });
+  }
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
@@ -53,6 +79,9 @@ class App extends React.Component {
   };
   goToHunt = () => {
     this.setState({ currentPage: Pages.HUNT });
+  };
+  goToWaldo = () => {
+    this.setState({ currentPage: Pages.WALDO });
   };
 
   openBackModal = () => {
@@ -102,13 +131,14 @@ class App extends React.Component {
     }
   };
 
-  updateSederInfo = (name, sederId, roomCode, sederName, huntId) => {
+  updateSederInfo = (name, sederId, roomCode, sederName, huntId, isOwner) => {
     this.setState({
       name: name,
       sederId: sederId,
       roomCode: roomCode,
       sederName: sederName,
       huntId: huntId,
+      isOwner: isOwner,
     });
   };
 
@@ -174,6 +204,7 @@ class App extends React.Component {
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToHunt={this.goToHunt}
+            isOwner={this.state.isOwner}
           />
         )}
         {this.state.currentPage === Pages.HUNT && (
@@ -184,8 +215,29 @@ class App extends React.Component {
             sederName={this.state.sederName}
             huntId={this.state.huntId}
             goToLobby={this.goToLobby}
+            goToWaldo={this.goToWaldo}
+            hintList={this.state.hintList}
           />
         )}
+        {this.state.currentPage === Pages.WALDO && (
+          <WaldoPage
+            name={this.state.name}
+            players={this.state.playerList}
+            roomCode={this.state.roomCode}
+            sederName={this.state.sederName}
+            huntId={this.state.huntId}
+            goToLobby={this.goToLobby}
+          />
+        )}
+        <div
+          style={{
+            textAlign: "center",
+          }}
+        >
+          <span>
+            Learn more about this <a href="/">project</a>
+          </span>
+        </div>
         <Modal show={this.state.backModal} onHide={this.closeBackModal}>
           <Modal.Header closeButton>
             <Modal.Title>Are you sure you want to go back?</Modal.Title>

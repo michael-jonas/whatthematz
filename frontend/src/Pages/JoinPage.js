@@ -51,9 +51,10 @@ export default class JoinPage extends React.Component {
       this.props.updateSederInfo(
         this.state.name,
         json.sederId,
-        json.roomCode,
+        this.state.roomCode.toUpperCase(),
         json.sederName,
-        json.huntId
+        json.huntId,
+        false
       );
       this.props.goToLobby();
     } else if (response.status === 400) {
@@ -96,6 +97,7 @@ export default class JoinPage extends React.Component {
 
           <div style={{ textAlign: "center" }}>
             <Button
+              style={{ borderRadius: "1rem", width: 220 }}
               disabled={!this.state.canJoin}
               variant="primary"
               onClick={() => this.tryJoinSeder()}
