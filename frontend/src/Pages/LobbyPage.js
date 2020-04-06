@@ -3,11 +3,15 @@ import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
 import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
-import Nav from "react-bootstrap/Nav";
+
 import Button from "react-bootstrap/Button";
 import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
+
+import mapInstruction from "../Images/Instructions/mapMobile.png";
+import matzahInstruction1 from "../Images/Instructions/matzah1Mobile.png";
+import matzahInstruction2 from "../Images/Instructions/matzah2Mobile.png";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -37,12 +41,24 @@ export default class LobbyPage extends React.Component {
   }
 
   showMapInstructions() {
+    document
+      .getElementById("discover")
+      .classList.replace("btn-outline-primary", "btn-primary");
+    document
+      .getElementById("waldo")
+      .classList.replace("btn-primary", "btn-outline-primary");
     this.setState({
       mapInstructions: true,
     });
   }
 
   showWaldoInstructions() {
+    document
+      .getElementById("waldo")
+      .classList.replace("btn-outline-primary", "btn-primary");
+    document
+      .getElementById("discover")
+      .classList.replace("btn-primary", "btn-outline-primary");
     this.setState({
       mapInstructions: false,
     });
@@ -125,8 +141,33 @@ export default class LobbyPage extends React.Component {
             </Button>
           )}
         </div>
-        <h4 style={{ marginTop: 30 }}>How to play</h4>
-        <Nav
+
+        <h4 style={{ marginTop: 30, marginBottom: 15 }}>How to play</h4>
+
+        <Button
+          style={{
+            fontSize: 12,
+            borderRadius: "1rem",
+            margin: 10,
+          }}
+          onClick={() => this.showMapInstructions()}
+          id="discover"
+        >
+          Discover the Location
+        </Button>
+        <Button
+          variant="outline-primary"
+          style={{
+            fontSize: 12,
+            borderRadius: "1rem",
+          }}
+          onClick={() => this.showWaldoInstructions()}
+          id="waldo"
+        >
+          Find the Afikoman
+        </Button>
+
+        {/* <Nav
           className="justify-content-center"
           variant="pills"
           defaultActiveKey="map"
@@ -135,6 +176,9 @@ export default class LobbyPage extends React.Component {
             <Nav.Link
               onSelect={() => this.showMapInstructions()}
               eventKey="map"
+              style={{
+                fontSize: 12,
+              }}
             >
               Discover the location
             </Nav.Link>
@@ -147,7 +191,8 @@ export default class LobbyPage extends React.Component {
               Find the Afikoman
             </Nav.Link>
           </Nav.Item>
-        </Nav>
+        </Nav> */}
+
         <div style={{ textAlign: "center", marginTop: "10px" }}>
           {this.state.mapInstructions && (
             <input

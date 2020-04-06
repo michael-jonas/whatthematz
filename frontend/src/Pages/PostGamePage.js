@@ -43,10 +43,14 @@ export default class PostGamePage extends React.Component {
         <Container style={{ textAlign: "center" }} id="winnerList">
           {winnersList}
         </Container>
-        <h5>Other players who are playing again</h5>
-        <Container style={{ textAlign: "center" }} id="playerList">
-          {playerList}
-        </Container>
+        {this.props.players.length > 0 && (
+          <>
+            <h5>Other players who are playing again</h5>
+            <Container style={{ textAlign: "center" }} id="playerList">
+              {playerList}
+            </Container>
+          </>
+        )}
         <div style={{ textAlign: "center" }}>
           <Button
             // todo actually handle click
