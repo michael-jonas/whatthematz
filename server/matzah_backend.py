@@ -139,7 +139,7 @@ def getImageForHunt(city):
         coords = file.read().split(',')
         x = int(coords[0])
         y = int(coords[1])
-    
+
     w, h = getMatzahImage().size
     return img, (x,y,w,h)
 

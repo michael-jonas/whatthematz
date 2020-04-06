@@ -1,9 +1,9 @@
 {
     "name": "Kiev", 
     "country": "Ukraine", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["The capital of this country, which finished 2nd place in Eurovision 2007."], 
+    "mediumHints": ["You could fit the entire Statue of Liberty in one of this city's metro stations."], 
+    "hardHints": ["This European capital's Jewish population was close to 81,000 in 1913."], 
     "latitude": 50.4500336, 
     "longitude": 30.5241361
 }
