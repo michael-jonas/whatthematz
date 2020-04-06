@@ -12,40 +12,31 @@ export default class PostGamePage extends React.Component {
   }
 
   render() {
-    let winnerPlayerList = [];
-
-    for (let i = 0; i < this.props.winnerList.length; i++) {
-      for (let j = 0; j < this.props.playerList.length; j++) {
-        if (this.props.playerList[j].uuid === winnerList[i]) {
-          winnerPlayerList.push(this.props.playerList.splice(j, 1));
-          break;
-        }
-      }
-    }
-
     // const playerList = this.props.players?.map((player) => (
     //   <Player key={player.uuid} name={player.name} avatarNum={player.avatar} />
     // ));
 
-    const winnerList = this.props.winnerPlayerList?.map((player, index) => (
+    const winnersList = this.props.winnersList?.map((player, index) => (
       <Player
-        key={player.uuid}
-        name={player.name}
+        key={player._id}
+        name={player.nickname}
+        score={player.score}
         avatarNum={player.avatar}
-        place={index}
       />
     ));
 
     return (
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
-        <h4>
-          <span style={{ color: "blue" }}>{this.props.winnerList[0]}</span> won{" "}
-          {this.props.sederName} game! Congratulations!
-        </h4>
+        <h5>
+          <span style={{ color: "blue" }}>
+            {this.props.winnersList[0].nickname}
+          </span>{" "}
+          won {this.props.sederName} game! Congratulations!
+        </h5>
         <h5 style={{ marginTop: 20 }}>Afikoman Finders!</h5>
         <Container style={{ textAlign: "center" }} id="playerList">
-          {winnerList}
+          {winnersList}
         </Container>
         <div style={{ textAlign: "center" }}>
           <Button

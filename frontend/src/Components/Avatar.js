@@ -46,6 +46,8 @@ export default class Avatar extends React.Component {
       case 9:
         src = j;
         break;
+      default:
+        break;
     }
 
     return <img className="Avatar" src={src} alt="" />;

@@ -34,7 +34,7 @@ class App extends React.Component {
       nextHuntId: "",
       sederName: "",
       playerList: [],
-      winnerList: [],
+      winnersList: [],
       hintList: ["help me", "im so cold"],
       numberOfHints: 1,
       backModal: false,
@@ -71,6 +71,8 @@ class App extends React.Component {
       // console.log('dt string: ' + dt_str);
       let datetime_start = new Date(dt_str);
       let datetime_now = Date.now();
+
+      // todo time doesnt work
       let diff = datetime_start - datetime_now;
       // console.log('diff: ')
       // console.log(datetime_start)
@@ -104,9 +106,10 @@ class App extends React.Component {
       // winners list
       // next hunt id
       // old player list conditionally
+      console.log(data);
 
       this.setState({
-        winnersList: data["winnersList"],
+        winnersList: data["winnerList"],
         nextHuntId: data["newHuntId"],
       });
     });
@@ -124,10 +127,20 @@ class App extends React.Component {
   ];
 
   concludeHunt = () => {
-    this.state.socket.emit("trigger_win", {
-      huntId: this.state.huntId,
-      userId: this.state.userId,
-    });
+    this.state.socket.emit(
+      "trigger_win",
+      {
+        huntId: this.state.huntId,
+        userId: this.state.userId,
+      },
+      (data) => {
+        console.log(data);
+        this.setState({
+          winnersList: data.winnerList,
+        });
+        this.goToPostGame();
+      }
+    );
   };
 
   async goToLobby(skipLobby) {
@@ -353,8 +366,7 @@ class App extends React.Component {
     // todo
     // join next hunt with "next hunt id" from "conclude_hunt" socket
     // set huntId state to be the nexthuntid
-    // clear winnerList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-
+    // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
     const nextHuntId = this.state.nextHuntId;
 
     let onSuccess = () => {
@@ -373,16 +385,20 @@ class App extends React.Component {
       this.setState({
         currentPage: Pages.LOBBY,
       });
-    }
+    };
 
-    this.state.socket.emit("join_hunt", {
-      huntId: this.state.huntId,
-      userId: this.state.userId,
-    }, (data) => {
-      if(data.ok) {
-        onSuccess();
+    this.state.socket.emit(
+      "join_hunt",
+      {
+        huntId: this.state.huntId,
+        userId: this.state.userId,
+      },
+      (data) => {
+        if (data.ok) {
+          onSuccess();
+        }
       }
-    });
+    );
   };
 
   render() {
@@ -484,7 +500,7 @@ class App extends React.Component {
             <PostGamePage
               name={this.state.name}
               players={this.state.oldPlayerList}
-              winnerList={this.state.winnerList}
+              winnersList={this.state.winnersList}
               roomCode={this.state.roomCode}
               sederName={this.state.sederName}
               huntId={this.state.huntId}
