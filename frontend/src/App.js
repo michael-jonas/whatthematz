@@ -381,8 +381,8 @@ class App extends React.Component {
     // join next hunt with "next hunt id" from "conclude_hunt" socket
     // set huntId state to be the nexthuntid
     // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-    const nextHuntId = this.state.nextHuntId;
 
+    const nextHuntId = this.state.nextHuntId;
     let onSuccess = () => {
       // fetch
       this.setState({
@@ -406,7 +406,7 @@ class App extends React.Component {
     this.state.socket.emit(
       "join_hunt",
       {
-        huntId: this.state.huntId,
+        huntId: this.state.nextHuntId,
         userId: this.state.userId,
       },
       (data) => {
