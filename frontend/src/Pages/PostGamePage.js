@@ -12,16 +12,21 @@ export default class PostGamePage extends React.Component {
   }
 
   render() {
-    // const playerList = this.props.players?.map((player) => (
-    //   <Player key={player.uuid} name={player.name} avatarNum={player.avatar} />
-    // ));
-
     const winnersList = this.props.winnersList?.map((player, index) => (
       <Player
         key={player._id}
         name={player.nickname}
         score={player.score}
         avatarNum={player.avatar}
+      />
+    ));
+
+    const playerList = this.props.players?.map((player) => (
+      <Player
+        key={player.uuid}
+        name={player.name}
+        avatarNum={player.avatar}
+        score={player.score}
       />
     ));
 
@@ -35,8 +40,12 @@ export default class PostGamePage extends React.Component {
           won {this.props.sederName} game! Congratulations!
         </h5>
         <h5 style={{ marginTop: 20 }}>Afikoman Finders!</h5>
-        <Container style={{ textAlign: "center" }} id="playerList">
+        <Container style={{ textAlign: "center" }} id="winnerList">
           {winnersList}
+        </Container>
+        <h5>Other players who are playing again</h5>
+        <Container style={{ textAlign: "center" }} id="playerList">
+          {playerList}
         </Container>
         <div style={{ textAlign: "center" }}>
           <Button
