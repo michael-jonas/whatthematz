@@ -50,8 +50,9 @@ CITIES = [
 ]
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'notacomplexsecret'
-socket = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+app.config['SECRET_KEY'] = 'secret!'
+#  async_mode='eventlet'
+socket = SocketIO(app, cors_allowed_origins="*")
 
 L_ROOMCODES = 4
 
@@ -256,9 +257,9 @@ class BEVENTS(Enum):
     USER_LEFT = 2
 
 
-# @socket.on('connect')
-# def on_connect():
-    # print('User connected')
+@socket.on('connect')
+def on_connect():
+    print('User connected')
 
 lookup_table = {}
 
@@ -908,5 +909,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0',debug=False, threaded=True)
     socket.run(app, debug=False)
