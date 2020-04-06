@@ -873,7 +873,7 @@ def getRoomCode(stringLength = 4):
         roomCode =  ''.join(random.choice(letters) for i in range(stringLength))
     return roomCode
 
-@app.route('/get_cities', methods=['GET'])
+@app.route('/api/get_cities', methods=['GET'])
 def getCities():
     # returns: list of tuples, each tuple contains (city name, lat, lon)
     cities = []
