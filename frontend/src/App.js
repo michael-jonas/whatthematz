@@ -233,7 +233,7 @@ class App extends React.Component {
   }
   async checkRightCity(name, retries) {
     const response = await fetch(
-      `/check_location?huntId=${this.state.huntId}&locationName=${name}`
+      `/api/check_location?huntId=${this.state.huntId}&locationName=${name}`
     );
     if (response.ok) {
       const json = await response.json();
