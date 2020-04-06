@@ -129,14 +129,15 @@ def ImageData(imgOrBytes, rect):
 
 def getImageForHunt(city):
     city = city.lower().replace(" ", "_")
-    imgPath = city + "/img/" + city + "_hidden.jpg"
+    imgPath = os.path.join('cities', city, 'img', city + '_hidden.jpg')
     img = PIL.Image.open(imgPath)
-    with open(city + "/img/" + "matza_xy.txt", 'r') as file:
+    matza_xy_path = os.path.join('cities', city, 'img', 'matza_xy.txt')
+    with open(matza_xy_path, 'r') as file:
         coords = file.read().split(',')
         x = int(coords[0])
         y = int(coords[1])
     
-    w, h = getMatzahImage()
+    w, h = getMatzahImage().size
     return img, (x,y,w,h)
 
 def setupHunt(huntId, city=None, matzahXY=None):

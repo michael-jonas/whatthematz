@@ -1,8 +1,8 @@
 {
     "name": "London", 
     "country": "United Kingdom", 
-    "easyHints": [], 
-    "mediumHints": [], 
+    "easyHints": ["The River that rhymes with James flows right through this city."], 
+    "mediumHints": [""], 
     "hardHints": [], 
     "latitude": 51.5073219, 
     "longitude": -0.1276474
