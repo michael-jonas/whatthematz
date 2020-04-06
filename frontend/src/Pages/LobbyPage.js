@@ -9,9 +9,11 @@ import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
 
-import mapInstruction from "../Images/Instructions/mapMobile.png";
 import matzahInstruction1 from "../Images/Instructions/matzah1Mobile.png";
 import matzahInstruction2 from "../Images/Instructions/matzah2Mobile.png";
+
+import MapInstructions from "../Components/MapInstructions";
+import WaldoInstructions from "../Components/WaldoInstructions";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -167,42 +169,12 @@ export default class LobbyPage extends React.Component {
           Find the Afikoman
         </Button>
 
-        {/* <Nav
-          className="justify-content-center"
-          variant="pills"
-          defaultActiveKey="map"
-        >
-          <Nav.Item>
-            <Nav.Link
-              onSelect={() => this.showMapInstructions()}
-              eventKey="map"
-              style={{
-                fontSize: 12,
-              }}
-            >
-              Discover the location
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link
-              onSelect={() => this.showWaldoInstructions()}
-              eventKey="waldo"
-            >
-              Find the Afikoman
-            </Nav.Link>
-          </Nav.Item>
-        </Nav> */}
-
         <div style={{ textAlign: "center", marginTop: "10px" }}>
-          {this.state.mapInstructions && (
-            <input
-              style={{ width: 300, height: 300 }}
-              type="image"
-              alt="map"
-              src={mapExample}
-            />
+          {this.state.mapInstructions ? (
+            <MapInstructions />
+          ) : (
+            <WaldoInstructions />
           )}
-          {this.state.mapInstructions || "notMap"}
         </div>
       </Container>
     );
