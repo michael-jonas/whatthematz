@@ -23,7 +23,7 @@ class App extends React.Component {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
 
-    const _socket = io("http://localhost:5000");
+    const _socket = io("http://3.20.149.230:3000");
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -256,7 +256,7 @@ class App extends React.Component {
     // create an image element so it loads pic now and caches the image
     // this element isnt even used - it just loads the cache
     const img = new Image();
-    img.src = `http://localhost:3000/get_image?huntId=${this.state.huntId}`;
+    img.src = `http://3.20.149.230:3000/get_image?huntId=${this.state.huntId}`;
   }
   async loadBoundingBox(retries) {
     const boundingBoxResponse = await fetch(

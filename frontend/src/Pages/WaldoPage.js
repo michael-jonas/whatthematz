@@ -33,7 +33,7 @@ export default class WaldoPage extends React.Component {
             id="waldoImg"
             alt="FindTheAfikoman"
             onLoad={() => this.onImageLoad()}
-            src={`http://localhost:3000/get_image?huntId=${this.props.huntId}`}
+            src={`http://3.20.149.230:3000/get_image?huntId=${this.props.huntId}`}
             style={{
               maxWidth: "95%",
             }}
