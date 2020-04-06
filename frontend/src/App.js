@@ -430,7 +430,7 @@ class App extends React.Component {
                 transform: "translatex(-50%)",
               }}
             >
-              UnleavenTheCurve
+              FlattenTheBread
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
               this.state.currentPage === Pages.JOIN) && (
