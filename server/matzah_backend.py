@@ -25,7 +25,7 @@ from bson.objectid import ObjectId
 
 from imaging import getRandomHide, getCityImage, getMatzahImage
 
-DEBUG = True
+DEBUG = False
 DEFAULT_WIN_COUNT = 0
 CITIES = [
     'Toronto',
@@ -213,7 +213,7 @@ if False and __name__ == '__main__' and DEBUG:
 
         setupHunt(huntResult.inserted_id)
 
-        print(name, _room, _seder_result.inserted_id, huntResult.inserted_id)
+        # print(name, _room, _seder_result.inserted_id, huntResult.inserted_id)
 
 
 PROJECT_PATH = '/usr/src/app'
@@ -237,7 +237,7 @@ def getHuntById(huntId):
 def badResponse(bad='Bad args'):
     error = f'Whoops! {bad}.'
     response = {'Error': error}
-    print(response)
+    # print(response)
     error_result = (response, status.HTTP_400_BAD_REQUEST)
     return error_result
 
@@ -256,9 +256,9 @@ class BEVENTS(Enum):
     USER_LEFT = 2
 
 
-@socket.on('connect')
-def on_connect():
-    print('User connected')
+# @socket.on('connect')
+# def on_connect():
+    # print('User connected')
 
 lookup_table = {}
 
@@ -270,7 +270,7 @@ def on_new_user(data):
     sederId = data['seder_id']
     huntId = data['hunt_id']
 
-    print(f'User {username} just joined room {room}')
+    # print(f'User {username} just joined room {room}')
 
     join_room(room)
     emit('message', {'message': f'User {username} just joined room {room}'}, room=room)
@@ -374,12 +374,12 @@ def trigger_win(data):
         )
         sederData = db.seders.find_one({"_id": hunt['sederId']})
         # create a new hunt!
-        print('creating a new hunt in the seder')
+        # print('creating a new hunt in the seder')
         newHuntId = createHuntInSeder(sederData)
         city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
         setupHunt(newHuntId, city)
     else:
-        print('finding latest hunt id a new hunt in the seder')
+        # print('finding latest hunt id a new hunt in the seder')
         newHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
 
     # returned winners list is from BEFORE, so we manually add here userid
@@ -717,7 +717,7 @@ def joinSeder():
     # else:
     if True: #pylint:disable=using-constant-test
         # Hunt hasn't started yet, add them as a participant in the hunt
-        print(sederData['members'])
+        # print(sederData['members'])
         str_uid = str(user_uuid)
         db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
 
@@ -878,7 +878,7 @@ def getCities():
     cities = []
     for city in CITIES:
         fpath = getJsonPath(city)
-        print(fpath)
+        # print(fpath)
         if os.path.exists(fpath) and os.path.isfile(fpath):
             with open(fpath) as f:
                 data = json.load(f)
@@ -908,5 +908,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0', debug=False, threaded=True)
     socket.run(app, debug=False)
