@@ -826,7 +826,7 @@ def triggerHunt():
 #     response = {'ok:': True}
 #     return (response, status.HTTP_200_OK)
 
-@app.route('/create_seder', methods=['POST'])
+@app.route('/api/create_seder', methods=['POST'])
 def createSeder():
     sederName = request.args.get(SEDER_NAME)
     nickname = request.args.get("nickname")
