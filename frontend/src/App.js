@@ -157,29 +157,21 @@ class App extends React.Component {
     // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    const pResponseAwaiter = fetch(
+    const responseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
       { method: "GET" }
     );
-    const hResponseAwaiter = fetch(`/get_hints?huntId=${this.state.huntId}`, {
-      method: "GET",
-    });
 
-    let pResponse = (await pResponseAwaiter).json();
-    let hResponse = (await hResponseAwaiter).json();
+    // todo this will be replaced in socket event
+    await this.getHintList();
 
-    let plist = (await pResponse).result;
-    let hlist = (await hResponse).result;
+    const jsonAwaiter = (await responseAwaiter).json();
 
-    let update = {};
-    if (hlist != null) {
-      update.hintList = hlist;
+    const playerList = (await jsonAwaiter).result;
+
+    if (playerList != null) {
+      this.setState({ playerList: playerList });
     }
-    if (plist != null) {
-      update.playerList = plist;
-    }
-
-    this.setState(update);
 
     if (skipLobby) {
       this.setState({
@@ -194,6 +186,18 @@ class App extends React.Component {
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
     this.loadMarkers();
+  }
+
+  async getHintList() {
+    const response = await fetch(`/get_hints?huntId=${this.state.huntId}`, {
+      method: "GET",
+    });
+    if (response.ok) {
+      const json = await response.json();
+      this.setState({
+        hintList: json.result,
+      });
+    }
   }
 
   async loadMarkers(retries) {
@@ -383,6 +387,7 @@ class App extends React.Component {
       });
       this.preloadWaldoImage();
       this.loadBoundingBox(0);
+      this.getHintList();
       this.setState({
         currentPage: Pages.LOBBY,
       });
