@@ -22,6 +22,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
+    this.handleLeavePage = this.handleLeavePage.bind(this);
 
     const _socket = io("http://localhost:5000");
     this.state = {
@@ -46,6 +47,7 @@ class App extends React.Component {
       markerLayer: <></>,
     };
   }
+  firstJoin = true;
 
   setPage(page) {
     this.setState({ currentPage: page });
@@ -59,9 +61,26 @@ class App extends React.Component {
     });
     this.state.socket.on("player_list", (data) => {
       // console.log("Got player list:");
-      // console.log(data["player_list"]);
+
+      if (this.firstJoin) {
+        this.firstJoin = false;
+        if (true) {
+          // if this.hunt is in progress TODO
+          this.setState({
+            currentPage: Pages.LOBBY,
+          });
+        } else {
+          this.setState({
+            currentPage: Pages.HUNT,
+          });
+        }
+      }
+      const isOwner = data.player_list[0].uuid === this.state.userId;
+
+      console.log(data["player_list"]);
       this.setState({
         playerList: data["player_list"],
+        isOwner: isOwner,
       });
     });
     this.state.socket.on("start_time_update", (data) => {
@@ -112,6 +131,20 @@ class App extends React.Component {
         nextHuntId: data.newHuntId,
       });
     });
+    window.addEventListener("beforeunload", () => {
+      this.handleLeavePage();
+    });
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("beforeunload", () => {
+      this.handleLeavePage();
+    });
+  }
+
+  handleLeavePage() {
+    console.log("blah");
+    this.state.socket.disconnect();
   }
 
   playerList = [
@@ -143,7 +176,7 @@ class App extends React.Component {
     );
   };
 
-  async goToLobby(skipLobby) {
+  async goToLobby() {
     this.state.socket.emit("new_user", {
       username: this.state.name,
       room: this.state.roomCode,
@@ -157,31 +190,8 @@ class App extends React.Component {
     // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    const responseAwaiter = fetch(
-      `/api/get_player_list?huntId=${this.state.huntId}`,
-      { method: "GET" }
-    );
-
     // todo this will be replaced in socket event
     await this.getHintList();
-
-    const jsonAwaiter = (await responseAwaiter).json();
-
-    const playerList = (await jsonAwaiter).result;
-
-    if (playerList != null) {
-      this.setState({ playerList: playerList });
-    }
-
-    if (skipLobby) {
-      this.setState({
-        currentPage: Pages.HUNT,
-      });
-    } else {
-      this.setState({
-        currentPage: Pages.LOBBY,
-      });
-    }
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
