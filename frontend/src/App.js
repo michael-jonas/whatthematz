@@ -55,12 +55,12 @@ class App extends React.Component {
   componentDidMount() {
     // verify our websocket connection is established
     this.state.socket.on("message", (data) => {
-      console.log("Got message:");
-      console.log(data);
+      // console.log("Got message:");
+      // console.log(data);
     });
     this.state.socket.on("player_list", (data) => {
-      console.log("Got player list:");
-      console.log(data["player_list"]);
+      // console.log("Got player list:");
+      // console.log(data["player_list"]);
       this.setState({
         playerList: data["player_list"],
       });
@@ -101,7 +101,7 @@ class App extends React.Component {
       this.setState({ showCountdown: true });
     });
     this.state.socket.on("winners_list_update", (data) => {
-      console.log("got winner list:");
+      // console.log("got winner list:");
       // Updates:
       // winners list
       // next hunt id

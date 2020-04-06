@@ -72,7 +72,7 @@ export default class LobbyPage extends React.Component {
       "trigger_hunt_socket",
       { huntId: this.props.huntId },
       (data) => {
-        console.log(data);
+        //console.log(data);
       }
     );
   }
