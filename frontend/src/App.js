@@ -22,8 +22,8 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
-
-    const _socket = io("http://3.20.149.230:3000");
+    const _socket = io("http://3.20.149.230");
+    //const _socket = io("localhost:5000");
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
