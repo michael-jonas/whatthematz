@@ -15,7 +15,10 @@ export default class Player extends React.Component {
           </Col>
           <Col>
             <Row>{this.props.name}</Row>
-            <Row bsPrefix={"row light"}>{this.props.score} points total</Row>
+            <Row bsPrefix={"row light"}>
+              {this.props.score} point{this.props.score === 1 ? false : "s"}{" "}
+              total
+            </Row>
           </Col>
         </Row>
         <div style={{ height: 0, border: "1px solid #EDEDED" }} />

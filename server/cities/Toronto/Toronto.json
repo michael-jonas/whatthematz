@@ -2,7 +2,7 @@
     "name": "Toronto", 
     "country": "Canada", 
     "easyHints": ["test hint 1"], 
-    "mediumHints": ["test hint 2"], 
+    "mediumHints": ["Home of the busiest highway in North America!"], 
     "hardHints": ["test hint 3"], 
     "latitude": 43.6534817, 
     "longitude": -79.3839347

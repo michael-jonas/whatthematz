@@ -3,11 +3,14 @@ import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
 import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
-import Nav from "react-bootstrap/Nav";
+
 import Button from "react-bootstrap/Button";
 import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
-import Countdown from "../Components/Countdown.js"
+import Countdown from "../Components/Countdown.js";
+
+import MapInstructions from "../Components/MapInstructions";
+import WaldoInstructions from "../Components/WaldoInstructions";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -37,18 +40,30 @@ export default class LobbyPage extends React.Component {
   }
 
   showMapInstructions() {
+    document
+      .getElementById("discover")
+      .classList.replace("btn-outline-primary", "btn-primary");
+    document
+      .getElementById("waldo")
+      .classList.replace("btn-primary", "btn-outline-primary");
     this.setState({
       mapInstructions: true,
     });
   }
 
   showWaldoInstructions() {
+    document
+      .getElementById("waldo")
+      .classList.replace("btn-outline-primary", "btn-primary");
+    document
+      .getElementById("discover")
+      .classList.replace("btn-primary", "btn-outline-primary");
     this.setState({
       mapInstructions: false,
     });
   }
 
-  async startHunt(retries) {
+  async startHunt() {
     // this.setState({
     //   isBusy: true,
     // });
@@ -72,10 +87,9 @@ export default class LobbyPage extends React.Component {
       "trigger_hunt_socket",
       { huntId: this.props.huntId },
       (data) => {
-        console.log(data);
+        //console.log(data);
       }
     );
-    this.props.goToHunt();
   }
 
   render() {
@@ -99,7 +113,9 @@ export default class LobbyPage extends React.Component {
         </div>
         {this.props.showCountdown ? (
           <div>
-            <span>Starting in <Countdown startingCount={3}/> seconds!</span>
+            <span>
+              Starting in <Countdown startingCount={3} /> seconds!
+            </span>
           </div>
         ) : this.state.justJoined ? (
           <WelcomeAnnouncement sederName={this.props.sederName} />
@@ -124,39 +140,38 @@ export default class LobbyPage extends React.Component {
             </Button>
           )}
         </div>
-        <h4 style={{ marginTop: 30 }}>How to play</h4>
-        <Nav
-          className="justify-content-center"
-          variant="pills"
-          defaultActiveKey="map"
+
+        <h4 style={{ marginTop: 30, marginBottom: 15 }}>How to play</h4>
+
+        <Button
+          style={{
+            fontSize: 12,
+            borderRadius: "1rem",
+            margin: 10,
+          }}
+          onClick={() => this.showMapInstructions()}
+          id="discover"
         >
-          <Nav.Item>
-            <Nav.Link
-              onSelect={() => this.showMapInstructions()}
-              eventKey="map"
-            >
-              Discover the location
-            </Nav.Link>
-          </Nav.Item>
-          <Nav.Item>
-            <Nav.Link
-              onSelect={() => this.showWaldoInstructions()}
-              eventKey="waldo"
-            >
-              Find the Afikoman
-            </Nav.Link>
-          </Nav.Item>
-        </Nav>
+          Discover the Location
+        </Button>
+        <Button
+          variant="outline-primary"
+          style={{
+            fontSize: 12,
+            borderRadius: "1rem",
+          }}
+          onClick={() => this.showWaldoInstructions()}
+          id="waldo"
+        >
+          Find the Afikoman
+        </Button>
+
         <div style={{ textAlign: "center", marginTop: "10px" }}>
-          {this.state.mapInstructions && (
-            <input
-              style={{ width: 300, height: 300 }}
-              type="image"
-              alt="map"
-              src={mapExample}
-            />
+          {this.state.mapInstructions ? (
+            <MapInstructions />
+          ) : (
+            <WaldoInstructions />
           )}
-          {this.state.mapInstructions || "notMap"}
         </div>
       </Container>
     );

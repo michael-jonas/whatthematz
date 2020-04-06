@@ -1,12 +1,7 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
-import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
-import WaitingAnnouncement from "../Components/WaitingAnnouncement";
-import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
-import mapExample from "../Images/lobbyMapExample.png";
-import Spinner from "react-bootstrap/Spinner";
 
 export default class PostGamePage extends React.Component {
   constructor(props) {
@@ -17,41 +12,47 @@ export default class PostGamePage extends React.Component {
   }
 
   render() {
-    let winnerPlayerList = [];
+    const winnersList = this.props.winnersList?.map((player, index) => (
+      <Player
+        key={player._id}
+        name={player.nickname}
+        score={player.score}
+        avatarNum={player.avatar}
+      />
+    ));
 
-    for (let i = 0; i < this.props.winnerList.length; i++) {
-      for (let j = 0; j < this.props.playerList.length; j++) {
-        if (this.props.playerList[j].uuid === winnerList[i]) {
-          winnerPlayerList.push(this.props.playerList.splice(j, 1));
-          break;
-        }
-      }
-    }
-
-    // const playerList = this.props.players?.map((player) => (
-    //   <Player key={player.uuid} name={player.name} avatarNum={player.avatar} />
-    // ));
-
-    const winnerList = this.props.winnerPlayerList?.map((player, index) => (
+    const playerList = this.props.players?.map((player) => (
       <Player
         key={player.uuid}
         name={player.name}
         avatarNum={player.avatar}
-        place={index}
+        score={player.score}
       />
     ));
 
     return (
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
-        <h4>
-          <span style={{ color: "blue" }}>{this.props.winnerList[0]}</span> won{" "}
-          {this.props.sederName} game! Congratulations!
-        </h4>
+        <h5>
+          <span style={{ color: "blue" }}>
+            {this.props.winnersList[0].nickname}
+          </span>{" "}
+          won {this.props.sederName} game! Congratulations!
+        </h5>
         <h5 style={{ marginTop: 20 }}>Afikoman Finders!</h5>
-        <Container style={{ textAlign: "center" }} id="playerList">
-          {winnerList}
+        <Container style={{ textAlign: "center" }} id="winnerList">
+          {winnersList}
         </Container>
+        {this.props.players.length > 0 && (
+          <>
+            <h5 style={{ marginTop: 10 }}>
+              Other players who are playing again
+            </h5>
+            <Container style={{ textAlign: "center" }} id="playerList">
+              {playerList}
+            </Container>
+          </>
+        )}
         <div style={{ textAlign: "center" }}>
           <Button
             // todo actually handle click

@@ -34,8 +34,7 @@ class App extends React.Component {
       nextHuntId: "",
       sederName: "",
       playerList: [],
-      oldPlayerList: [],
-      winnerList: [],
+      winnersList: [],
       hintList: ["help me", "im so cold"],
       numberOfHints: 1,
       backModal: false,
@@ -56,12 +55,12 @@ class App extends React.Component {
   componentDidMount() {
     // verify our websocket connection is established
     this.state.socket.on("message", (data) => {
-      console.log("Got message:");
-      console.log(data);
+      // console.log("Got message:");
+      // console.log(data);
     });
     this.state.socket.on("player_list", (data) => {
-      console.log("Got player list:");
-      console.log(data["player_list"]);
+      // console.log("Got player list:");
+      // console.log(data["player_list"]);
       this.setState({
         playerList: data["player_list"],
       });
@@ -72,6 +71,8 @@ class App extends React.Component {
       // console.log('dt string: ' + dt_str);
       let datetime_start = new Date(dt_str);
       let datetime_now = Date.now();
+
+      // todo time doesnt work
       let diff = datetime_start - datetime_now;
       // console.log('diff: ')
       // console.log(datetime_start)
@@ -100,19 +101,16 @@ class App extends React.Component {
       this.setState({ showCountdown: true });
     });
     this.state.socket.on("winners_list_update", (data) => {
-      console.log("got winner list:");
+      // console.log("got winner list:");
       // Updates:
-        // winners list
-        // next hunt id
-        // old player list conditionally
+      // winners list
+      // next hunt id
+      // old player list conditionally
+      //console.log(data);
 
-      this.setState(function(state, props) {
-        let oldPlayerList = state.oldPlayerList.length == 0 ? state.playerlist : state.oldPlayerList
-        return {
-          winnersList: data["winnersList"],
-          nextHuntId: data["newHuntId"],
-          oldPlayerList: state.playerList,
-        };
+      this.setState({
+        winnersList: data["winnerList"],
+        nextHuntId: data["newHuntId"],
       });
     });
   }
@@ -128,20 +126,31 @@ class App extends React.Component {
     },
   ];
 
-  async concludeHunt() {
-    this.state.socket.emit("trigger_win", {
-      huntId: this.state.huntId,
-      userId: this.state.userId,
-    });
-  }
+  concludeHunt = () => {
+    this.state.socket.emit(
+      "trigger_win",
+      {
+        huntId: this.state.huntId,
+        userId: this.state.userId,
+      },
+      (data) => {
+        //console.log(data);
+        this.setState({
+          winnersList: data.winnerList,
+          playerList: [],
+        });
+        this.goToPostGame();
+      }
+    );
+  };
 
   async goToLobby(skipLobby) {
-    // this.state.socket.emit("new_user", {
-    //   username: this.state.name,
-    //   room: this.state.roomCode,
-    //   seder_id: this.state.sederId,
-    //   hunt_id: this.state.huntId,
-    // });
+    this.state.socket.emit("new_user", {
+      username: this.state.name,
+      room: this.state.roomCode,
+      seder_id: this.state.sederId,
+      hunt_id: this.state.huntId,
+    });
     // load the players in the lobby
     // TODO SPINNER HERE
 
@@ -149,29 +158,21 @@ class App extends React.Component {
     // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    const pResponseAwaiter = fetch(
+    const responseAwaiter = fetch(
       `/get_player_list?huntId=${this.state.huntId}`,
       { method: "GET" }
     );
-    const hResponseAwaiter = fetch(`/get_hints?huntId=${this.state.huntId}`, {
-      method: "GET",
-    });
 
-    let pResponse = (await pResponseAwaiter).json();
-    let hResponse = (await hResponseAwaiter).json();
+    // todo this will be replaced in socket event
+    await this.getHintList();
 
-    let plist = (await pResponse).result;
-    let hlist = (await hResponse).result;
+    const jsonAwaiter = (await responseAwaiter).json();
 
-    let update = {};
-    if (hlist != null) {
-      update.hintList = hlist;
+    const playerList = (await jsonAwaiter).result;
+
+    if (playerList != null) {
+      this.setState({ playerList: playerList });
     }
-    if (plist != null) {
-      update.playerList = plist;
-    }
-
-    this.setState(update);
 
     if (skipLobby) {
       this.setState({
@@ -186,6 +187,18 @@ class App extends React.Component {
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
     this.loadMarkers();
+  }
+
+  async getHintList() {
+    const response = await fetch(`/get_hints?huntId=${this.state.huntId}`, {
+      method: "GET",
+    });
+    if (response.ok) {
+      const json = await response.json();
+      this.setState({
+        hintList: json.result,
+      });
+    }
   }
 
   async loadMarkers(retries) {
@@ -358,132 +371,179 @@ class App extends React.Component {
     // todo
     // join next hunt with "next hunt id" from "conclude_hunt" socket
     // set huntId state to be the nexthuntid
-    // clear winnerList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
+    // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
     const nextHuntId = this.state.nextHuntId;
-    // fetch
 
-    this.setState({
-      huntId: this.nextHundId,
-      winnerList: [],
-      oldPlayerList: [],
-      hintList: [],
-      boundingBox: [],
-    });
-    this.preloadWaldoImage();
-    this.setState({
-      currentPage: Pages.LOBBY,
-    });
+    let onSuccess = () => {
+      // fetch
+      this.setState({
+        huntId: nextHuntId,
+        nextHuntId: "",
+        winnerList: [],
+        hintList: [],
+        numberOfHints: 1,
+        boundingBox: [],
+        showCountdown: false,
+        gameEndTime: Date.now(),
+      });
+      this.preloadWaldoImage();
+      this.loadBoundingBox(0);
+      this.getHintList();
+      this.setState({
+        currentPage: Pages.LOBBY,
+      });
+    };
+
+    this.state.socket.emit(
+      "join_hunt",
+      {
+        huntId: this.state.huntId,
+        userId: this.state.userId,
+      },
+      (data) => {
+        if (data.ok) {
+          onSuccess();
+        }
+      }
+    );
   };
 
   render() {
     return (
-      <div>
-        <Navbar
-          expand="xs"
-          //bg="dark"
-          variant="light"
-        >
-          <Navbar.Toggle />
-          <Navbar.Brand
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translatex(-50%)",
-            }}
-          >
-            <img
-              alt=""
-              src={logo}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />
-            UnleavenTheCurve
-          </Navbar.Brand>
-          {(this.state.currentPage === Pages.CREATE ||
-            this.state.currentPage === Pages.JOIN) && (
-            <input
-              style={{ width: "40px", height: "40px" }}
-              type="image"
-              alt="Back"
-              src={backButton}
-              onClick={() => this.handleBackButton()}
-            />
-          )}
-        </Navbar>
+      <>
         <div
-          style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
-        />
-        <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
-          {this.state.currentPage === Pages.LANDING && (
-            <LandingPage
-              goToCreate={this.goToCreate}
-              goToJoin={this.goToJoin}
-            />
-          )}
-          {this.state.currentPage === Pages.CREATE && (
-            <CreatePage
-              goToLobby={this.goToLobby}
-              updateInfo={this.updateInfo}
-            />
-          )}
-          {this.state.currentPage === Pages.JOIN && (
-            <JoinPage goToLobby={this.goToLobby} updateInfo={this.updateInfo} />
-          )}
-          {this.state.currentPage === Pages.LOBBY && (
-            <LobbyPage
-              name={this.state.name}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToHunt={this.goToHunt}
-              isOwner={this.state.isOwner}
-              socket={this.state.socket}
-              showCountdown={this.state.showCountdown}
-            />
-          )}
-          {this.state.currentPage === Pages.HUNT && (
-            <HuntPage
-              name={this.state.name}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToLobby={this.goToLobby}
-              goToWaldo={this.goToWaldo}
-              hintList={this.state.hintList}
-              numberOfHints={this.state.numberOfHints}
-              markerLayer={this.state.markerLayer}
-            />
-          )}
-          {this.state.currentPage === Pages.WALDO && (
-            <WaldoPage
-              name={this.state.name}
-              userId={this.state.userId}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToPostGame={this.goToPostGame}
-              boundingBox={this.state.boundingBox}
-              // concludeHuntHandler={this.concludeHunt}
-            />
-          )}
-          {this.state.currentPage === Pages.POSTGAME && (
-            <PostGamePage
-              name={this.state.name}
-              players={this.state.oldPlayerList}
-              winnerList={this.state.winnerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              joinNextLobby={this.joinNextLobby}
-            />
-          )}
+          style={{
+            maxHeight: "calc(100vh - 40px)",
+            overflowY: "auto",
+          }}
+        >
+          <Navbar
+            expand="xs"
+            //bg="dark"
+            variant="light"
+          >
+            <Navbar.Toggle />
+            <Navbar.Brand
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translatex(-50%)",
+              }}
+            >
+              UnleavenTheCurve
+            </Navbar.Brand>
+            {(this.state.currentPage === Pages.CREATE ||
+              this.state.currentPage === Pages.JOIN) && (
+              <input
+                style={{ width: "40px", height: "40px" }}
+                type="image"
+                alt="Back"
+                src={backButton}
+                onClick={() => this.handleBackButton()}
+              />
+            )}
+          </Navbar>
+          <div
+            style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
+          />
+          <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.LANDING && (
+              <LandingPage
+                goToCreate={this.goToCreate}
+                goToJoin={this.goToJoin}
+              />
+            )}
+            {this.state.currentPage === Pages.CREATE && (
+              <CreatePage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.JOIN && (
+              <JoinPage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.LOBBY && (
+              <LobbyPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToHunt={this.goToHunt}
+                isOwner={this.state.isOwner}
+                socket={this.state.socket}
+                showCountdown={this.state.showCountdown}
+              />
+            )}
+            {this.state.currentPage === Pages.HUNT && (
+              <HuntPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToLobby={this.goToLobby}
+                goToWaldo={this.goToWaldo}
+                hintList={this.state.hintList}
+                numberOfHints={this.state.numberOfHints}
+                markerLayer={this.state.markerLayer}
+              />
+            )}
+            {this.state.currentPage === Pages.WALDO && (
+              <WaldoPage
+                name={this.state.name}
+                userId={this.state.userId}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToPostGame={this.goToPostGame}
+                boundingBox={this.state.boundingBox}
+                concludeHuntHandler={this.concludeHunt}
+              />
+            )}
+            {this.state.currentPage === Pages.POSTGAME && (
+              <PostGamePage
+                name={this.state.name}
+                players={this.state.playerList}
+                winnersList={this.state.winnersList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                joinNextLobby={this.joinNextLobby}
+              />
+            )}
+          </div>
+
+          <Modal show={this.state.backModal} onHide={this.closeBackModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Are you sure you want to go back?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {this.state.currentPage === Pages.LOBBY
+                ? "If you leave now, you'll lose your score and have to rejoin the Seder."
+                : "If you leave now, you'll have to wait until the next hunt."}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="danger" onClick={this.confirmBack}>
+                {this.state.currentPage === Pages.LOBBY
+                  ? "Leave Seder"
+                  : "Leave Hunt"}
+              </Button>
+              <Button variant="primary" onClick={this.closeBackModal}>
+                Cancel
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
         <div
           style={{
+            position: "fixed",
+            bottom: "10px",
+            width: "100%",
             textAlign: "center",
           }}
         >
@@ -491,27 +551,7 @@ class App extends React.Component {
             Learn more about this <a href="/">project</a>
           </span>
         </div>
-        <Modal show={this.state.backModal} onHide={this.closeBackModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Are you sure you want to go back?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.state.currentPage === Pages.LOBBY
-              ? "If you leave now, you'll lose your score and have to rejoin the Seder."
-              : "If you leave now, you'll have to wait until the next hunt."}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="danger" onClick={this.confirmBack}>
-              {this.state.currentPage === Pages.LOBBY
-                ? "Leave Seder"
-                : "Leave Hunt"}
-            </Button>
-            <Button variant="primary" onClick={this.closeBackModal}>
-              Cancel
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      </>
     );
   }
 }

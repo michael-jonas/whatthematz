@@ -25,7 +25,7 @@ from bson.objectid import ObjectId
 
 from imaging import getRandomHide, getCityImage, getMatzahImage
 
-DEBUG = True
+DEBUG = False
 DEFAULT_WIN_COUNT = 0
 CITIES = [
     'Toronto',
@@ -129,14 +129,17 @@ def ImageData(imgOrBytes, rect):
 
 def getImageForHunt(city):
     city = city.lower().replace(" ", "_")
-    imgPath = city + "/img/" + city + "_hidden.jpg"
+    folderPath = os.path.join('cities', city, 'img')
+    imgPath = os.path.join(folderPath, city + '_hidden.jpg')
+    txtPath = os.path.join(folderPath, 'matza_xy.txt')
+
     img = PIL.Image.open(imgPath)
-    with open(city + "/img/" + "matza_xy.txt", 'r') as file:
+    with open(txtPath, 'r') as file:
         coords = file.read().split(',')
         x = int(coords[0])
         y = int(coords[1])
-    
-    w, h = getMatzahImage()
+
+    w, h = getMatzahImage().size
     return img, (x,y,w,h)
 
 def setupHunt(huntId, city=None, matzahXY=None):
@@ -165,10 +168,10 @@ def setupHunt(huntId, city=None, matzahXY=None):
 
     # put the image in the images db, and link to it from the hunt
     imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
-    db.hunts.update_one({'_id': huntId}, {'$set': {'imageId': imageId}})
+    db.hunts.update_one({'_id': huntId}, {'$set': {'city': city, 'imageId': imageId}})
     return imageId
 
-if __name__ == '__main__' and DEBUG:
+if False and __name__ == '__main__' and DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = ['ADCD', 'DCBA', 'AAAA', 'BBBB']
     idxs = range(len(names))
@@ -210,7 +213,7 @@ if __name__ == '__main__' and DEBUG:
 
         setupHunt(huntResult.inserted_id)
 
-        print(name, _room, _seder_result.inserted_id, huntResult.inserted_id)
+        # print(name, _room, _seder_result.inserted_id, huntResult.inserted_id)
 
 
 PROJECT_PATH = '/usr/src/app'
@@ -234,7 +237,7 @@ def getHuntById(huntId):
 def badResponse(bad='Bad args'):
     error = f'Whoops! {bad}.'
     response = {'Error': error}
-    print(response)
+    # print(response)
     error_result = (response, status.HTTP_400_BAD_REQUEST)
     return error_result
 
@@ -253,9 +256,9 @@ class BEVENTS(Enum):
     USER_LEFT = 2
 
 
-@socket.on('connect')
-def on_connect():
-    print('User connected')
+# @socket.on('connect')
+# def on_connect():
+    # print('User connected')
 
 lookup_table = {}
 
@@ -267,7 +270,7 @@ def on_new_user(data):
     sederId = data['seder_id']
     huntId = data['hunt_id']
 
-    print(f'User {username} just joined room {room}')
+    # print(f'User {username} just joined room {room}')
 
     join_room(room)
     emit('message', {'message': f'User {username} just joined room {room}'}, room=room)
@@ -317,10 +320,10 @@ def on_trigger_hunt(data):
     roomCode = hunt['roomCode']
     emit('start_time_update', {'startTime': huntStart.isoformat() + '+00:00'}, room=roomCode)
 
-    response = {'ok:': True}
+    response = {'ok': True}
     return (response, status.HTTP_200_OK)
 
-def createHuntInSeder(sederData, queuedPlayers, currentHuntData=None):
+def createHuntInSeder(sederData):
     sederId = sederData['_id']
     roomCode = sederData['roomCode']
 
@@ -361,28 +364,48 @@ def trigger_win(data):
         return_document=ReturnDocument.BEFORE,
     )
 
-    sederId = huntId['sederId']
+    sederId = hunt['sederId']
 
     # update the player only if they were the first to finish
     if not hunt['isFinished']:
-        db.users.update_one({
+        db.users.update_one(
             {'_id': userId},
             {'$inc': {M_SCORE: 1}}
-        })
+        )
         sederData = db.seders.find_one({"_id": hunt['sederId']})
         # create a new hunt!
-        newHuntId = createHuntInSeder(sederData, [])
+        # print('creating a new hunt in the seder')
+        newHuntId = createHuntInSeder(sederData)
+        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
+        setupHunt(newHuntId, city)
     else:
+        # print('finding latest hunt id a new hunt in the seder')
         newHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
 
     # returned winners list is from BEFORE, so we manually add here userid
     winners_list = hunt['winners'] + [str(userId)]
     roomCode = hunt['roomCode']
 
+    # fill out winners list (effectively a join)
+    winner_list_ids = [ObjectId(x) for x in winners_list]
+
+    winner_docs = db.users.find({
+        '_id': { '$in': winner_list_ids }
+    })
+
+    def _foo(doc):
+        return {
+            '_id': str(doc['_id']),
+            M_NICKNAME: str(doc[M_NICKNAME]),
+            M_SCORE: doc[M_SCORE],
+            M_AVATAR: doc[M_AVATAR],
+        }
+
+    winners = [_foo(doc) for doc in winner_docs]
     # emit that the winners list is updated
     response = {
-        'winnersList': winners_list,
-        'newHuntId': newHuntId
+        'winnerList': winners,
+        'newHuntId': str(newHuntId),
     }
 
     emit('winners_list_update', response, roomCode=roomCode)
@@ -410,10 +433,11 @@ def join_hunt(data):
 
     response = {
         'participants': participants,
+        'ok': True,
     }
 
     roomCode = hunt['roomCode']
-    emit('hunt_player_list', response, roomCode=roomCode)
+    emit('player_list', response, roomCode=roomCode)
     return (response, status.HTTP_200_OK)
 
 
@@ -693,7 +717,7 @@ def joinSeder():
     # else:
     if True: #pylint:disable=using-constant-test
         # Hunt hasn't started yet, add them as a participant in the hunt
-        print(sederData['members'])
+        # print(sederData['members'])
         str_uid = str(user_uuid)
         db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
 
@@ -854,7 +878,7 @@ def getCities():
     cities = []
     for city in CITIES:
         fpath = getJsonPath(city)
-        print(fpath)
+        # print(fpath)
         if os.path.exists(fpath) and os.path.isfile(fpath):
             with open(fpath) as f:
                 data = json.load(f)
@@ -884,5 +908,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', debug=False)
+    app.run(host='0.0.0.0', debug=False, threaded=True)
     socket.run(app, debug=False)

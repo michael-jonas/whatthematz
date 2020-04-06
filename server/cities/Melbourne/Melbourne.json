@@ -1,9 +1,9 @@
 {
     "name": "Melbourne", 
     "country": "Australia", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["You might think it is the capital of Australia, but it is not."], 
+    "mediumHints": ["It's not hard to live down under, this city is consistently one of the most livable."], 
+    "hardHints": ["Do you have a rose in every cheek?"], 
     "latitude": -37.8142176, 
     "longitude": 144.9631608
 }
