@@ -109,7 +109,7 @@ class App extends React.Component {
 
       this.setState({
         winnersList: data["winnerList"],
-        nextHuntId: data.newHuntId._id,
+        nextHuntId: data.newHuntId,
       });
     });
   }

@@ -431,7 +431,7 @@ def join_hunt(data):
         return_document=ReturnDocument.AFTER,
     )
 
-    participants = hunt['participants']
+    participants = generatePlayerList(huntId)
 
     response = {
         'n': len(participants),
