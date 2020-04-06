@@ -68,8 +68,10 @@ class App extends React.Component {
   }
 
   handleLeavePage(e) {
-    e.preventDefault();
-    e.returnValue = "are you sure";
+    if (this.state.roomCode !== "") {
+      e.preventDefault();
+      e.returnValue = "are you sure";
+    }
   }
 
   playerList = [
