@@ -382,6 +382,7 @@ class App extends React.Component {
         gameEndTime: Date.now(),
       });
       this.preloadWaldoImage();
+      this.loadBoundingBox(0);
       this.setState({
         currentPage: Pages.LOBBY,
       });
@@ -403,113 +404,147 @@ class App extends React.Component {
 
   render() {
     return (
-      <div>
-        <Navbar
-          expand="xs"
-          //bg="dark"
-          variant="light"
-        >
-          <Navbar.Toggle />
-          <Navbar.Brand
-            style={{
-              position: "absolute",
-              left: "50%",
-              transform: "translatex(-50%)",
-            }}
-          >
-            <img
-              alt=""
-              src={logo}
-              width="30"
-              height="30"
-              className="d-inline-block align-top"
-            />
-            UnleavenTheCurve
-          </Navbar.Brand>
-          {(this.state.currentPage === Pages.CREATE ||
-            this.state.currentPage === Pages.JOIN) && (
-            <input
-              style={{ width: "40px", height: "40px" }}
-              type="image"
-              alt="Back"
-              src={backButton}
-              onClick={() => this.handleBackButton()}
-            />
-          )}
-        </Navbar>
+      <>
         <div
-          style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
-        />
-        <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
-          {this.state.currentPage === Pages.LANDING && (
-            <LandingPage
-              goToCreate={this.goToCreate}
-              goToJoin={this.goToJoin}
-            />
-          )}
-          {this.state.currentPage === Pages.CREATE && (
-            <CreatePage
-              goToLobby={this.goToLobby}
-              updateInfo={this.updateInfo}
-            />
-          )}
-          {this.state.currentPage === Pages.JOIN && (
-            <JoinPage goToLobby={this.goToLobby} updateInfo={this.updateInfo} />
-          )}
-          {this.state.currentPage === Pages.LOBBY && (
-            <LobbyPage
-              name={this.state.name}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToHunt={this.goToHunt}
-              isOwner={this.state.isOwner}
-              socket={this.state.socket}
-              showCountdown={this.state.showCountdown}
-            />
-          )}
-          {this.state.currentPage === Pages.HUNT && (
-            <HuntPage
-              name={this.state.name}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToLobby={this.goToLobby}
-              goToWaldo={this.goToWaldo}
-              hintList={this.state.hintList}
-              numberOfHints={this.state.numberOfHints}
-              markerLayer={this.state.markerLayer}
-            />
-          )}
-          {this.state.currentPage === Pages.WALDO && (
-            <WaldoPage
-              name={this.state.name}
-              userId={this.state.userId}
-              players={this.state.playerList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              goToPostGame={this.goToPostGame}
-              boundingBox={this.state.boundingBox}
-              concludeHuntHandler={this.concludeHunt}
-            />
-          )}
-          {this.state.currentPage === Pages.POSTGAME && (
-            <PostGamePage
-              name={this.state.name}
-              players={this.state.oldPlayerList}
-              winnersList={this.state.winnersList}
-              roomCode={this.state.roomCode}
-              sederName={this.state.sederName}
-              huntId={this.state.huntId}
-              joinNextLobby={this.joinNextLobby}
-            />
-          )}
+          style={{
+            maxHeight: 662,
+            overflowY: "auto",
+          }}
+        >
+          <Navbar
+            expand="xs"
+            //bg="dark"
+            variant="light"
+          >
+            <Navbar.Toggle />
+            <Navbar.Brand
+              style={{
+                position: "absolute",
+                left: "50%",
+                transform: "translatex(-50%)",
+              }}
+            >
+              <img
+                alt=""
+                src={logo}
+                width="30"
+                height="30"
+                className="d-inline-block align-top"
+              />
+              UnleavenTheCurve
+            </Navbar.Brand>
+            {(this.state.currentPage === Pages.CREATE ||
+              this.state.currentPage === Pages.JOIN) && (
+              <input
+                style={{ width: "40px", height: "40px" }}
+                type="image"
+                alt="Back"
+                src={backButton}
+                onClick={() => this.handleBackButton()}
+              />
+            )}
+          </Navbar>
+          <div
+            style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
+          />
+          <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.LANDING && (
+              <LandingPage
+                goToCreate={this.goToCreate}
+                goToJoin={this.goToJoin}
+              />
+            )}
+            {this.state.currentPage === Pages.CREATE && (
+              <CreatePage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.JOIN && (
+              <JoinPage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.LOBBY && (
+              <LobbyPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToHunt={this.goToHunt}
+                isOwner={this.state.isOwner}
+                socket={this.state.socket}
+                showCountdown={this.state.showCountdown}
+              />
+            )}
+            {this.state.currentPage === Pages.HUNT && (
+              <HuntPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToLobby={this.goToLobby}
+                goToWaldo={this.goToWaldo}
+                hintList={this.state.hintList}
+                numberOfHints={this.state.numberOfHints}
+                markerLayer={this.state.markerLayer}
+              />
+            )}
+            {this.state.currentPage === Pages.WALDO && (
+              <WaldoPage
+                name={this.state.name}
+                userId={this.state.userId}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToPostGame={this.goToPostGame}
+                boundingBox={this.state.boundingBox}
+                concludeHuntHandler={this.concludeHunt}
+              />
+            )}
+            {this.state.currentPage === Pages.POSTGAME && (
+              <PostGamePage
+                name={this.state.name}
+                players={this.state.oldPlayerList}
+                winnersList={this.state.winnersList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                joinNextLobby={this.joinNextLobby}
+              />
+            )}
+          </div>
+
+          <Modal show={this.state.backModal} onHide={this.closeBackModal}>
+            <Modal.Header closeButton>
+              <Modal.Title>Are you sure you want to go back?</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {this.state.currentPage === Pages.LOBBY
+                ? "If you leave now, you'll lose your score and have to rejoin the Seder."
+                : "If you leave now, you'll have to wait until the next hunt."}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="danger" onClick={this.confirmBack}>
+                {this.state.currentPage === Pages.LOBBY
+                  ? "Leave Seder"
+                  : "Leave Hunt"}
+              </Button>
+              <Button variant="primary" onClick={this.closeBackModal}>
+                Cancel
+              </Button>
+            </Modal.Footer>
+          </Modal>
         </div>
         <div
           style={{
+            position: "fixed",
+            bottom: "10px",
+            width: "100%",
             textAlign: "center",
           }}
         >
@@ -517,27 +552,7 @@ class App extends React.Component {
             Learn more about this <a href="/">project</a>
           </span>
         </div>
-        <Modal show={this.state.backModal} onHide={this.closeBackModal}>
-          <Modal.Header closeButton>
-            <Modal.Title>Are you sure you want to go back?</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            {this.state.currentPage === Pages.LOBBY
-              ? "If you leave now, you'll lose your score and have to rejoin the Seder."
-              : "If you leave now, you'll have to wait until the next hunt."}
-          </Modal.Body>
-          <Modal.Footer>
-            <Button variant="danger" onClick={this.confirmBack}>
-              {this.state.currentPage === Pages.LOBBY
-                ? "Leave Seder"
-                : "Leave Hunt"}
-            </Button>
-            <Button variant="primary" onClick={this.closeBackModal}>
-              Cancel
-            </Button>
-          </Modal.Footer>
-        </Modal>
-      </div>
+      </>
     );
   }
 }
