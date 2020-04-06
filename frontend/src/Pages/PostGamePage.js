@@ -43,7 +43,7 @@ export default class PostGamePage extends React.Component {
         <Container style={{ textAlign: "center" }} id="winnerList">
           {winnersList}
         </Container>
-        {this.props.players.length > 0 && (
+        {this.props.players?.length > 0 && (
           <>
             <h5 style={{ marginTop: 10 }}>
               Other players who are playing again
@@ -55,6 +55,7 @@ export default class PostGamePage extends React.Component {
         )}
         <div style={{ textAlign: "center" }}>
           <Button
+            variant="outline-primary"
             // todo actually handle click
             style={{
               marginLeft: "20px",

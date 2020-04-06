@@ -105,11 +105,11 @@ class App extends React.Component {
       // winners list
       // next hunt id
       // old player list conditionally
-      //console.log(data);
+      // console.log(data);
 
       this.setState({
         winnersList: data["winnerList"],
-        nextHuntId: data["newHuntId"],
+        nextHuntId: data.newHuntId._id,
       });
     });
   }
