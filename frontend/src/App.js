@@ -429,13 +429,6 @@ class App extends React.Component {
                 transform: "translatex(-50%)",
               }}
             >
-              <img
-                alt=""
-                src={logo}
-                width="30"
-                height="30"
-                className="d-inline-block align-top"
-              />
               UnleavenTheCurve
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
