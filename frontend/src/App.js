@@ -158,7 +158,7 @@ class App extends React.Component {
     // hintlist is necessary if joining mid game - cant show empty block
 
     const responseAwaiter = fetch(
-      `/get_player_list?huntId=${this.state.huntId}`,
+      `/api/get_player_list?huntId=${this.state.huntId}`,
       { method: "GET" }
     );
 
@@ -189,7 +189,7 @@ class App extends React.Component {
   }
 
   async getHintList() {
-    const response = await fetch(`/get_hints?huntId=${this.state.huntId}`, {
+    const response = await fetch(`/api/get_hints?huntId=${this.state.huntId}`, {
       method: "GET",
     });
     if (response.ok) {
@@ -202,7 +202,7 @@ class App extends React.Component {
 
   async loadMarkers(retries) {
     // fetch list of cities
-    const response = await fetch(`/get_cities`);
+    const response = await fetch(`/api/get_cities`);
     if (response.ok) {
       const json = await response.json();
 
@@ -260,7 +260,7 @@ class App extends React.Component {
   }
   async loadBoundingBox(retries) {
     const boundingBoxResponse = await fetch(
-      `/get_bounding_box?huntId=${this.state.huntId}`,
+      `/api/get_bounding_box?huntId=${this.state.huntId}`,
       { method: "GET" }
     );
 
