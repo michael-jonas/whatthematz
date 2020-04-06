@@ -23,7 +23,7 @@ class App extends React.Component {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
 
-    const _socket = io("http://localhost:3000");
+    const _socket = io("http://localhost:5000");
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -46,7 +46,6 @@ class App extends React.Component {
       markerLayer: <></>,
     };
   }
-  endpoint = ":5000";
 
   setPage(page) {
     this.setState({ currentPage: page });
