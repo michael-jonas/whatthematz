@@ -43,7 +43,7 @@ export default class JoinPage extends React.Component {
       isBusy: true,
     });
     const response = await fetch(
-      `/join_seder?roomCode=${this.state.roomCode.toUpperCase()}&nickname=${
+      `/api/join_seder?roomCode=${this.state.roomCode.toUpperCase()}&nickname=${
         this.state.name
       }`,
       {

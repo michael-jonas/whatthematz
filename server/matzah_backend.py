@@ -472,7 +472,7 @@ def on_disconnect():
 #     leave_room(room)
 #     emit(username + ' has left the room.', room=room)
 
-@app.route('/get_seder_details', methods=['GET'])
+@app.route('/api/get_seder_details', methods=['GET'])
 def getSederDetails():
     sederId = parseIdArg(request.args.get('sederId'))
     # userId is optional!
@@ -524,7 +524,7 @@ def generatePlayerList(huntId):
     result = [_foo(pid) for pid in players]
     return result
 
-@app.route('/get_player_list', methods=['GET'])
+@app.route('/api/get_player_list', methods=['GET'])
 def getPlayerList():
     # get parameters and sanitize
     huntId = request.args.get('huntId')
@@ -535,7 +535,7 @@ def getPlayerList():
 
     return goodResponse(playerList)
 
-@app.route('/hunt_start_time', methods=['GET'])
+@app.route('/api/hunt_start_time', methods=['GET'])
 def huntStartTime():
     # get parameters and sanitize
     huntId = request.args.get('huntId')
@@ -553,7 +553,7 @@ def getJsonPath(city):
     x = city.lower().replace(' ', '_')
     return os.path.join('cities', x, x + '.json')
 
-@app.route('/get_hints', methods=['GET'])
+@app.route('/api/get_hints', methods=['GET'])
 def getHints():
     # get parameters and sanitize
     huntId = request.args.get('huntId')
@@ -577,7 +577,7 @@ def getHints():
     # return bad if no json found
     return badResponse('Invalid Resource, city JSON not found')
 
-@app.route('/check_location', methods=['GET'])
+@app.route('/api/check_location', methods=['GET'])
 def checkLocation():
     """User hits this endpoint when they click on a location.
 
@@ -612,7 +612,7 @@ def checkLocation():
 
     return goodResponse(response)
 
-@app.route('/get_image', methods=['GET'])
+@app.route('/api/get_image', methods=['GET'])
 def getImage():
 
     huntIdArg = request.args.get('huntId')
@@ -637,7 +637,7 @@ def getImage():
         mimetype='image/jpg',
     )
 
-@app.route('/get_bounding_box', methods=['GET'])
+@app.route('/api/get_bounding_box', methods=['GET'])
 def getBoundingBox():
 
     huntIdArg = request.args.get('huntId')
@@ -668,7 +668,7 @@ def getSederDataByRoomCode(roomCode):
     # TODO: Get most recent seder with roomCode
     return db.seders.find_one({"roomCode": roomCode})
 
-@app.route('/join_seder', methods=['POST'])
+@app.route('/api/join_seder', methods=['POST'])
 def joinSeder():
 
     # Get data from the HTTP request
@@ -740,7 +740,7 @@ def joinSeder():
 
     return (response, status.HTTP_200_OK)
 
-@app.route('/trigger_hunt', methods=['PUT'])
+@app.route('/api/trigger_hunt', methods=['PUT'])
 def triggerHunt():
     """ 
     Owner of seder clicks start hunt
