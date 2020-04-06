@@ -434,7 +434,8 @@ def join_hunt(data):
     participants = hunt['participants']
 
     response = {
-        'participants': participants,
+        'n': len(participants),
+        'player_list': participants,
         'ok': True,
     }
 
