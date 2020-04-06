@@ -137,6 +137,7 @@ class App extends React.Component {
         //console.log(data);
         this.setState({
           winnersList: data.winnerList,
+          playerList: [],
         });
         this.goToPostGame();
       }
@@ -412,7 +413,7 @@ class App extends React.Component {
       <>
         <div
           style={{
-            maxHeight: 662,
+            maxHeight: "calc(100vh - 40px)",
             overflowY: "auto",
           }}
         >
@@ -507,7 +508,7 @@ class App extends React.Component {
             {this.state.currentPage === Pages.POSTGAME && (
               <PostGamePage
                 name={this.state.name}
-                players={this.state.oldPlayerList}
+                players={this.state.playerList}
                 winnersList={this.state.winnersList}
                 roomCode={this.state.roomCode}
                 sederName={this.state.sederName}

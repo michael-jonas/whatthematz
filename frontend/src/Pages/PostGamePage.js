@@ -45,7 +45,9 @@ export default class PostGamePage extends React.Component {
         </Container>
         {this.props.players.length > 0 && (
           <>
-            <h5>Other players who are playing again</h5>
+            <h5 style={{ marginTop: 10 }}>
+              Other players who are playing again
+            </h5>
             <Container style={{ textAlign: "center" }} id="playerList">
               {playerList}
             </Container>
