@@ -50,7 +50,7 @@ CITIES = [
 ]
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'not a publicly avialable asfd!'
+app.config['SECRET_KEY'] = 'notacomplexsecret'
 socket = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
 
 L_ROOMCODES = 4
@@ -908,5 +908,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    #app.run(debug=False)
+    app.run(host='0.0.0.0', debug=False)
     socket.run(app, debug=False)
