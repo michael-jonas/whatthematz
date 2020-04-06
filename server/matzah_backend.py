@@ -129,14 +129,17 @@ def ImageData(imgOrBytes, rect):
 
 def getImageForHunt(city):
     city = city.lower().replace(" ", "_")
-    imgPath = city + "/img/" + city + "_hidden.jpg"
+    folderPath = os.path.join('cities', city, 'img')
+    imgPath = os.path.join(folderPath, city + '_hidden.jpg')
+    txtPath = os.path.join(folderPath, 'matza_xy.txt')
+
     img = PIL.Image.open(imgPath)
-    with open(city + "/img/" + "matza_xy.txt", 'r') as file:
+    with open(txtPath, 'r') as file:
         coords = file.read().split(',')
         x = int(coords[0])
         y = int(coords[1])
     
-    w, h = getMatzahImage()
+    w, h = getMatzahImage().size
     return img, (x,y,w,h)
 
 def setupHunt(huntId, city=None, matzahXY=None):
@@ -165,10 +168,10 @@ def setupHunt(huntId, city=None, matzahXY=None):
 
     # put the image in the images db, and link to it from the hunt
     imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
-    db.hunts.update_one({'_id': huntId}, {'$set': {'imageId': imageId}})
+    db.hunts.update_one({'_id': huntId}, {'$set': {'city': city, 'imageId': imageId}})
     return imageId
 
-if __name__ == '__main__' and DEBUG:
+if False and __name__ == '__main__' and DEBUG:
     names = ['jonas', 'david', 'daniel', 'allison']
     rooms = ['ADCD', 'DCBA', 'AAAA', 'BBBB']
     idxs = range(len(names))
