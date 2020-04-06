@@ -411,7 +411,7 @@ def trigger_win(data):
         'newHuntId': str(newHuntId),
     }
 
-    emit('winners_list_update', response, roomCode=roomCode)
+    emit('winners_list_update', response, room=roomCode)
     return (response, status.HTTP_200_OK)
 
 
@@ -441,7 +441,7 @@ def join_hunt(data):
     }
 
     roomCode = hunt['roomCode']
-    emit('player_list', response, roomCode=roomCode)
+    emit('player_list', response, room=roomCode)
     return (response, status.HTTP_200_OK)
 
 
