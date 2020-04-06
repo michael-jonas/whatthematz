@@ -16,14 +16,13 @@ import WaldoPage from "./Pages/WaldoPage";
 import PostGamePage from "./Pages/PostGamePage";
 
 import { Pages } from "./Globals/Enums";
-import io from "socket.io-client";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
-    const _socket = io("http://3.20.149.230");
-    //const _socket = io("localhost:5000");
+    this.handleLeavePage = this.handleLeavePage.bind(this);
+
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -40,31 +39,98 @@ class App extends React.Component {
       backModal: false,
       isOwner: false,
       boundingBox: null,
-      socket: _socket,
       showCountdown: false,
       gameEndTime: Date.now(),
       markerLayer: <></>,
+      currentHuntOver: false,
     };
   }
+  firstJoin = true;
 
   setPage(page) {
     this.setState({ currentPage: page });
   }
 
   componentDidMount() {
+    window.addEventListener("beforeunload", () => {
+      this.handleLeavePage();
+    });
+  }
+
+  componentWillUnmount() {
+    window.addEventListener("beforeunload", () => {
+      this.handleLeavePage();
+    });
+  }
+
+  handleLeavePage() {
+    this.props.socket.disconnect();
+  }
+
+  playerList = [
+    {
+      name: "bob",
+      score: 0,
+    },
+    {
+      name: "ted",
+      score: 3,
+    },
+  ];
+
+  concludeHunt = () => {
+    this.props.socket.emit(
+      "trigger_win",
+      {
+        huntId: this.state.huntId,
+        userId: this.state.userId,
+      },
+      (data) => {
+        //console.log(data);
+        this.setState({
+          winnersList: data.winnerList,
+          playerList: [],
+        });
+        this.goToPostGame();
+      }
+    );
+  };
+
+  async goToLobby() {
+    //console.log("emit user");
+
     // verify our websocket connection is established
-    this.state.socket.on("message", (data) => {
+    this.props.socket.on("message", (data) => {
       // console.log("Got message:");
       // console.log(data);
     });
-    this.state.socket.on("player_list", (data) => {
+
+    this.props.socket.on("player_list", (data) => {
       // console.log("Got player list:");
-      // console.log(data["player_list"]);
+
+      console.log(data["player_list"]);
+      if (this.firstJoin) {
+        this.firstJoin = false;
+        if (true) {
+          // if this.hunt is in progress TODO
+          this.setState({
+            currentPage: Pages.LOBBY,
+          });
+        } else {
+          this.setState({
+            currentPage: Pages.HUNT,
+          });
+        }
+      }
+      const isOwner = data.player_list[0].uuid === this.state.userId;
+
       this.setState({
         playerList: data["player_list"],
+        isOwner: isOwner,
       });
     });
-    this.state.socket.on("start_time_update", (data) => {
+
+    this.props.socket.on("start_time_update", (data) => {
       // console.log('Got start time update:');
       let dt_str = data["startTime"];
       // console.log('dt string: ' + dt_str);
@@ -99,57 +165,40 @@ class App extends React.Component {
 
       this.setState({ showCountdown: true });
     });
-    this.state.socket.on("winners_list_update", (data) => {
+    this.props.socket.on("winners_list_update", (data) => {
       // console.log("got winner list:");
       // Updates:
       // winners list
       // next hunt id
       // old player list conditionally
-      // console.log(data);
+      console.log(data);
+
+      if (!this.state.currentHuntOver) {
+        // kick off timers
+        this.setState({
+          currentHuntOver: true,
+          gameEndTime: Date.now(),
+        });
+      }
 
       this.setState({
         winnersList: data["winnerList"],
         nextHuntId: data.newHuntId,
       });
     });
-  }
 
-  playerList = [
-    {
-      name: "bob",
-      score: 0,
-    },
-    {
-      name: "ted",
-      score: 3,
-    },
-  ];
-
-  concludeHunt = () => {
-    this.state.socket.emit(
-      "trigger_win",
+    this.props.socket.emit(
+      "new_user",
       {
-        huntId: this.state.huntId,
-        userId: this.state.userId,
+        username: this.state.name,
+        room: this.state.roomCode,
+        seder_id: this.state.sederId,
+        hunt_id: this.state.huntId,
       },
       (data) => {
-        //console.log(data);
-        this.setState({
-          winnersList: data.winnerList,
-          playerList: [],
-        });
-        this.goToPostGame();
+        //console.log("success new_user");
       }
     );
-  };
-
-  async goToLobby(skipLobby) {
-    this.state.socket.emit("new_user", {
-      username: this.state.name,
-      room: this.state.roomCode,
-      seder_id: this.state.sederId,
-      hunt_id: this.state.huntId,
-    });
     // load the players in the lobby
     // TODO SPINNER HERE
 
@@ -157,31 +206,8 @@ class App extends React.Component {
     // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    const responseAwaiter = fetch(
-      `/api/get_player_list?huntId=${this.state.huntId}`,
-      { method: "GET" }
-    );
-
     // todo this will be replaced in socket event
     await this.getHintList();
-
-    const jsonAwaiter = (await responseAwaiter).json();
-
-    const playerList = (await jsonAwaiter).result;
-
-    if (playerList != null) {
-      this.setState({ playerList: playerList });
-    }
-
-    if (skipLobby) {
-      this.setState({
-        currentPage: Pages.HUNT,
-      });
-    } else {
-      this.setState({
-        currentPage: Pages.LOBBY,
-      });
-    }
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
@@ -371,12 +397,11 @@ class App extends React.Component {
     // join next hunt with "next hunt id" from "conclude_hunt" socket
     // set huntId state to be the nexthuntid
     // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-    const nextHuntId = this.state.nextHuntId;
 
     let onSuccess = () => {
       // fetch
       this.setState({
-        huntId: nextHuntId,
+        huntId: this.state.nextHuntId,
         nextHuntId: "",
         winnerList: [],
         hintList: [],
@@ -384,6 +409,7 @@ class App extends React.Component {
         boundingBox: [],
         showCountdown: false,
         gameEndTime: Date.now(),
+        currentHuntOver: false,
       });
       this.preloadWaldoImage();
       this.loadBoundingBox(0);
@@ -393,10 +419,10 @@ class App extends React.Component {
       });
     };
 
-    this.state.socket.emit(
+    this.props.socket.emit(
       "join_hunt",
       {
-        huntId: this.state.huntId,
+        huntId: this.state.nextHuntId,
         userId: this.state.userId,
       },
       (data) => {
@@ -473,7 +499,7 @@ class App extends React.Component {
                 huntId={this.state.huntId}
                 goToHunt={this.goToHunt}
                 isOwner={this.state.isOwner}
-                socket={this.state.socket}
+                socket={this.props.socket}
                 showCountdown={this.state.showCountdown}
               />
             )}
