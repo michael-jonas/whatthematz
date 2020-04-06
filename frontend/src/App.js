@@ -106,7 +106,7 @@ class App extends React.Component {
       // winners list
       // next hunt id
       // old player list conditionally
-      console.log(data);
+      //console.log(data);
 
       this.setState({
         winnersList: data["winnerList"],
@@ -134,7 +134,7 @@ class App extends React.Component {
         userId: this.state.userId,
       },
       (data) => {
-        console.log(data);
+        //console.log(data);
         this.setState({
           winnersList: data.winnerList,
         });
