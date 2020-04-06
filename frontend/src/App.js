@@ -52,19 +52,24 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.addEventListener("beforeunload", (e) => {
+      this.handleLeavePage(e);
+    });
+    window.addEventListener("unload", (e) => {
+      this.props.socket.disconnect();
+      console.log("disconnected");
     });
   }
 
   componentWillUnmount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.removeEventListener("beforeunload", (e) => {
+      this.handleLeavePage(e);
     });
   }
 
-  handleLeavePage() {
-    this.props.socket.disconnect();
+  handleLeavePage(e) {
+    e.preventDefault();
+    e.returnValue = "are you sure";
   }
 
   playerList = [
