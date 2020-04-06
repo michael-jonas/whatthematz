@@ -413,7 +413,7 @@ class App extends React.Component {
       <>
         <div
           style={{
-            maxHeight: "calc(100vh - 80px)",
+            maxHeight: "calc(100vh - 40px)",
             overflowY: "auto",
           }}
         >

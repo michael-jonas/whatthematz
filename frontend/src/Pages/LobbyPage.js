@@ -9,9 +9,6 @@ import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
 
-import matzahInstruction1 from "../Images/Instructions/matzah1Mobile.png";
-import matzahInstruction2 from "../Images/Instructions/matzah2Mobile.png";
-
 import MapInstructions from "../Components/MapInstructions";
 import WaldoInstructions from "../Components/WaldoInstructions";
 
