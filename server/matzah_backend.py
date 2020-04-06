@@ -382,8 +382,8 @@ def trigger_win(data):
         return {
             '_id': str(doc['_id']),
             M_NICKNAME: str(doc[M_NICKNAME]),
-            M_SCORE: str(doc[M_SCORE]),
-            M_AVATAR: str(doc[M_AVATAR]),
+            M_SCORE: doc[M_SCORE],
+            M_AVATAR: doc[M_AVATAR],
         }
 
     winners = [_foo(doc) for doc in winner_docs]
