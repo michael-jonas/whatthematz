@@ -381,7 +381,8 @@ def trigger_win(data):
         setupHunt(newHuntId, city)
     else:
         # print('finding latest hunt id a new hunt in the seder')
-        newHuntId = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
+        newHunt = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
+        newHuntId = newHunt['_id']
 
     # returned winners list is from BEFORE, so we manually add here userid
     winners_list = hunt['winners'] + [str(userId)]
