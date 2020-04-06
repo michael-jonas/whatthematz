@@ -437,7 +437,7 @@ def join_hunt(data):
     }
 
     roomCode = hunt['roomCode']
-    emit('hunt_player_list', response, roomCode=roomCode)
+    emit('player_list', response, roomCode=roomCode)
     return (response, status.HTTP_200_OK)
 
 
