@@ -6,6 +6,7 @@
 #pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
 #pylint:disable=unused-import
 
+import sys
 import time
 import os
 import io
@@ -51,8 +52,13 @@ CITIES = [
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-#  async_mode='eventlet'
-socket = SocketIO(app, cors_allowed_origins="*")
+#app.config['SERVER_NAME'] = 'localhost:5000'
+#  
+if len(sys.argv) > 1 and sys.argv[1] == 'eventlet':
+    print('running server with eventlet')
+    socket = SocketIO(app, async_mode='eventlet', cors_allowed_origins="*")
+else:
+    socket = SocketIO(app, cors_allowed_origins="*")
 
 L_ROOMCODES = 4
 
@@ -911,5 +917,5 @@ def getCities():
 #     return str(sederList)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0',debug=False, threaded=True)
-    socket.run(app, debug=False)
+    #app.run(host='0.0.0.0',debug=False, threaded=True)
+    socket.run(app, host='0.0.0.0', debug=False)

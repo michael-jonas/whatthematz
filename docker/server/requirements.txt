@@ -1,4 +1,4 @@
-flask==1.1
+eventlet
 Flask-API==2.0
 flask-socketio
 PyMongo==3.9

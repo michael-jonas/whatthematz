@@ -15,7 +15,7 @@
 #     - flask
 flask:
   build: docker/server
-  command: python -u /usr/src/app/matzah_backend.py
+  command: python -u /usr/src/app/matzah_backend.py eventlet
   ports:
     # so that I can test API
     - "5000:5000"
@@ -25,3 +25,5 @@ flask:
     - db
 db:
   image: mongo:3.0.2
+  restart: always
+  command: --smallfiles
