@@ -4,4 +4,3 @@ flask-socketio
 PyMongo==3.9
 Pillow
 profanityfilter
-pytest

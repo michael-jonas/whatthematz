@@ -23,7 +23,7 @@ class App extends React.Component {
     super(props);
     this.goToLobby = this.goToLobby.bind(this);
 
-    const _socket = io("http://localhost:3000");
+    const _socket = io("http://localhost:5000");
     this.state = {
       currentPage: Pages.LANDING,
       name: "",
@@ -46,7 +46,6 @@ class App extends React.Component {
       markerLayer: <></>,
     };
   }
-  endpoint = ":5000";
 
   setPage(page) {
     this.setState({ currentPage: page });
@@ -106,11 +105,11 @@ class App extends React.Component {
       // winners list
       // next hunt id
       // old player list conditionally
-      //console.log(data);
+      // console.log(data);
 
       this.setState({
         winnersList: data["winnerList"],
-        nextHuntId: data["newHuntId"],
+        nextHuntId: data.newHuntId._id,
       });
     });
   }
@@ -430,7 +429,7 @@ class App extends React.Component {
                 transform: "translatex(-50%)",
               }}
             >
-              UnleavenTheCurve
+              FlattenTheBread
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
               this.state.currentPage === Pages.JOIN) && (

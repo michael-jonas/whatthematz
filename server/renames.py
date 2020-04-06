@@ -1,6 +1,7 @@
 
 import os
 from os.path import join, isfile, isdir
+import shutil
 
 def sanitize(s):
 	return s.lower().replace(' ', '-')
@@ -12,7 +13,7 @@ def rename_under_dir(base):
 		path = join(base, p)
 		if isdir(path):
 			rename_under_dir(path)
-		os.rename(path, sanitize(path))
+		shutil.move(path, sanitize(path))
 
 rename_under_dir('cities')
 
