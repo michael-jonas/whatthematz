@@ -43,7 +43,7 @@ export default class CreatePage extends React.Component {
       isBusy: true,
     });
     const response = await fetch(
-      `/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
+      `/api/create_seder?sederName=${this.state.sederName}&nickname=${this.state.name}`,
       {
         method: "POST",
       }
