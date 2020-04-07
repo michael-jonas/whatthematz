@@ -36,6 +36,7 @@ export default class WaldoInstructions extends React.Component {
                 fontSize: "14px",
                 padding: "5px",
                 display: "flex",
+                alignItems: "center",
               }}
             >
               <img

@@ -529,11 +529,10 @@ class App extends React.Component {
           }}
         >
           <Navbar
-            expand="xs"
             //bg="dark"
             variant="light"
+            style={{ height: "50px" }}
           >
-            <Navbar.Toggle style={{ color: "blue" }} />
             <Navbar.Brand
               style={{
                 position: "absolute",
@@ -549,6 +548,7 @@ class App extends React.Component {
                   fontSize: "14px",
                   fontWeight: "600",
                   lineHeight: "17px",
+                  color: "#212121",
                 }}
               >
                 FLATTEN THE BREAD
@@ -558,7 +558,9 @@ class App extends React.Component {
                   fontFamily: "Muli",
                   fontSize: "12px",
                   fontWeight: "normal",
+                  fontStyle: "normal",
                   lineHeight: "15px",
+                  color: "#424242",
                 }}
               >
                 Keeping a tradition alive during Covid-19
@@ -663,21 +665,21 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        {this.state.currentPage !== Pages.WALDO &&
-          this.state.currentPage !== Pages.HUNT && (
-            <div
-              style={{
-                position: "fixed",
-                bottom: "10px",
-                width: "100%",
-                textAlign: "center",
-              }}
-            >
-              <span>
-                Learn more about this <a href="/">project</a>
-              </span>
-            </div>
-          )}
+        {(this.state.currentPage === Pages.LOBBY ||
+          this.state.currentPage === Pages.POSTGAME) && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: "10px",
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            <span>
+              Learn more about this <a href="/">project</a>
+            </span>
+          </div>
+        )}
       </>
     );
   }
