@@ -43,7 +43,7 @@ export default class HuntPage extends React.Component {
         style={{
           height: 42,
           width: "80%",
-          left: "3%",
+          left: "10%",
           lineHeight: 1.2,
           textAlign: "center",
         }}
