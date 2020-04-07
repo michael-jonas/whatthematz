@@ -2,11 +2,20 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Instructions from "../Components/Instructions";
+import AboutTeam from "../Components/AboutTeam";
 
 import mag from "../Images/mag.png";
 
 export default class PreLandingPage extends React.Component {
   blueColor = "rgba(0, 102, 255, 0.95)";
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      learnMoreShown: false,
+    }
+  }
+  
   render() {
     return (
       <>
@@ -83,6 +92,15 @@ export default class PreLandingPage extends React.Component {
 
             <div style={{ marginTop: "25px" }}>
               <Button
+                onClick={() => {
+                  this.setState(function(state, props){
+                    return {
+                      // TODO: turn this on
+                      // learnMoreShown: !state.learnMoreShown
+                      learnMoreShown: false
+                    };
+                  })
+                }}
                 style={{
                   backgroundColor: this.blueColor,
                   color: "white",
@@ -106,7 +124,6 @@ export default class PreLandingPage extends React.Component {
                   borderRadius: "20px",
                   borderColor: "white",
                   fontSize: "15px",
-
                   paddingLeft: "15px",
                   paddingRight: "15px",
                   width: "120px",
@@ -118,9 +135,11 @@ export default class PreLandingPage extends React.Component {
             </div>
           </Container>
         </div>
-        <Container>
-          <Instructions />
-        </Container>
+        <div style={{width: "100%"}}>
+          {(this.state.learnMoreShown ? 
+          <AboutTeam/> :
+          <Container><Instructions/></Container>)}
+        </div>
       </>
     );
   }

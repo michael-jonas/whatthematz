@@ -54,14 +54,22 @@ class App extends React.Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", (e) => {
-      this.props.socket.emit("disconnect");
+      this.props.socket.emit(
+        "unloading",
+        {
+          sederId: this.state.sederId,
+          userId: this.state.userId,
+        },
+        (data) => {
+          this.setState({
+            winnersList: data.winnerList,
+            playerList: [],
+          });
+          this.goToPostGame();
+        }
+      );
       this.props.socket.disconnect();
     });
-  }
-
-  componentWillUnmount() {
-    this.props.socket.emit("disconnect");
-    this.props.socket.disconnect();
   }
 
   handleLeavePage(e) {
