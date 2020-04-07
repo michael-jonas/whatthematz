@@ -57,7 +57,9 @@ export default class HuntPage extends React.Component {
             textAlign: "center",
           }}
         >
-          <div style={{ height: "auto", textAlign: "center" }}>
+          <div
+            style={{ height: "auto", textAlign: "center", fontSize: "12px" }}
+          >
             <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
             <span style={{ fontWeight: "normal" }}>{hint}</span>
           </div>

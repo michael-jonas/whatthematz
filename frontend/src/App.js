@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./logo.svg";
+
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
@@ -14,6 +14,7 @@ import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
 import PostGamePage from "./Pages/PostGamePage";
+import PreLandingPage from "./Pages/PreLandingPage";
 
 import { Pages } from "./Globals/Enums";
 
@@ -52,19 +53,22 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.addEventListener("beforeunload", (e) => {
+      this.props.socket.disconnect();
     });
   }
 
   componentWillUnmount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.removeEventListener("beforeunload", (e) => {
+      this.handleLeavePage(e);
     });
   }
 
-  handleLeavePage() {
-    this.props.socket.disconnect();
+  handleLeavePage(e) {
+    if (this.state.roomCode !== "") {
+      e.preventDefault();
+      e.returnValue = "are you sure";
+    }
   }
 
   playerList = [
@@ -96,6 +100,8 @@ class App extends React.Component {
     );
   };
 
+  timeouts = [];
+
   async goToLobby() {
     //console.log("emit user");
 
@@ -122,7 +128,8 @@ class App extends React.Component {
           });
         }
       }
-      const isOwner = data.player_list[0].uuid === this.state.userId;
+
+      const isOwner = data.player_list?.[0]?.uuid === this.state.userId;
 
       this.setState({
         playerList: data["player_list"],
@@ -156,7 +163,9 @@ class App extends React.Component {
       for (let i = 2; i <= this.state.hintList.length; i++) {
         let myCallback = callbackGen(i);
         let seconds = (i - 1) * INTERVAL;
-        setTimeout(myCallback, (diff_seconds + seconds) * 1000);
+        this.timeouts.push(
+          setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+        );
       }
 
       setTimeout(() => {
@@ -282,7 +291,7 @@ class App extends React.Component {
     // create an image element so it loads pic now and caches the image
     // this element isnt even used - it just loads the cache
     const img = new Image();
-    img.src = `http://flattenthebread.com/api/get_image?huntId=${this.state.huntId}`;
+    img.src = `${this.props.apiUrl}/api/get_image?huntId=${this.state.huntId}`;
   }
   async loadBoundingBox(retries) {
     const boundingBoxResponse = await fetch(
@@ -400,6 +409,11 @@ class App extends React.Component {
 
     let onSuccess = () => {
       // fetch
+      for (let i = 0; i < this.timeouts.length; i++) {
+        clearTimeout(this.timeouts[i]);
+      }
+      this.timeouts = [];
+
       this.setState({
         huntId: this.state.nextHuntId,
         nextHuntId: "",
@@ -453,9 +467,19 @@ class App extends React.Component {
                 position: "absolute",
                 left: "50%",
                 transform: "translatex(-50%)",
+                textAlign: "center",
               }}
             >
-              FlattenTheBread
+              <div
+                style={{
+                  fontFamily: "Montserrat",
+                }}
+              >
+                FLATTEN THE BREAD
+              </div>
+              <div style={{ fontFamily: "Muli", fontSize: "12px" }}>
+                Keeping a tradition alive during Covid-19
+              </div>
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
               this.state.currentPage === Pages.JOIN) && (
@@ -472,6 +496,12 @@ class App extends React.Component {
             style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
           />
           <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.PRELANDING && (
+              <PreLandingPage
+                goToLanding={this.goToLanding}
+                goToAbout={this.goToAbout}
+              />
+            )}
             {this.state.currentPage === Pages.LANDING && (
               <LandingPage
                 goToCreate={this.goToCreate}
@@ -528,6 +558,7 @@ class App extends React.Component {
                 goToPostGame={this.goToPostGame}
                 boundingBox={this.state.boundingBox}
                 concludeHuntHandler={this.concludeHunt}
+                apiUrl={this.props.apiUrl}
               />
             )}
             {this.state.currentPage === Pages.POSTGAME && (

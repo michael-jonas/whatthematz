@@ -1,9 +1,9 @@
 {
     "name": "Prague", 
     "country": "Czhechia", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["Home of the oldest, still active synagogue in Europe."], 
+    "mediumHints": ["90km west of this city, you might find yourself holding a deliciously golden pils."], 
+    "hardHints": ["It's not Gollum you'll find here, but someone else with a similar name."], 
     "latitude": 50.0874654, 
     "longitude": 14.4212535
 }

@@ -16,4 +16,5 @@ export const Pages = {
   HUNT: "hunt",
   WALDO: "waldo",
   POSTGAME: "postgame",
+  PRELANDING: "prelanding",
 };
