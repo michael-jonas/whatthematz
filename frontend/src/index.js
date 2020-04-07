@@ -10,6 +10,7 @@ import "./fonts/Montserrat-Regular.ttf";
 import "./fonts/Muli-VariableFont_wght.ttf";
 import "./fonts/SourceSansPro-Regular.ttf";
 import "./fonts/Lato-Regular.ttf";
+import { ToastProvider } from "react-toast-notifications";
 
 const apiUrl = "http://localhost:5000";
 //const apiUrl = "flattenthebread.com";
@@ -17,7 +18,9 @@ const socket = io(apiUrl);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App socket={socket} apiUrl={apiUrl} />
+    <ToastProvider autoDismiss placement={"top-center"}>
+      <App socket={socket} apiUrl={apiUrl} />
+    </ToastProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );

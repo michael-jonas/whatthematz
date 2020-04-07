@@ -38,25 +38,6 @@ export default class LobbyPage extends React.Component {
   }
 
   async startHunt() {
-    // this.setState({
-    //   isBusy: true,
-    // });
-    // // const response = await fetch(`/trigger_hunt?huntId=${this.props.huntId}`, {
-    // //   method: "PUT",
-    // // });
-    // if (response.ok) {
-    //   // TODO countdown timer
-    //   this.props.goToHunt();
-    // } else if (response.status !== 400 && retries < 3) {
-    //   setTimeout(() => {
-    //     this.startHunt(++retries);
-    //   }, 1000);
-    // } else {
-    //   // toast an error?
-    //   this.setState({
-    //     isBusy: false,
-    //   });
-    // }
     this.props.socket.emit(
       "trigger_hunt_socket",
       { huntId: this.props.huntId },
