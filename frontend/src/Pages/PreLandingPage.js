@@ -1,6 +1,7 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
+import Instructions from "../Components/Instructions";
 
 import mag from "../Images/mag.png";
 
@@ -117,7 +118,9 @@ export default class PreLandingPage extends React.Component {
             </div>
           </Container>
         </div>
-        <Container></Container>
+        <Container>
+          <Instructions />
+        </Container>
       </>
     );
   }
