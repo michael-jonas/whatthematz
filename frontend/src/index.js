@@ -18,7 +18,7 @@ const socket = io(apiUrl);
 
 ReactDOM.render(
   <React.StrictMode>
-    <ToastProvider autoDismiss placement={"bottom-right"}>
+    <ToastProvider autoDismiss placement={"top-center"}>
       <App socket={socket} apiUrl={apiUrl} />
     </ToastProvider>
   </React.StrictMode>,
