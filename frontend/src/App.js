@@ -112,6 +112,28 @@ class App extends React.Component {
 
   timeouts = [];
 
+  setHintTimeouts() {
+    const diff_seconds = 3;
+    let callbackGen = (nHints) => {
+      return () => {
+        this.setState({ numberOfHints: nHints });
+      };
+    };
+
+    const timeDeltas = [10, 20, 30, 40, 50, 60, 70, 80, 90, 10];
+    let sumSeconds = 0;
+    // const INTERVAL = 30; // 30 seconds between each
+    for (let i = 2; i <= this.state.hintList.length; i++) {
+      let myCallback = callbackGen(i);
+      sumSeconds += timeDeltas[i-2];
+      // let seconds = (i - 1) * INTERVAL;
+      console.log(sumSeconds);
+      this.timeouts.push(
+        setTimeout(myCallback, (diff_seconds + sumSeconds) * 1000)
+      );
+    }
+  }
+
   async goToLobby() {
     //console.log("emit user");
 
@@ -136,21 +158,8 @@ class App extends React.Component {
           this.setState({
             currentPage: Pages.HUNT,
           });
-          let diff_seconds = 3;
-          let callbackGen = (nHints) => {
-            return () => {
-              this.setState({ numberOfHints: nHints });
-            };
-          };
 
-          const INTERVAL = 30; // 30 seconds between each
-          for (let i = 2; i <= this.state.hintList.length; i++) {
-            let myCallback = callbackGen(i);
-            let seconds = (i - 1) * INTERVAL;
-            this.timeouts.push(
-              setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-            );
-          }
+          this.setHintTimeouts()
         }
       }
 
@@ -178,26 +187,27 @@ class App extends React.Component {
       // console.log(datetime_now)
       // console.log(diff)
 
-      let diff_seconds = 3;
+      this.setHintTimeouts();
+      // let diff_seconds = 3;
 
-      let callbackGen = (nHints) => {
-        return () => {
-          this.setState({ numberOfHints: nHints });
-        };
-      };
+      // let callbackGen = (nHints) => {
+      //   return () => {
+      //     this.setState({ numberOfHints: nHints });
+      //   };
+      // };
 
-      const INTERVAL = 30; // 30 seconds between each
-      for (let i = 2; i <= this.state.hintList.length; i++) {
-        let myCallback = callbackGen(i);
-        let seconds = (i - 1) * INTERVAL;
-        this.timeouts.push(
-          setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-        );
-      }
+      // const INTERVAL = 30; // 30 seconds between each
+      // for (let i = 2; i <= this.state.hintList.length; i++) {
+      //   let myCallback = callbackGen(i);
+      //   let seconds = (i - 1) * INTERVAL;
+      //   this.timeouts.push(
+      //     setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+      //   );
+      // }
 
-      setTimeout(() => {
-        this.setPage(Pages.HUNT);
-      }, diff_seconds * 1000);
+      // setTimeout(() => {
+      //   this.setPage(Pages.HUNT);
+      // }, diff_seconds * 1000);
 
       this.setState({ showCountdown: true });
     });
@@ -475,21 +485,23 @@ class App extends React.Component {
         this.setState({
           currentPage: Pages.HUNT,
         });
-        let diff_seconds = 3;
-        let callbackGen = (nHints) => {
-          return () => {
-            this.setState({ numberOfHints: nHints });
-          };
-        };
 
-        const INTERVAL = 30; // 30 seconds between each
-        for (let i = 2; i <= this.state.hintList.length; i++) {
-          let myCallback = callbackGen(i);
-          let seconds = (i - 1) * INTERVAL;
-          this.timeouts.push(
-            setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-          );
-        }
+        this.setHintTimeouts();
+        // let diff_seconds = 3;
+        // let callbackGen = (nHints) => {
+        //   return () => {
+        //     this.setState({ numberOfHints: nHints });
+        //   };
+        // };
+
+        // const INTERVAL = 30; // 30 seconds between each
+        // for (let i = 2; i <= this.state.hintList.length; i++) {
+        //   let myCallback = callbackGen(i);
+        //   let seconds = (i - 1) * INTERVAL;
+        //   this.timeouts.push(
+        //     setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+        //   );
+        // }
       }
     };
 
