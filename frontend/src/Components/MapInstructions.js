@@ -1,5 +1,6 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
+import mag from "../Images/mag.png";
 
 import mapInstruction from "../Images/Instructions/mapMobile.png";
 
@@ -37,12 +38,25 @@ export default class MapInstructions extends React.Component {
             opacity: 1,
             fontSize: "14px",
             padding: "5px",
+            display: "flex",
           }}
         >
-          <span style={{ color: "blue" }}>Hint 1:</span> Find the right location
-          with the help of a few clues and some research!
+          <img
+            src={mag}
+            alt={"magnifying glass"}
+            style={{
+              height: "33px",
+              width: "33px",
+              marginTop: "4px",
+              marginRight: "10px",
+            }}
+          />
+          <div>
+            <span style={{ color: "blue" }}>Hint 1:</span> Find the right
+            location with the help of a few clues and some research!
+          </div>
         </div>
-        <img src={mapInstruction} alt="Example map" />
+        <img src={mapInstruction} style={{ width: "90%" }} alt="Example map" />
       </div>
     );
   }

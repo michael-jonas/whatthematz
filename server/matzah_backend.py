@@ -410,7 +410,8 @@ def trigger_win(data):
             M_AVATAR: doc[M_AVATAR],
         }
 
-    winners = list(reversed(_foo(doc) for doc in winner_docs))
+    winners = list(_foo(doc) for doc in winner_docs)
+    winners = list(reversed(winners))
     # emit that the winners list is updated
     response = {
         'winnerList': winners,
@@ -460,9 +461,12 @@ def on_disconnect():
 
     data = lookup_table[clientId]
     room = data['room']
-    huntId = data['hunt_id']
-    sederId = data['seder_id']
-    uid = data['uid']
+
+    sederId = ObjectId(data['seder_id'])
+    # cant trust the hunt id from the lookup since it is out of date
+    hunt = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
+    huntId = hunt['_id']
+    uid = ObjectId(data['uid'])
 
     db.seders.update_one({'_id': sederId}, {"$pull": {'members': uid}})
     db.hunts.update_one({"_id": huntId}, { "$pull": {"participants": uid}})
@@ -473,6 +477,7 @@ def on_disconnect():
         return
 
     emit('player_list', {'n': len(player_list), 'player_list': player_list}, room=room)
+    return
 
 # @socket.on('leave')
 # def on_leave(data):
@@ -580,7 +585,7 @@ def getHints():
     if os.path.exists(fpath) and os.path.isfile(fpath):
         with open(fpath) as f:
             data = json.load(f)
-        hints = data['easyHints'] + data['mediumHints'] + data['hardHints']
+        hints = data['hardHints'] + data['mediumHints'] + data['easyHints']
         return goodResponse(hints)
 
     # return bad if no json found

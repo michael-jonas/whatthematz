@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./logo.svg";
+
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
@@ -14,6 +14,7 @@ import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
 import PostGamePage from "./Pages/PostGamePage";
+import PreLandingPage from "./Pages/PreLandingPage";
 
 import { Pages } from "./Globals/Enums";
 
@@ -24,7 +25,7 @@ class App extends React.Component {
     this.handleLeavePage = this.handleLeavePage.bind(this);
 
     this.state = {
-      currentPage: Pages.LANDING,
+      currentPage: Pages.PRELANDING,
       name: "",
       userId: "",
       roomCode: "",
@@ -53,11 +54,7 @@ class App extends React.Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", (e) => {
-      this.handleLeavePage(e);
-    });
-    window.addEventListener("unload", (e) => {
       this.props.socket.disconnect();
-      console.log("disconnected");
     });
   }
 
@@ -131,7 +128,8 @@ class App extends React.Component {
           });
         }
       }
-      const isOwner = data.player_list[0].uuid === this.state.userId;
+
+      const isOwner = data.player_list?.[0]?.uuid === this.state.userId;
 
       this.setState({
         playerList: data["player_list"],
@@ -140,6 +138,7 @@ class App extends React.Component {
     });
 
     this.props.socket.on("start_time_update", (data) => {
+      if (this.state.currentPage !== Pages.LOBBY) return;
       // console.log('Got start time update:');
       let dt_str = data["startTime"];
       // console.log('dt string: ' + dt_str);
@@ -317,6 +316,9 @@ class App extends React.Component {
     }
   }
 
+  goToPreLanding = () => {
+    this.setState({ currentPage: Pages.PRELANDING });
+  };
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
@@ -360,6 +362,10 @@ class App extends React.Component {
         break;
       case Pages.HUNT:
         this.openBackModal();
+        break;
+      case Pages.LANDING:
+        console.log("b)");
+        this.goToPreLanding();
         break;
       default:
         break;
@@ -463,18 +469,30 @@ class App extends React.Component {
             //bg="dark"
             variant="light"
           >
-            <Navbar.Toggle />
+            <Navbar.Toggle style={{ color: "blue" }} />
             <Navbar.Brand
               style={{
                 position: "absolute",
                 left: "50%",
                 transform: "translatex(-50%)",
+                textAlign: "center",
               }}
             >
-              FlattenTheBread
+              <div
+                style={{
+                  fontFamily: "Montserrat",
+                  letterSpacing: "0.08em",
+                }}
+              >
+                FLATTEN THE BREAD
+              </div>
+              <div style={{ fontFamily: "Muli", fontSize: "12px" }}>
+                Keeping a tradition alive during Covid-19
+              </div>
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
-              this.state.currentPage === Pages.JOIN) && (
+              this.state.currentPage === Pages.JOIN ||
+              this.state.currentPage === Pages.LANDING) && (
               <input
                 style={{ width: "40px", height: "40px" }}
                 type="image"
@@ -488,6 +506,12 @@ class App extends React.Component {
             style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
           />
           <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.PRELANDING && (
+              <PreLandingPage
+                goToLanding={this.goToLanding}
+                goToAbout={this.goToAbout}
+              />
+            )}
             {this.state.currentPage === Pages.LANDING && (
               <LandingPage
                 goToCreate={this.goToCreate}
