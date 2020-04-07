@@ -533,12 +533,22 @@ class App extends React.Component {
               <div
                 style={{
                   fontFamily: "Montserrat",
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.1em",
+                  fontSize: "14px",
+                  fontWeight: "600",
+                  lineHeight: "17px",
                 }}
               >
                 FLATTEN THE BREAD
               </div>
-              <div style={{ fontFamily: "Muli", fontSize: "12px" }}>
+              <div
+                style={{
+                  fontFamily: "Muli",
+                  fontSize: "12px",
+                  fontWeight: "normal",
+                  lineHeight: "15px",
+                }}
+              >
                 Keeping a tradition alive during Covid-19
               </div>
             </Navbar.Brand>
