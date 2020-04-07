@@ -1,5 +1,4 @@
 import React from "react";
-import Container from "react-bootstrap/Container";
 import mag from "../Images/mag.png";
 
 import mapInstruction from "../Images/Instructions/mapMobile.png";

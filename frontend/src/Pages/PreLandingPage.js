@@ -8,14 +8,14 @@ import mag from "../Images/mag.png";
 
 export default class PreLandingPage extends React.Component {
   blueColor = "rgba(0, 102, 255, 0.95)";
-  
+
   constructor(props) {
     super(props);
     this.state = {
       learnMoreShown: false,
-    }
+    };
   }
-  
+
   render() {
     return (
       <>
@@ -38,9 +38,11 @@ export default class PreLandingPage extends React.Component {
           >
             <div
               style={{
-                fontSize: "16px",
+                fontSize: "20px",
                 letterSpacing: "0.1em",
                 lineHeight: "120%",
+                fontFamily: "Source Sans Pro",
+                fontWeight: 600,
               }}
             >
               FLATTEN THE BREAD
@@ -50,6 +52,7 @@ export default class PreLandingPage extends React.Component {
                 fontWeight: "normal",
                 fontSize: "14px",
                 marginTop: "5px",
+                fontFamily: "Muli",
               }}
             >
               Keeping a popular Passover tradition going while social distancing
@@ -93,13 +96,13 @@ export default class PreLandingPage extends React.Component {
             <div style={{ marginTop: "25px" }}>
               <Button
                 onClick={() => {
-                  this.setState(function(state, props){
+                  this.setState(function (state, props) {
                     return {
                       // TODO: turn this on
                       // learnMoreShown: !state.learnMoreShown
-                      learnMoreShown: false
+                      learnMoreShown: false,
                     };
-                  })
+                  });
                 }}
                 style={{
                   backgroundColor: this.blueColor,
@@ -135,10 +138,14 @@ export default class PreLandingPage extends React.Component {
             </div>
           </Container>
         </div>
-        <div style={{width: "100%"}}>
-          {(this.state.learnMoreShown ? 
-          <AboutTeam/> :
-          <Container><Instructions/></Container>)}
+        <div style={{ width: "100%" }}>
+          {this.state.learnMoreShown ? (
+            <AboutTeam />
+          ) : (
+            <Container>
+              <Instructions />
+            </Container>
+          )}
         </div>
       </>
     );

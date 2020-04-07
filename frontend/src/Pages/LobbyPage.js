@@ -10,7 +10,10 @@ import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
 import Instructions from "../Components/Instructions.js";
 
-export default class LobbyPage extends React.Component {
+import clipboard from "../Images/clipboard.png";
+import { withToastManager } from "react-toast-notifications";
+
+class LobbyPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -36,6 +39,28 @@ export default class LobbyPage extends React.Component {
       clearTimeout(this.timeout);
     }
   }
+  copyCodeToClipboard = () => {
+    const el = document.createElement("textarea");
+    el.value = this.props.roomCode;
+    el.setAttribute("readonly", "");
+    el.style.position = "absolute";
+    el.style.left = "-9999px";
+    document.body.appendChild(el);
+    const selected =
+      document.getSelection().rangeCount > 0 //
+        ? document.getSelection().getRangeAt(0)
+        : false;
+    el.select();
+    document.execCommand("copy");
+    document.body.removeChild(el);
+    if (selected) {
+      document.getSelection().removeAllRanges();
+      document.getSelection().addRange(selected);
+    }
+    this.props.toastManager.add(`Code copied to clipboard!`, {
+      appearance: "success",
+    });
+  };
 
   async startHunt() {
     this.props.socket.emit(
@@ -63,7 +88,16 @@ export default class LobbyPage extends React.Component {
         <div>
           <h6>
             ROOM CODE:{" "}
-            <span style={{ color: "blue" }}>{this.props.roomCode}</span>
+            <span id="roomCode" style={{ color: "blue" }}>
+              {this.props.roomCode}
+            </span>
+            <input
+              type="image"
+              onClick={() => this.copyCodeToClipboard()}
+              src={clipboard}
+              width="20px"
+              style={{ marginLeft: "5px", marginBottom: "-3px" }}
+            />
           </h6>
         </div>
         {this.props.showCountdown ? (
@@ -101,3 +135,4 @@ export default class LobbyPage extends React.Component {
     );
   }
 }
+export default withToastManager(LobbyPage);

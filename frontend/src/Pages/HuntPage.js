@@ -2,6 +2,8 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, ZoomControl } from "react-leaflet";
+import "./HuntPage.css";
+import mag from "../Images/mag.png";
 
 export default class HuntPage extends React.Component {
   constructor(props) {
@@ -57,10 +59,22 @@ export default class HuntPage extends React.Component {
           }}
         >
           <div
-            style={{ height: "auto", textAlign: "center", fontSize: "12px" }}
+            style={{ fontSize: "12px", display: "flex", alignItems: "center" }}
           >
-            <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
-            <span style={{ fontWeight: "normal" }}>{hint}</span>
+            <img
+              src={mag}
+              alt={"magnifying glass"}
+              style={{
+                height: "33px",
+                width: "33px",
+                marginTop: "4px",
+                marginRight: "10px",
+              }}
+            />
+            <div>
+              <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
+              <span style={{ fontWeight: "normal" }}>{hint}</span>
+            </div>
           </div>
         </div>
       </Carousel.Item>
