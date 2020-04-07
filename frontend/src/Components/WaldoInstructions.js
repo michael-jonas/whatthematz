@@ -49,7 +49,7 @@ export default class WaldoInstructions extends React.Component {
                   marginRight: "10px",
                 }}
               />
-              <div>
+              <div style={{ fontFamily: "Muli" }}>
                 Zoom in on a location and try to find the afikoman hidden in the
                 scene.
               </div>
@@ -99,7 +99,9 @@ export default class WaldoInstructions extends React.Component {
                   marginRight: "10px",
                 }}
               />
-              <div>When you find it, tap it to win the game!</div>
+              <div style={{ fontFamily: "Muli" }}>
+                When you find it, tap it to win the game!
+              </div>
             </div>
             <img
               src={matzahInstruction2}

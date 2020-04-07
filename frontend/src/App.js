@@ -522,12 +522,7 @@ class App extends React.Component {
   render() {
     return (
       <>
-        <div
-          style={{
-            maxHeight: "calc(100vh - 40px)",
-            overflowY: "auto",
-          }}
-        >
+        <div>
           <Navbar
             //bg="dark"
             variant="light"

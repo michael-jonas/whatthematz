@@ -72,7 +72,7 @@ export default class HuntPage extends React.Component {
               }}
             />
             <div>
-              <span style={{ color: "blue" }}>Hint {index + 1}:</span>{" "}
+              <span style={{ color: "#0066FF" }}>Hint {index + 1}:</span>{" "}
               <span style={{ fontWeight: "normal" }}>{hint}</span>
             </div>
           </div>

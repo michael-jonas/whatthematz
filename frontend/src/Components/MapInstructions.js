@@ -49,9 +49,9 @@ export default class MapInstructions extends React.Component {
               marginRight: "10px",
             }}
           />
-          <div>
-            <span style={{ color: "blue" }}>Hint 1:</span> Find the right city
-            with the help of a few clues and some research!
+          <div style={{ fontFamily: "Muli" }}>
+            <span style={{ color: "#0066FF" }}>Hint 1:</span> Find the right
+            city with the help of a few clues and some research!
           </div>
         </div>
         <img src={mapInstruction} style={{ width: "90%" }} alt="Example map" />

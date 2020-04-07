@@ -81,14 +81,21 @@ class LobbyPage extends React.Component {
         score={player.score}
       />
     ));
+    const bluecolor = "#0066FF";
 
     return (
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
         <div>
-          <h6>
+          <div
+            style={{
+              fontFamily: "Source Sans Pro",
+              fontSize: "12px",
+              fontWeight: "normal",
+            }}
+          >
             ROOM CODE:{" "}
-            <span id="roomCode" style={{ color: "blue" }}>
+            <span id="roomCode" style={{ color: bluecolor }}>
               {this.props.roomCode}
             </span>
             <input
@@ -98,12 +105,13 @@ class LobbyPage extends React.Component {
               width="20px"
               style={{ marginLeft: "5px", marginBottom: "-3px" }}
             />
-          </h6>
+          </div>
         </div>
         {this.props.showCountdown ? (
           <div>
             <span>
-              Starting in <Countdown startingCount={3} /> seconds!
+              Starting in <Countdown startingCount={3} color={bluecolor} />{" "}
+              seconds!
             </span>
           </div>
         ) : this.state.justJoined ? (
@@ -111,20 +119,23 @@ class LobbyPage extends React.Component {
         ) : (
           <WaitingAnnouncement sederName={this.props.sederName} />
         )}
-        <h4 style={{ marginTop: 20 }}>Players in the room</h4>
+        <div style={{ marginTop: 20, fontWeight: "600", fontSize: "16px" }}>
+          Players in the room
+        </div>
         <Container style={{ textAlign: "center" }} id="playerList">
           {playerList}
         </Container>
         <div style={{ textAlign: "center", paddingTop: "10px" }}>
           {this.props.isOwner && (
             <Button
+              style={{ borderRadius: "1rem", width: "150px" }}
               disabled={this.state.isBusy}
               onClick={() => this.startHunt()}
             >
               {this.state.isBusy ? (
                 <Spinner animation="border" />
               ) : (
-                "Start Hunt!"
+                "Start hunt!"
               )}
             </Button>
           )}

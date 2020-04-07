@@ -88,7 +88,7 @@ export default class PreLandingPage extends React.Component {
                 }}
               />
               <div>
-                <span style={{ color: "blue" }}>Hint 1:</span> Search,
+                <span style={{ color: "#0066FF" }}>Hint 1:</span> Search,
                 discovery, and puzzling adventure!
               </div>
             </div>
@@ -109,7 +109,7 @@ export default class PreLandingPage extends React.Component {
                   color: "white",
                   borderRadius: "20px",
                   borderColor: "white",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
                   width: "120px",
@@ -126,7 +126,7 @@ export default class PreLandingPage extends React.Component {
                   color: this.blueColor,
                   borderRadius: "20px",
                   borderColor: "white",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
                   width: "120px",
