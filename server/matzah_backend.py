@@ -411,7 +411,6 @@ def trigger_win(data):
         }
 
     winners = list(_foo(doc) for doc in winner_docs)
-    winners = list(reversed(winners))
     # emit that the winners list is updated
     response = {
         'winnerList': winners,
