@@ -1,9 +1,9 @@
 {
     "name": "Vancouver", 
     "country": "Canada", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["Home of the 2010 Winter Olympics."], 
+    "mediumHints": ["Mountainous Hollywood north."], 
+    "hardHints": ["The second mayor of this city was a successful Jewish entrepreneur."], 
     "latitude": 49.2608724, 
     "longitude": -123.1139529
 }
