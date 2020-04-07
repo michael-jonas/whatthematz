@@ -1,5 +1,5 @@
 import React from "react";
-import { ToastProvider, withToastManager } from "react-toast-notifications";
+import { withToastManager } from "react-toast-notifications";
 
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
@@ -47,6 +47,7 @@ class App extends React.Component {
   }
   firstJoin = true;
   isActive = false;
+  haveWon = false;
 
   setPage(page) {
     this.setState({ currentPage: page });
@@ -91,6 +92,7 @@ class App extends React.Component {
   ];
 
   concludeHunt = () => {
+    this.haveWon = true;
     this.props.socket.emit(
       "trigger_win",
       {
@@ -208,7 +210,15 @@ class App extends React.Component {
       console.log(data);
       this.isActive = false;
       if (!this.state.currentHuntOver) {
-        // kick off timers
+        // todo kick off timers
+        if (!this.haveWon) {
+          this.props.toastManager.add(
+            `Uh oh, ${data.winnerList?.[0]?.nickname} found the afikoman! Finish quick before time runs out!`,
+            {
+              appearance: "warning",
+            }
+          );
+        }
 
         this.setState({
           currentHuntOver: true,
@@ -442,6 +452,7 @@ class App extends React.Component {
       }
       this.timeouts = [];
 
+      this.haveWon = false;
       this.setState({
         huntId: this.state.nextHuntId,
         nextHuntId: "",
@@ -630,18 +641,21 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        <div
-          style={{
-            position: "fixed",
-            bottom: "10px",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <span>
-            Learn more about this <a href="/">project</a>
-          </span>
-        </div>
+        {this.state.currentPage !== Pages.WALDO &&
+          this.state.currentPage !== Pages.HUNT && (
+            <div
+              style={{
+                position: "fixed",
+                bottom: "10px",
+                width: "100%",
+                textAlign: "center",
+              }}
+            >
+              <span>
+                Learn more about this <a href="/">project</a>
+              </span>
+            </div>
+          )}
       </>
     );
   }
