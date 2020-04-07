@@ -1,8 +1,8 @@
 {
     "name": "Philadelphia", 
     "country": "USA", 
-    "easyHints": ["An American city of firsts! Library, zoo, hospital, you name it!"], 
-    "mediumHints": ["It's Always Sunny here."], 
+    "easyHints": ["It's Always Sunny here."], 
+    "mediumHints": ["An American city of firsts! Library, zoo, hospital, you name it!"], 
     "hardHints": ["If you received care from a U.S. doctor, there is a 17% chance they were trained here."], 
     "latitude": 39.9527237, 
     "longitude": -75.1635262

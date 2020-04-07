@@ -458,23 +458,23 @@ def join_hunt(data):
 
 
 
-@socket.on('disconnect')
-def on_disconnect():
-    clientId = request.sid
-    if clientId not in lookup_table:
-        return
+@socket.on('unloading')
+def on_disconnect(data):
+    # clientId = request.sid
+    # if clientId not in lookup_table:
+        # return
 
-    data = lookup_table[clientId]
-    room = data['room']
+    # data = lookup_table[clientId]
+    # room = data['room']
 
-    sederId = ObjectId(data['seder_id'])
+    sederId = ObjectId(data['sederId'])
     # cant trust the hunt id from the lookup since it is out of date
     hunt = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
     huntId = hunt['_id']
-    uid = ObjectId(data['uid'])
-
-    db.seders.update_one({'_id': sederId}, {"$pull": {'members': uid}})
-    db.hunts.update_one({"_id": huntId}, { "$pull": {"participants": uid}})
+    room = hunt['roomCode']
+    uid = ObjectId(data['userId'])
+    db.seders.update_one({'_id': ObjectId(sederId)}, {"$pull": {'members': str(uid)}})
+    db.hunts.update_one({'_id': ObjectId(huntId)}, { "$pull": {"participants": str(uid)}})
 
     player_list = generatePlayerList(huntId)
     if player_list is None:
