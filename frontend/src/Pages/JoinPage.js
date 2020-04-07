@@ -1,11 +1,11 @@
 import React from "react";
-
+import { withToastManager } from "react-toast-notifications";
 import Form from "react-bootstrap/Form";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Spinner from "react-bootstrap/Spinner";
 
-export default class JoinPage extends React.Component {
+class JoinPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,6 +24,7 @@ export default class JoinPage extends React.Component {
       canJoin: state.roomCode.length === 4 && state.name.length > 0,
     }));
   }
+
   handleNameChange(event) {
     this.setState({
       name: event.target.value,
@@ -60,11 +61,14 @@ export default class JoinPage extends React.Component {
         this.state.roomCode.toUpperCase(),
         json.sederName,
         json.huntId,
-        false
+        false,
+        json.isActive
       );
       this.props.goToLobby(json?.queued ?? false);
     } else if (response.status === 400) {
-      // Todo Toast "room code not found"
+      this.props.toastManager.add("Room Code not found", {
+        appearance: "error",
+      });
       this.setState({
         isBusy: false,
       });
@@ -126,3 +130,4 @@ export default class JoinPage extends React.Component {
     );
   }
 }
+export default withToastManager(JoinPage);
