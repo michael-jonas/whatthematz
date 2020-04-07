@@ -15,11 +15,11 @@ export default class LandingPage extends React.Component {
   setCreate = () => {
     document
       .getElementById("createSederButton")
-      .className.replace("normal-button", "highlight-button");
+      .classList.replace("normal-button", "highlight-button");
 
     document
       .getElementById("joinSederButton")
-      .className.replace("highlight-button", "normal-button");
+      .classList.replace("highlight-button", "normal-button");
 
     this.createHighlight = true;
     this.joinHighlight = false;
@@ -28,13 +28,14 @@ export default class LandingPage extends React.Component {
   };
 
   setJoin = () => {
+    console.log(document.getElementById("joinSederButton"));
     document
       .getElementById("joinSederButton")
-      .className.replace("normal-button", "highlight-button");
+      .classList.replace("normal-button", "highlight-button");
 
     document
       .getElementById("createSederButton")
-      .className.replace("highlight-button", "normal-button");
+      .classList.replace("highlight-button", "normal-button");
 
     this.createHighlight = false;
     this.joinHighlight = true;
