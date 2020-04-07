@@ -92,6 +92,7 @@ class LobbyPage extends React.Component {
               fontFamily: "Source Sans Pro",
               fontSize: "12px",
               fontWeight: "normal",
+              marginBottom: "10px",
             }}
           >
             ROOM CODE:{" "}
@@ -119,7 +120,7 @@ class LobbyPage extends React.Component {
         ) : (
           <WaitingAnnouncement sederName={this.props.sederName} />
         )}
-        <div style={{ marginTop: 20, fontWeight: "600", fontSize: "16px" }}>
+        <div style={{ marginTop: 10, fontWeight: "600", fontSize: "16px" }}>
           Players in the room
         </div>
         <Container style={{ textAlign: "center" }} id="playerList">
