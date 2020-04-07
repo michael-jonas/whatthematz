@@ -1,11 +1,9 @@
 import React from "react";
-import { ToastProvider } from "react-toast-notifications";
+import { ToastProvider, withToastManager } from "react-toast-notifications";
 
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import { Marker } from "react-leaflet";
 
 import LandingPage from "./Pages/LandingPage";
@@ -62,9 +60,8 @@ class App extends React.Component {
   }
 
   componentWillUnmount() {
-    window.removeEventListener("beforeunload", (e) => {
-      this.handleLeavePage(e);
-    });
+    this.props.socket.emit("disconnect");
+    this.props.socket.disconnect();
   }
 
   handleLeavePage(e) {
@@ -297,7 +294,12 @@ class App extends React.Component {
         // complete hunt, navigate away TODO
         this.goToWaldo();
       } else {
-        // toast hunt not complete
+        this.props.toastManager.add(
+          "Hmm, I don't smell any matzah here. Let's try somewhere else!",
+          {
+            appearance: "info",
+          }
+        );
       }
     } else if (response.status === 400) {
       // be sad, maybe check if hunt still active?
@@ -552,86 +554,85 @@ class App extends React.Component {
               marginBottom: 10,
             }}
           />
-          <ToastProvider autoDismiss placement={"bottom-right"}>
-            <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
-              {this.state.currentPage === Pages.PRELANDING && (
-                <PreLandingPage
-                  goToLanding={this.goToLanding}
-                  goToAbout={this.goToAbout}
-                />
-              )}
-              {this.state.currentPage === Pages.LANDING && (
-                <LandingPage
-                  goToCreate={this.goToCreate}
-                  goToJoin={this.goToJoin}
-                />
-              )}
-              {this.state.currentPage === Pages.CREATE && (
-                <CreatePage
-                  goToLobby={this.goToLobby}
-                  updateInfo={this.updateInfo}
-                />
-              )}
-              {this.state.currentPage === Pages.JOIN && (
-                <JoinPage
-                  goToLobby={this.goToLobby}
-                  updateInfo={this.updateInfo}
-                />
-              )}
-              {this.state.currentPage === Pages.LOBBY && (
-                <LobbyPage
-                  name={this.state.name}
-                  players={this.state.playerList}
-                  roomCode={this.state.roomCode}
-                  sederName={this.state.sederName}
-                  huntId={this.state.huntId}
-                  goToHunt={this.goToHunt}
-                  isOwner={this.state.isOwner}
-                  socket={this.props.socket}
-                  showCountdown={this.state.showCountdown}
-                />
-              )}
-              {this.state.currentPage === Pages.HUNT && (
-                <HuntPage
-                  name={this.state.name}
-                  players={this.state.playerList}
-                  roomCode={this.state.roomCode}
-                  sederName={this.state.sederName}
-                  huntId={this.state.huntId}
-                  goToLobby={this.goToLobby}
-                  goToWaldo={this.goToWaldo}
-                  hintList={this.state.hintList}
-                  numberOfHints={this.state.numberOfHints}
-                  markerLayer={this.state.markerLayer}
-                />
-              )}
-              {this.state.currentPage === Pages.WALDO && (
-                <WaldoPage
-                  name={this.state.name}
-                  userId={this.state.userId}
-                  players={this.state.playerList}
-                  roomCode={this.state.roomCode}
-                  sederName={this.state.sederName}
-                  huntId={this.state.huntId}
-                  goToPostGame={this.goToPostGame}
-                  boundingBox={this.state.boundingBox}
-                  concludeHuntHandler={this.concludeHunt}
-                  apiUrl={this.props.apiUrl}
-                />
-              )}
-              {this.state.currentPage === Pages.POSTGAME && (
-                <PostGamePage
-                  name={this.state.name}
-                  players={this.state.playerList}
-                  winnersList={this.state.winnersList}
-                  roomCode={this.state.roomCode}
-                  sederName={this.state.sederName}
-                  huntId={this.state.huntId}
-                  joinNextLobby={this.joinNextLobby}
-                />
-              )}
-            </div>
-          </ToastProvider>
+
+          <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.PRELANDING && (
+              <PreLandingPage
+                goToLanding={this.goToLanding}
+                goToAbout={this.goToAbout}
+              />
+            )}
+            {this.state.currentPage === Pages.LANDING && (
+              <LandingPage
+                goToCreate={this.goToCreate}
+                goToJoin={this.goToJoin}
+              />
+            )}
+            {this.state.currentPage === Pages.CREATE && (
+              <CreatePage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.JOIN && (
+              <JoinPage
+                goToLobby={this.goToLobby}
+                updateInfo={this.updateInfo}
+              />
+            )}
+            {this.state.currentPage === Pages.LOBBY && (
+              <LobbyPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToHunt={this.goToHunt}
+                isOwner={this.state.isOwner}
+                socket={this.props.socket}
+                showCountdown={this.state.showCountdown}
+              />
+            )}
+            {this.state.currentPage === Pages.HUNT && (
+              <HuntPage
+                name={this.state.name}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToLobby={this.goToLobby}
+                goToWaldo={this.goToWaldo}
+                hintList={this.state.hintList}
+                numberOfHints={this.state.numberOfHints}
+                markerLayer={this.state.markerLayer}
+              />
+            )}
+            {this.state.currentPage === Pages.WALDO && (
+              <WaldoPage
+                name={this.state.name}
+                userId={this.state.userId}
+                players={this.state.playerList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                goToPostGame={this.goToPostGame}
+                boundingBox={this.state.boundingBox}
+                concludeHuntHandler={this.concludeHunt}
+                apiUrl={this.props.apiUrl}
+              />
+            )}
+            {this.state.currentPage === Pages.POSTGAME && (
+              <PostGamePage
+                name={this.state.name}
+                players={this.state.playerList}
+                winnersList={this.state.winnersList}
+                roomCode={this.state.roomCode}
+                sederName={this.state.sederName}
+                huntId={this.state.huntId}
+                joinNextLobby={this.joinNextLobby}
+              />
+            )}
+          </div>
         </div>
         <div
           style={{
@@ -650,4 +651,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withToastManager(App);

@@ -68,7 +68,12 @@ export default class CreatePage extends React.Component {
         this.tryCreateSeder(++retries);
       }, 1000);
     } else {
-      // Todo Toast a message?
+      this.props.toastManager.add(
+        "Hmm, something went wrong. Try again in a little bit!",
+        {
+          appearance: "error",
+        }
+      );
       this.setState({
         isBusy: false,
       });

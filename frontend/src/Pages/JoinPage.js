@@ -77,7 +77,12 @@ class JoinPage extends React.Component {
         this.tryJoinSeder(++retries);
       }, 1000);
     } else {
-      // Todo Toast a fail message?
+      this.props.toastManager.add(
+        "Hmm, something went wrong. Try again in a little bit!",
+        {
+          appearance: "error",
+        }
+      );
       this.setState({
         isBusy: false,
       });
