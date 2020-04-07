@@ -8,9 +8,7 @@ import Button from "react-bootstrap/Button";
 import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
-
-import MapInstructions from "../Components/MapInstructions";
-import WaldoInstructions from "../Components/WaldoInstructions";
+import Instructions from "../Components/Instructions.js";
 
 export default class LobbyPage extends React.Component {
   constructor(props) {
@@ -37,30 +35,6 @@ export default class LobbyPage extends React.Component {
     if (!this.props.isOwner) {
       clearTimeout(this.timeout);
     }
-  }
-
-  showMapInstructions() {
-    document
-      .getElementById("discover")
-      .classList.replace("btn-outline-primary", "btn-primary");
-    document
-      .getElementById("waldo")
-      .classList.replace("btn-primary", "btn-outline-primary");
-    this.setState({
-      mapInstructions: true,
-    });
-  }
-
-  showWaldoInstructions() {
-    document
-      .getElementById("waldo")
-      .classList.replace("btn-outline-primary", "btn-primary");
-    document
-      .getElementById("discover")
-      .classList.replace("btn-primary", "btn-outline-primary");
-    this.setState({
-      mapInstructions: false,
-    });
   }
 
   async startHunt() {
@@ -141,38 +115,7 @@ export default class LobbyPage extends React.Component {
           )}
         </div>
 
-        <h4 style={{ marginTop: 30, marginBottom: 15 }}>How to play</h4>
-
-        <Button
-          style={{
-            fontSize: 12,
-            borderRadius: "1rem",
-            margin: 10,
-          }}
-          onClick={() => this.showMapInstructions()}
-          id="discover"
-        >
-          Discover the Location
-        </Button>
-        <Button
-          variant="outline-primary"
-          style={{
-            fontSize: 12,
-            borderRadius: "1rem",
-          }}
-          onClick={() => this.showWaldoInstructions()}
-          id="waldo"
-        >
-          Find the Afikoman
-        </Button>
-
-        <div style={{ textAlign: "center", marginTop: "10px" }}>
-          {this.state.mapInstructions ? (
-            <MapInstructions />
-          ) : (
-            <WaldoInstructions />
-          )}
-        </div>
+        <Instructions />
       </Container>
     );
   }
