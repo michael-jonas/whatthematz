@@ -112,8 +112,7 @@ class App extends React.Component {
 
   timeouts = [];
 
-  setHintTimeouts() {
-    const diff_seconds = 3;
+  setHintTimeouts(diff_seconds = 0) {
     let callbackGen = (nHints) => {
       return () => {
         this.setState({ numberOfHints: nHints });
@@ -125,7 +124,7 @@ class App extends React.Component {
     // const INTERVAL = 30; // 30 seconds between each
     for (let i = 2; i <= this.state.hintList.length; i++) {
       let myCallback = callbackGen(i);
-      sumSeconds += timeDeltas[i-2];
+      sumSeconds += timeDeltas[i - 2];
       // let seconds = (i - 1) * INTERVAL;
       console.log(sumSeconds);
       this.timeouts.push(
@@ -159,7 +158,7 @@ class App extends React.Component {
             currentPage: Pages.HUNT,
           });
 
-          this.setHintTimeouts()
+          this.setHintTimeouts();
         }
       }
 
@@ -187,27 +186,11 @@ class App extends React.Component {
       // console.log(datetime_now)
       // console.log(diff)
 
-      this.setHintTimeouts();
-      // let diff_seconds = 3;
+      this.setHintTimeouts(3);
 
-      // let callbackGen = (nHints) => {
-      //   return () => {
-      //     this.setState({ numberOfHints: nHints });
-      //   };
-      // };
-
-      // const INTERVAL = 30; // 30 seconds between each
-      // for (let i = 2; i <= this.state.hintList.length; i++) {
-      //   let myCallback = callbackGen(i);
-      //   let seconds = (i - 1) * INTERVAL;
-      //   this.timeouts.push(
-      //     setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-      //   );
-      // }
-
-      // setTimeout(() => {
-      //   this.setPage(Pages.HUNT);
-      // }, diff_seconds * 1000);
+      setTimeout(() => {
+        this.setPage(Pages.HUNT);
+      }, diff_seconds * 1000);
 
       this.setState({ showCountdown: true });
     });
@@ -487,21 +470,6 @@ class App extends React.Component {
         });
 
         this.setHintTimeouts();
-        // let diff_seconds = 3;
-        // let callbackGen = (nHints) => {
-        //   return () => {
-        //     this.setState({ numberOfHints: nHints });
-        //   };
-        // };
-
-        // const INTERVAL = 30; // 30 seconds between each
-        // for (let i = 2; i <= this.state.hintList.length; i++) {
-        //   let myCallback = callbackGen(i);
-        //   let seconds = (i - 1) * INTERVAL;
-        //   this.timeouts.push(
-        //     setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-        //   );
-        // }
       }
     };
 
