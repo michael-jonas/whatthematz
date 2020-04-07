@@ -356,6 +356,27 @@ def createHuntInSeder(sederData):
 
     return newHuntId
 
+
+def updateCitiesInSeder(sederData, huntId):
+    unusedCities = sederData.unusedCities
+    usedCities = sederData.usedCities
+
+    # Reset the lists if the cities have been exhausted
+    if (len(unusedCities) == 0):
+        unusedCities = CITIES
+        usedCities = []
+
+    city = unusedCities.pop(random.randint(0,len(unusedCities)-1)) # Remove city from the unused list
+    usedCities.append(city) # Add city to the used list
+    db.seders.update_one(
+        {'_id': sederId}, 
+        {
+            "$push": {"huntIds": str(huntId)},
+            '$set': {'usedCities': usedCities, 'unusedCities': unusedCities}
+        }
+
+    )
+    return city
 @socket.on('trigger_win')
 def trigger_win(data):
 
@@ -387,25 +408,8 @@ def trigger_win(data):
         # print('creating a new hunt in the seder')
         newHuntId = createHuntInSeder(sederData)
 
-
-        unusedCities = sederData.unusedCities
-        usedCities = sederData.usedCities
-
-        # Reset the lists if the cities have been exhausted
-        if (len(unusedCities) == 0):
-            unusedCities = CITIES
-            usedCities = []
-
-        city = unusedCities.pop(random.randint(0,len(unusedCities)-1)) # Remove city from the unused list
-        usedCities.append(city) # Add city to the used list
-        db.seders.update_one(
-            {'_id': sederId}, 
-            {
-                "$push": {"huntIds": str(newHuntId)},
-                '$set': {'usedCities': usedCities, 'unusedCities': unusedCities}
-            }
-
-        )
+        city = updateCitiesInSeder(sederData, newHuntId)
+        
         setupHunt(newHuntId, city)
     else:
         # print('finding latest hunt id a new hunt in the seder')
@@ -881,23 +885,17 @@ def createSeder():
     sederId = insertionResult.inserted_id
     
     # Create a hunt and update seders to include the hunt
-    unusedCities = insertionResult.unusedCities
-    usedCities = insertionResult.usedCities
-    city = unusedCities.pop(random.randint(0,len(unusedCities)-1)) # Remove city from the unused list
-    usedCities.append(city) # Add city to the used list
-    if DEBUG:
-        city = 'Toronto'
-    insertHuntData = HuntData(sederId=sederId, roomCode=roomCode, participants=baseUsers, city=city)
-    newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
+    newHuntId = createHuntInSeder(insertionResult)
+    city = updateCitiesInSeder(sederData, newHuntId)
     setupHunt(newHuntId, city)
-    db.seders.update_one(
-        {'_id': sederId}, 
-        {
-            "$push": {"huntIds": str(newHuntId)},
-            '$set': {'usedCities': usedCities, 'unusedCities': unusedCities}
-        }
-
-    )
+    
+    response = {
+        'sederId': sederId,
+        SEDER_NAME: sederName,
+        'roomCode': roomCode,
+        'huntId': newHuntId,
+        'userId': userId,
+    }
     return goodResponse(response)
 
 def getRoomCode(stringLength = 4):
