@@ -25,7 +25,7 @@ class App extends React.Component {
     this.handleLeavePage = this.handleLeavePage.bind(this);
 
     this.state = {
-      currentPage: Pages.LANDING,
+      currentPage: Pages.PRELANDING,
       name: "",
       userId: "",
       roomCode: "",
@@ -461,7 +461,7 @@ class App extends React.Component {
             //bg="dark"
             variant="light"
           >
-            <Navbar.Toggle />
+            <Navbar.Toggle style={{ color: "blue" }} />
             <Navbar.Brand
               style={{
                 position: "absolute",
@@ -473,6 +473,7 @@ class App extends React.Component {
               <div
                 style={{
                   fontFamily: "Montserrat",
+                  letterSpacing: "0.08em",
                 }}
               >
                 FLATTEN THE BREAD
