@@ -53,11 +53,7 @@ class App extends React.Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", (e) => {
-      this.handleLeavePage(e);
-    });
-    window.addEventListener("unload", (e) => {
       this.props.socket.disconnect();
-      console.log("disconnected");
     });
   }
 
