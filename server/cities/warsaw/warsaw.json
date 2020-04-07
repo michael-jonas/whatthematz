@@ -1,9 +1,9 @@
 {
     "name": "Warsaw", 
     "country": "Poland", 
-    "easyHints": [], 
-    "mediumHints": [], 
-    "hardHints": [], 
+    "easyHints": ["The capital city of this March of the Living destination country."], 
+    "mediumHints": ["The birthplace of radioactivity."], 
+    "hardHints": ["A Holocaust memoir about a pianist and composer was partially filmed here."], 
     "latitude": 52.2337172, 
     "longitude": 21.07141112883227
 }
