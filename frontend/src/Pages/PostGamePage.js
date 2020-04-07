@@ -57,7 +57,6 @@ export default class PostGamePage extends React.Component {
           <Button
             onClick={() => window.location.reload()}
             variant="outline-primary"
-            // todo actually handle click
             style={{
               marginLeft: "20px",
               marginRight: "20px",
