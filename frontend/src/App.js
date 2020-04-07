@@ -291,7 +291,8 @@ class App extends React.Component {
     // create an image element so it loads pic now and caches the image
     // this element isnt even used - it just loads the cache
     const img = new Image();
-    img.src = `${this.props.apiUrl}/api/get_image?huntId=${this.state.huntId}`;
+    //img.src = `${this.props.apiUrl}/api/get_image?huntId=${this.state.huntId}`;
+    img.src = `/api/get_image?huntId=${this.state.huntId}`;
   }
   async loadBoundingBox(retries) {
     const boundingBoxResponse = await fetch(

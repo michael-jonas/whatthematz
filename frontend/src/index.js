@@ -10,8 +10,8 @@ import "./fonts/Montserrat-Regular.ttf";
 import "./fonts/Muli-VariableFont_wght.ttf";
 import "./fonts/SourceSansPro-Regular.ttf";
 
-const apiUrl = "http://localhost:5000";
-//const apiUrl = "flattenthebread.com";
+//const apiUrl = "http://localhost:5000";
+const apiUrl = "flattenthebread.com";
 const socket = io(apiUrl);
 
 ReactDOM.render(
