@@ -103,6 +103,8 @@ class App extends React.Component {
     );
   };
 
+  timeouts = [];
+
   async goToLobby() {
     //console.log("emit user");
 
@@ -163,7 +165,9 @@ class App extends React.Component {
       for (let i = 2; i <= this.state.hintList.length; i++) {
         let myCallback = callbackGen(i);
         let seconds = (i - 1) * INTERVAL;
-        setTimeout(myCallback, (diff_seconds + seconds) * 1000);
+        this.timeouts.push(
+          setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+        );
       }
 
       setTimeout(() => {
@@ -407,6 +411,11 @@ class App extends React.Component {
 
     let onSuccess = () => {
       // fetch
+      for (let i = 0; i < this.timeouts.length; i++) {
+        clearTimeout(this.timeouts[i]);
+      }
+      this.timeouts = [];
+
       this.setState({
         huntId: this.state.nextHuntId,
         nextHuntId: "",
