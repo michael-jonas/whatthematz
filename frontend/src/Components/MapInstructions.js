@@ -42,7 +42,7 @@ export default class MapInstructions extends React.Component {
           <span style={{ color: "blue" }}>Hint 1:</span> Find the right location
           with the help of a few clues and some research!
         </div>
-        <img src={mapInstruction} alt="Example map" />
+        <img src={mapInstruction} style={{width: "90%"}} alt="Example map" />
       </div>
     );
   }
