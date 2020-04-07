@@ -1,6 +1,6 @@
 import React from "react";
-import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
+import mag from "../Images/mag.png";
 
 import matzahInstruction1 from "../Images/Instructions/matzah3Mobile.png";
 import matzahInstruction2 from "../Images/Instructions/matzah4Mobile.png";
@@ -35,10 +35,23 @@ export default class WaldoInstructions extends React.Component {
                 opacity: 1,
                 fontSize: "14px",
                 padding: "5px",
+                display: "flex",
               }}
             >
-              Zoom in on a location and try to find the afikoman hidden in the
-              scene.
+              <img
+                src={mag}
+                alt={"magnifying glass"}
+                style={{
+                  height: "33px",
+                  width: "33px",
+                  marginTop: "4px",
+                  marginRight: "10px",
+                }}
+              />
+              <div>
+                Zoom in on a location and try to find the afikoman hidden in the
+                scene.
+              </div>
             </div>
             <img
               src={matzahInstruction1}
@@ -71,9 +84,21 @@ export default class WaldoInstructions extends React.Component {
                 opacity: 1,
                 fontSize: "14px",
                 padding: "5px",
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              When you find it, tap it to win the game!
+              <img
+                src={mag}
+                alt={"magnifying glass"}
+                style={{
+                  height: "33px",
+                  width: "33px",
+                  marginTop: "4px",
+                  marginRight: "10px",
+                }}
+              />
+              <div>When you find it, tap it to win the game!</div>
             </div>
             <img
               src={matzahInstruction2}

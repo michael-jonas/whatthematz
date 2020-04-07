@@ -47,7 +47,7 @@ export default class Instructions extends React.Component {
         <Button
           style={{
             fontSize: 12,
-            height: "33px",
+            height: "38px",
             fontFamily: "Muli",
             borderRadius: "1rem",
             marginLeft: "5%",
@@ -64,6 +64,7 @@ export default class Instructions extends React.Component {
           variant="outline-primary"
           style={{
             fontSize: 12,
+            height: "38px",
             borderRadius: "1rem",
             fontFamily: "Muli",
           }}
