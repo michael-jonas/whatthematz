@@ -12,8 +12,8 @@ def getMatzahImage():
 	imgPath = join('resources', 'afikomen.png')
 	img = Image.open(imgPath)
 	W, H = img.size
-	scale = 10
-	img = img.resize((int(W/scale), int(H/scale)), Image.ANTIALIAS)
+	scale = 12
+	img = img.resize((int(W*(scale/100)), int(H*(scale/100))), Image.ANTIALIAS)
 	return img
 
 def getRandomImage(cityName):

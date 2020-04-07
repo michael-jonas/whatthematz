@@ -75,58 +75,86 @@ def draw_circle(event,x,y,flags,param):
 ix,iy = -1,-1
 
 
-# # a window and bind the function to window
+# a window and bind the function to window
 # cv2.namedWindow('city')
 # cv2.setMouseCallback('city', draw_circle)
 
-# # while(1):
+# while(1):
 # for city in cities:
 
 # 	city = city.lower().replace(" ", "_")
 # 	print(city)
 # 	img = cv2.imread(city + "/img/" + city + ".jpg", cv2.IMREAD_UNCHANGED)
-# 	cv2.imshow('city', img)
-# 	k = cv2.waitKey() & 0xFF
-# 	if k == 27:
-# 		break
-# 	elif k == ord('a'):
-# 		with open(city + "/img/" + "matza_xy.txt", 'w') as file:
-# 			csv.writer(file, delimiter=',').writerow((ix, iy))
-# 	# print (ix,iy)
+# 	for i in range(1,5):
+# 		cv2.imshow('city', img)
+# 		k = cv2.waitKey() & 0xFF
+# 		if k == 27:
+# 			break
+# 		elif k == ord('a'):
+# 			print (ix,iy)
+# 			with open(city + "/img/" + "matza_xy.txt", 'w') as file:
+# 				csv.writer(file, delimiter=',').writerow((ix, iy))
 # cv2.destroyAllWindows()
 
 
+matza = cv2.imread("../resources/afikomen.png", cv2.IMREAD_UNCHANGED)
+scale_percent = 12 # percent of original size
+matza_width = int(matza.shape[1] * scale_percent / 100)
+matza_height = int(matza.shape[0] * scale_percent / 100)
+dim = (matza_width, matza_height)
+matza = cv2.resize(matza, dim, interpolation = cv2.INTER_AREA)
 
 for city in cities:
 	city = city.lower().replace(" ", "_")
-	city_img = cv2.imread(city + "/img/" + city + ".jpg", cv2.IMREAD_UNCHANGED)
-	city_img = cartoonify(city_img)
-	with open(city + "/img/" + "matza_xy.txt", 'r') as file:
+	
 
-		coords = file.read().split(',')
-		x_offset = int(coords[0])
-		y_offset = int(coords[1])	
-		matza = cv2.imread("../resources/afikomen.png", cv2.IMREAD_UNCHANGED)
+	with open(city + "/img/matza_xy.txt", 'w', newline='') as file:
+		
 
-		# Matza resizing 
-		scale_percent = 10 # percent of original size
-		width = int(matza.shape[1] * scale_percent / 100)
-		height = int(matza.shape[0] * scale_percent / 100)
-		dim = (width, height)
-		matza = cv2.resize(matza, dim, interpolation = cv2.INTER_AREA)
+		x_offset_prev = 0
+		y_offset_prev = 0
+		for i in range(0,5):
+			city_img = cv2.imread(city + "/img/" + city + ".jpg", cv2.IMREAD_UNCHANGED)
+			city_img = cartoonify(city_img)
+			city_width = int(city_img.shape[1])
+			city_height = int(city_img.shape[0])
 
-		# Set coordinates of matza
-		y1, y2 = y_offset, y_offset + matza.shape[0]
-		x1, x2 = x_offset, x_offset + matza.shape[1]
+			max_y_pos = city_height - matza_height
+			min_y_pos = matza_height
+			max_x_pos = city_width - matza_width
+			min_x_pos = matza_width
 
-		alpha_s = matza[:, :, 3] / 255.0
-		alpha_l = 1.0 - alpha_s
+			new_x_threshold = city_width/5
+			new_y_threshold = city_width/10
+			# coords = file.readline().split(',')
+			# print(city)
+			# x_offset = int(coords[0])
+			# y_offset = int(coords[1])	
 
-		for c in range(0, 3):
-		    city_img[y1:y2, x1:x2, c] = (alpha_s * matza[:, :, c] +
-		                              alpha_l * city_img[y1:y2, x1:x2, c])
+			# Set coordinates of matza
+			print(city)
+			while( True ):
+				y_offset = random.randint(min_y_pos, max_y_pos)
+				x_offset = random.randint(min_x_pos, max_x_pos)
+				if (abs(y_offset-y_offset_prev) > new_y_threshold) and (abs(y_offset-y_offset_prev) > new_y_threshold):
+					break
+			y1, y2 = y_offset, y_offset + matza.shape[0]
+			x1, x2 = x_offset, x_offset + matza.shape[1]
 
-		# city_img = cartoonify(city_img)
-		# cv2.imshow("image", city_img)
-		# cv2.waitKey()
-		cv2.imwrite(city + "/img/" + city + "_hidden.jpg", city_img)
+			alpha_s = matza[:, :, 3] / 255.0
+			alpha_l = 1.0 - alpha_s
+
+			for c in range(0, 3):
+			    city_img[y1:y2, x1:x2, c] = (alpha_s * matza[:, :, c] +
+			                              alpha_l * city_img[y1:y2, x1:x2, c])
+
+			# city_img = cartoonify(city_img)
+			# cv2.imshow("image", city_img)
+			# cv2.waitKey()
+
+			csv.writer(file, delimiter=',').writerow((x_offset, y_offset))
+			x_offset_prev = x_offset
+			y_offset_prev = y_offset
+			# city_img = cartoonify(city_img)
+
+			cv2.imwrite(city + "/img/" + city + "_hidden" + str(i) + ".jpg", city_img)

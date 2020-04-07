@@ -128,17 +128,23 @@ def ImageData(imgOrBytes, rect):
         'percentRect': percentRect,
     }
 
-def getImageForHunt(city):
+def getRandomImageForHunt(city):
+    
     city = city.lower().replace(" ", "_")
     folderPath = os.path.join('cities', city, 'img')
-    imgPath = os.path.join(folderPath, city + '_hidden.jpg')
     txtPath = os.path.join(folderPath, 'matza_xy.txt')
-
-    img = PIL.Image.open(imgPath)
+    
     with open(txtPath, 'r') as file:
-        coords = file.read().split(',')
-        x = int(coords[0])
-        y = int(coords[1])
+        lines = file.readlines()
+        numHides = len(lines)
+        hideImgIdx = random.randint(0, numHides-1)
+
+    coords = lines[hideImgIdx].split(',')
+    x = int(coords[0])
+    y = int(coords[1])
+
+    imgPath = os.path.join(folderPath, f'{city}_hidden{hideImgIdx}.jpg')
+    img = PIL.Image.open(imgPath)
 
     w, h = getMatzahImage().size
     return img, (x,y,w,h)
@@ -157,7 +163,7 @@ def setupHunt(huntId, city=None, matzahXY=None):
         city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
 
     if not matzahXY:
-        img, rect = getImageForHunt(city)
+        img, rect = getRandomImageForHunt(city)
     # otherwise generate the hunt based on params
     else:
         img = getCityImage(city)
