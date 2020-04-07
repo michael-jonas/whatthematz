@@ -457,7 +457,7 @@ def on_disconnect():
     room = data['room']
     huntId = data['hunt_id']
     sederId = data['seder_id']
-    uid = data['uid']
+    uid = ObjectId(data['uid'])
 
     db.seders.update_one({'_id': sederId}, {"$pull": {'members': uid}})
     db.hunts.update_one({"_id": huntId}, { "$pull": {"participants": uid}})
@@ -576,7 +576,7 @@ def getHints():
     if os.path.exists(fpath) and os.path.isfile(fpath):
         with open(fpath) as f:
             data = json.load(f)
-        hints = data['easyHints'] + data['mediumHints'] + data['hardHints']
+        hints = data['hardHints'] + data['mediumHints'] + data['easyHints']
         return goodResponse(hints)
 
     # return bad if no json found
