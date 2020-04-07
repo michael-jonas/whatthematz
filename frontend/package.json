@@ -15,6 +15,7 @@
     "react-dom": "^16.13.1",
     "react-leaflet": "^2.6.3",
     "react-scripts": "3.4.1",
+    "react-toast-notifications": "^2.4.0",
     "socket.io-client": "^2.3.0"
   },
   "scripts": {

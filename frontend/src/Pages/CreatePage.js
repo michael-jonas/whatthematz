@@ -59,7 +59,8 @@ export default class CreatePage extends React.Component {
         json.roomCode,
         json.sederName,
         json.huntId,
-        true
+        true,
+        false
       );
       this.props.goToLobby(false);
     } else if (response.status === 500 && retries < 3) {
@@ -67,7 +68,12 @@ export default class CreatePage extends React.Component {
         this.tryCreateSeder(++retries);
       }, 1000);
     } else {
-      // Todo Toast a message?
+      this.props.toastManager.add(
+        "Hmm, something went wrong. Try again in a little bit!",
+        {
+          appearance: "error",
+        }
+      );
       this.setState({
         isBusy: false,
       });

@@ -1,10 +1,9 @@
 import React from "react";
+import { ToastProvider, withToastManager } from "react-toast-notifications";
 
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import { Marker } from "react-leaflet";
 
 import LandingPage from "./Pages/LandingPage";
@@ -47,6 +46,7 @@ class App extends React.Component {
     };
   }
   firstJoin = true;
+  isActive = false;
 
   setPage(page) {
     this.setState({ currentPage: page });
@@ -54,14 +54,14 @@ class App extends React.Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", (e) => {
+      this.props.socket.emit("disconnect");
       this.props.socket.disconnect();
     });
   }
 
   componentWillUnmount() {
-    window.removeEventListener("beforeunload", (e) => {
-      this.handleLeavePage(e);
-    });
+    this.props.socket.emit("disconnect");
+    this.props.socket.disconnect();
   }
 
   handleLeavePage(e) {
@@ -117,7 +117,7 @@ class App extends React.Component {
       console.log(data["player_list"]);
       if (this.firstJoin) {
         this.firstJoin = false;
-        if (true) {
+        if (!this.isActive) {
           // if this.hunt is in progress TODO
           this.setState({
             currentPage: Pages.LOBBY,
@@ -126,6 +126,21 @@ class App extends React.Component {
           this.setState({
             currentPage: Pages.HUNT,
           });
+          let diff_seconds = 3;
+          let callbackGen = (nHints) => {
+            return () => {
+              this.setState({ numberOfHints: nHints });
+            };
+          };
+
+          const INTERVAL = 30; // 30 seconds between each
+          for (let i = 2; i <= this.state.hintList.length; i++) {
+            let myCallback = callbackGen(i);
+            let seconds = (i - 1) * INTERVAL;
+            this.timeouts.push(
+              setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+            );
+          }
         }
       }
 
@@ -138,6 +153,7 @@ class App extends React.Component {
     });
 
     this.props.socket.on("start_time_update", (data) => {
+      this.isActive = true;
       if (this.state.currentPage !== Pages.LOBBY) return;
       // console.log('Got start time update:');
       let dt_str = data["startTime"];
@@ -182,9 +198,10 @@ class App extends React.Component {
       // next hunt id
       // old player list conditionally
       console.log(data);
-
+      this.isActive = false;
       if (!this.state.currentHuntOver) {
         // kick off timers
+
         this.setState({
           currentHuntOver: true,
           gameEndTime: Date.now(),
@@ -209,14 +226,8 @@ class App extends React.Component {
         //console.log("success new_user");
       }
     );
-    // load the players in the lobby
-    // TODO SPINNER HERE
-
-    // fire off non-blocking calls
-    // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    // todo this will be replaced in socket event
     await this.getHintList();
 
     this.preloadWaldoImage();
@@ -274,10 +285,14 @@ class App extends React.Component {
     if (response.ok) {
       const json = await response.json();
       if (json.found === true) {
-        // complete hunt, navigate away TODO
         this.goToWaldo();
       } else {
-        // toast hunt not complete
+        this.props.toastManager.add(
+          "Hmm, I don't smell any matzah here. Let's try somewhere else!",
+          {
+            appearance: "info",
+          }
+        );
       }
     } else if (response.status === 400) {
       // be sad, maybe check if hunt still active?
@@ -397,8 +412,10 @@ class App extends React.Component {
     roomCode,
     sederName,
     huntId,
-    isOwner
+    isOwner,
+    isActive
   ) => {
+    this.isActive = isActive;
     this.setState({
       name: name,
       userId: userId,
@@ -411,11 +428,6 @@ class App extends React.Component {
   };
 
   joinNextLobby = () => {
-    // todo
-    // join next hunt with "next hunt id" from "conclude_hunt" socket
-    // set huntId state to be the nexthuntid
-    // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-
     let onSuccess = () => {
       // fetch
       for (let i = 0; i < this.timeouts.length; i++) {
@@ -437,9 +449,30 @@ class App extends React.Component {
       this.preloadWaldoImage();
       this.loadBoundingBox(0);
       this.getHintList();
-      this.setState({
-        currentPage: Pages.LOBBY,
-      });
+      if (!this.isActive) {
+        this.setState({
+          currentPage: Pages.LOBBY,
+        });
+      } else {
+        this.setState({
+          currentPage: Pages.HUNT,
+        });
+        let diff_seconds = 3;
+        let callbackGen = (nHints) => {
+          return () => {
+            this.setState({ numberOfHints: nHints });
+          };
+        };
+
+        const INTERVAL = 30; // 30 seconds between each
+        for (let i = 2; i <= this.state.hintList.length; i++) {
+          let myCallback = callbackGen(i);
+          let seconds = (i - 1) * INTERVAL;
+          this.timeouts.push(
+            setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+          );
+        }
+      }
     };
 
     this.props.socket.emit(
@@ -504,8 +537,13 @@ class App extends React.Component {
             )}
           </Navbar>
           <div
-            style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
+            style={{
+              height: 0,
+              border: "1px solid #EDEDED",
+              marginBottom: 10,
+            }}
           />
+
           <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
             {this.state.currentPage === Pages.PRELANDING && (
               <PreLandingPage
@@ -584,27 +622,6 @@ class App extends React.Component {
               />
             )}
           </div>
-
-          <Modal show={this.state.backModal} onHide={this.closeBackModal}>
-            <Modal.Header closeButton>
-              <Modal.Title>Are you sure you want to go back?</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              {this.state.currentPage === Pages.LOBBY
-                ? "If you leave now, you'll lose your score and have to rejoin the Seder."
-                : "If you leave now, you'll have to wait until the next hunt."}
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="danger" onClick={this.confirmBack}>
-                {this.state.currentPage === Pages.LOBBY
-                  ? "Leave Seder"
-                  : "Leave Hunt"}
-              </Button>
-              <Button variant="primary" onClick={this.closeBackModal}>
-                Cancel
-              </Button>
-            </Modal.Footer>
-          </Modal>
         </div>
         <div
           style={{
@@ -623,4 +640,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default withToastManager(App);

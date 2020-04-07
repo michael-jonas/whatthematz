@@ -17,10 +17,9 @@ export default class HuntPage extends React.Component {
   }
   markerLayer = [];
   minZoom = 10;
-  // todo revert to 0 0 1
-  lat = 43.65;
-  lng = -79.38;
-  zoom = 9;
+  lat = 0;
+  lng = 0;
+  zoom = 1;
 
   updateZoomState = () => {
     const map = this.mapRef.current;
@@ -72,6 +71,7 @@ export default class HuntPage extends React.Component {
         <h5 style={{ marginTop: 10, marginBottom: 20 }}>
           Find the location of the Afikoman!
         </h5>
+        <h6>Click on a marker to check if the Afikoman is there!</h6>
         {/* <h6>zoom level {this.state.curZoom}</h6> */}
         <div style={{ position: "relative", textAlign: "center" }}>
           {this.props.hintList.length > 0 && (
