@@ -33,16 +33,20 @@ export default class Instructions extends React.Component {
   }
   render() {
     return (
-      <div style={{width: "90%"}}>
-        <h4 style={{ marginTop: 30, marginBottom: 15 }}>How to play</h4>
+      <div style={{ width: "90%" }}>
+        <h4 style={{ marginTop: 30, marginBottom: 15, fontWeight: "600" }}>
+          How to play
+        </h4>
         <Button
           style={{
             fontSize: 12,
+            height: "33px",
+            fontFamily: "Muli",
             borderRadius: "1rem",
             marginLeft: "5%",
             marginTop: 10,
             marginBottom: 10,
-            marginRight: 10
+            marginRight: 10,
           }}
           onClick={() => this.showMapInstructions()}
           id="discover"
@@ -54,13 +58,20 @@ export default class Instructions extends React.Component {
           style={{
             fontSize: 12,
             borderRadius: "1rem",
+            fontFamily: "Muli",
           }}
           onClick={() => this.showWaldoInstructions()}
           id="waldo"
         >
           Find the Afikoman
         </Button>
-        <div style={{ textAlign: "center", marginTop: "10px" }}>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "10px",
+            fontWeight: "normal",
+          }}
+        >
           {this.state.mapInstructions ? (
             <MapInstructions />
           ) : (
