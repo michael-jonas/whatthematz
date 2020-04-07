@@ -52,19 +52,26 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.addEventListener("beforeunload", (e) => {
+      this.handleLeavePage(e);
+    });
+    window.addEventListener("unload", (e) => {
+      this.props.socket.disconnect();
+      console.log("disconnected");
     });
   }
 
   componentWillUnmount() {
-    window.addEventListener("beforeunload", () => {
-      this.handleLeavePage();
+    window.removeEventListener("beforeunload", (e) => {
+      this.handleLeavePage(e);
     });
   }
 
-  handleLeavePage() {
-    this.props.socket.disconnect();
+  handleLeavePage(e) {
+    if (this.state.roomCode !== "") {
+      e.preventDefault();
+      e.returnValue = "are you sure";
+    }
   }
 
   playerList = [
@@ -95,6 +102,8 @@ class App extends React.Component {
       }
     );
   };
+
+  timeouts = [];
 
   async goToLobby() {
     //console.log("emit user");
@@ -156,7 +165,9 @@ class App extends React.Component {
       for (let i = 2; i <= this.state.hintList.length; i++) {
         let myCallback = callbackGen(i);
         let seconds = (i - 1) * INTERVAL;
-        setTimeout(myCallback, (diff_seconds + seconds) * 1000);
+        this.timeouts.push(
+          setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+        );
       }
 
       setTimeout(() => {
@@ -282,7 +293,7 @@ class App extends React.Component {
     // create an image element so it loads pic now and caches the image
     // this element isnt even used - it just loads the cache
     const img = new Image();
-    img.src = `http://localhost:3000/api/get_image?huntId=${this.state.huntId}`;
+    img.src = `${this.props.apiUrl}/api/get_image?huntId=${this.state.huntId}`;
   }
   async loadBoundingBox(retries) {
     const boundingBoxResponse = await fetch(
@@ -400,6 +411,11 @@ class App extends React.Component {
 
     let onSuccess = () => {
       // fetch
+      for (let i = 0; i < this.timeouts.length; i++) {
+        clearTimeout(this.timeouts[i]);
+      }
+      this.timeouts = [];
+
       this.setState({
         huntId: this.state.nextHuntId,
         nextHuntId: "",
@@ -528,6 +544,7 @@ class App extends React.Component {
                 goToPostGame={this.goToPostGame}
                 boundingBox={this.state.boundingBox}
                 concludeHuntHandler={this.concludeHunt}
+                apiUrl={this.props.apiUrl}
               />
             )}
             {this.state.currentPage === Pages.POSTGAME && (
