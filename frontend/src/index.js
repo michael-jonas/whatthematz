@@ -6,6 +6,8 @@ import "./index.css";
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";
 import io from "socket.io-client";
+import "./fonts/Montserrat-Regular.ttf";
+import "./fonts/Muli-VariableFont_wght.ttf";
 
 const apiUrl = "http://localhost:5000";
 //const apiUrl = "flattenthebread.com";

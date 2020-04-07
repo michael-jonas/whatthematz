@@ -1,3 +1,14 @@
+@font-face {
+  font-family: "Montserrat";
+  src: local("Montserrat-Regular"),
+    url(./fonts/Montserrat-Regular.ttf) format("truetype");
+}
+@font-face {
+  font-family: "Muli";
+  src: local("Muli-VariableFont_wght"),
+    url(./fonts/Muli-VariableFont_wght.ttf) format("truetype");
+}
+
 .leaflet-top {
   top: 90px;
 }

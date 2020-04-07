@@ -465,9 +465,19 @@ class App extends React.Component {
                 position: "absolute",
                 left: "50%",
                 transform: "translatex(-50%)",
+                textAlign: "center",
               }}
             >
-              FlattenTheBread
+              <div
+                style={{
+                  fontFamily: "Montserrat",
+                }}
+              >
+                FLATTEN THE BREAD
+              </div>
+              <div style={{ fontFamily: "Muli", fontSize: "12px" }}>
+                Keeping a tradition alive during Covid-19
+              </div>
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
               this.state.currentPage === Pages.JOIN) && (
