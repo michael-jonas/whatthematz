@@ -2,6 +2,7 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, ZoomControl } from "react-leaflet";
+import "./HuntPage.css";
 
 export default class HuntPage extends React.Component {
   constructor(props) {

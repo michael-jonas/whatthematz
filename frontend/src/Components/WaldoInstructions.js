@@ -8,8 +8,8 @@ import matzahInstruction2 from "../Images/Instructions/matzah4Mobile.png";
 export default class WaldoInstructions extends React.Component {
   render() {
     return (
-      <div>
-        <Carousel controls={false}>
+      <div id="instructions">
+        <Carousel controls={true}>
           <Carousel.Item>
             <div
               style={{

@@ -18,7 +18,7 @@
   src: local("Lato-Regular"), url(./fonts/Lato-Regular.ttf) format("truetype");
 }
 
-Lato-Regular .leaflet-top {
+.leaflet-top {
   top: 90px;
 }
 

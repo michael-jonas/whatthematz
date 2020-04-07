@@ -34,7 +34,14 @@ export default class Instructions extends React.Component {
   render() {
     return (
       <div style={{ width: "90%" }}>
-        <h4 style={{ marginTop: 30, marginBottom: 15, fontWeight: "600" }}>
+        <h4
+          style={{
+            marginTop: 30,
+            marginBottom: 15,
+            fontWeight: "600",
+            marginLeft: "5%",
+          }}
+        >
           How to play
         </h4>
         <Button
