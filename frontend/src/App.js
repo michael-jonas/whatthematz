@@ -630,18 +630,21 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        <div
-          style={{
-            position: "fixed",
-            bottom: "10px",
-            width: "100%",
-            textAlign: "center",
-          }}
-        >
-          <span>
-            Learn more about this <a href="/">project</a>
-          </span>
-        </div>
+        {this.state.currentPage !== Pages.WALDO &&
+          this.state.currentPage !== Pages.HUNT && (
+            <div
+              style={{
+                position: "fixed",
+                bottom: "10px",
+                width: "100%",
+                textAlign: "center",
+              }}
+            >
+              <span>
+                Learn more about this <a href="/">project</a>
+              </span>
+            </div>
+          )}
       </>
     );
   }
