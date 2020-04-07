@@ -138,6 +138,7 @@ class App extends React.Component {
     });
 
     this.props.socket.on("start_time_update", (data) => {
+      if (this.state.currentPage !== Pages.LOBBY) return;
       // console.log('Got start time update:');
       let dt_str = data["startTime"];
       // console.log('dt string: ' + dt_str);
@@ -316,6 +317,9 @@ class App extends React.Component {
     }
   }
 
+  goToPreLanding = () => {
+    this.setState({ currentPage: Pages.PRELANDING });
+  };
   goToLanding = () => {
     this.setState({ currentPage: Pages.LANDING });
   };
@@ -359,6 +363,10 @@ class App extends React.Component {
         break;
       case Pages.HUNT:
         this.openBackModal();
+        break;
+      case Pages.LANDING:
+        console.log("b)");
+        this.goToPreLanding();
         break;
       default:
         break;
@@ -484,7 +492,8 @@ class App extends React.Component {
               </div>
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
-              this.state.currentPage === Pages.JOIN) && (
+              this.state.currentPage === Pages.JOIN ||
+              this.state.currentPage === Pages.LANDING) && (
               <input
                 style={{ width: "40px", height: "40px" }}
                 type="image"

@@ -2,8 +2,8 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 
-import matzahInstruction1 from "../Images/Instructions/matzah1Mobile.png";
-import matzahInstruction2 from "../Images/Instructions/matzah2Mobile.png";
+import matzahInstruction1 from "../Images/Instructions/matzah3Mobile.png";
+import matzahInstruction2 from "../Images/Instructions/matzah4Mobile.png";
 
 export default class WaldoInstructions extends React.Component {
   render() {
@@ -40,7 +40,11 @@ export default class WaldoInstructions extends React.Component {
               Zoom in on a location and try to find the afikoman hidden in the
               scene.
             </div>
-            <img src={matzahInstruction1} style={{width: "90%"}} alt="Example Find the Matzah 1" />
+            <img
+              src={matzahInstruction1}
+              style={{ width: "90%" }}
+              alt="Example Find the Matzah 1"
+            />
           </Carousel.Item>
           <Carousel.Item>
             <div
@@ -71,7 +75,11 @@ export default class WaldoInstructions extends React.Component {
             >
               When you find it, tap it to win the game!
             </div>
-            <img src={matzahInstruction2} style={{width: "90%"}} alt="Example Find the Matzah 2" />
+            <img
+              src={matzahInstruction2}
+              style={{ width: "90%" }}
+              alt="Example Find the Matzah 2"
+            />
           </Carousel.Item>
         </Carousel>
       </div>
