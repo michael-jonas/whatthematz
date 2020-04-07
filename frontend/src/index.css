@@ -13,8 +13,12 @@
   src: local("SourceSansPro-Regular"),
     url(./fonts/SourceSansPro-Regular.ttf) format("truetype");
 }
+@font-face {
+  font-family: "Lato";
+  src: local("Lato-Regular"), url(./fonts/Lato-Regular.ttf) format("truetype");
+}
 
-.leaflet-top {
+Lato-Regular .leaflet-top {
   top: 90px;
 }
 
