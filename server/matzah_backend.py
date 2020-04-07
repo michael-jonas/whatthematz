@@ -281,7 +281,7 @@ def on_new_user(data):
     # Check that the seder exists
     if sederData is None:
         # TODO: Error handling
-        return
+        return ({"ok": False}, status.HTTP_400_BAD_REQUEST)
 
     avatar = random.randint(0,9)
     user_uuid = db.users.insert_one(User(username, 0, avatar)).inserted_id
@@ -294,9 +294,10 @@ def on_new_user(data):
 
     player_list = generatePlayerList(huntId)
     if player_list is None:
-        return
+        return ({"ok": False}, status.HTTP_400_BAD_REQUEST)
 
     emit('player_list', {'n': len(player_list), 'player_list': player_list}, room=room)
+    return ({"ok": True}, status.HTTP_200_OK)
 
 @socket.on('trigger_hunt_socket')
 def on_trigger_hunt(data):
@@ -410,7 +411,7 @@ def trigger_win(data):
         'newHuntId': str(newHuntId),
     }
 
-    emit('winners_list_update', response, roomCode=roomCode)
+    emit('winners_list_update', response, room=roomCode)
     return (response, status.HTTP_200_OK)
 
 
@@ -440,7 +441,7 @@ def join_hunt(data):
     }
 
     roomCode = hunt['roomCode']
-    emit('player_list', response, roomCode=roomCode)
+    emit('player_list', response, room=roomCode)
     return (response, status.HTTP_200_OK)
 
 
