@@ -455,8 +455,11 @@ def on_disconnect():
 
     data = lookup_table[clientId]
     room = data['room']
-    huntId = data['hunt_id']
-    sederId = data['seder_id']
+
+    sederId = ObjectId(data['seder_id'])
+    # cant trust the hunt id from the lookup since it is out of date
+    hunt = db.hunts.find({"sederId": sederId}).sort([("$natural",-1)]).limit(1)[0]
+    huntId = hunt['_id']
     uid = ObjectId(data['uid'])
 
     db.seders.update_one({'_id': sederId}, {"$pull": {'members': uid}})

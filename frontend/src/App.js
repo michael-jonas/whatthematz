@@ -128,7 +128,8 @@ class App extends React.Component {
           });
         }
       }
-      const isOwner = data.player_list[0].uuid === this.state.userId;
+
+      const isOwner = data.player_list?.[0]?.uuid === this.state.userId;
 
       this.setState({
         playerList: data["player_list"],
