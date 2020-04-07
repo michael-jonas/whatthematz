@@ -56,6 +56,7 @@ class App extends React.Component {
 
   componentDidMount() {
     window.addEventListener("beforeunload", (e) => {
+      this.props.socket.emit("disconnect");
       this.props.socket.disconnect();
     });
   }
@@ -200,10 +201,10 @@ class App extends React.Component {
       // next hunt id
       // old player list conditionally
       console.log(data);
-
+      this.isActive = false;
       if (!this.state.currentHuntOver) {
         // kick off timers
-        this.isActive = false;
+
         this.setState({
           currentHuntOver: true,
           gameEndTime: Date.now(),
@@ -465,6 +466,21 @@ class App extends React.Component {
         this.setState({
           currentPage: Pages.HUNT,
         });
+        let diff_seconds = 3;
+        let callbackGen = (nHints) => {
+          return () => {
+            this.setState({ numberOfHints: nHints });
+          };
+        };
+
+        const INTERVAL = 30; // 30 seconds between each
+        for (let i = 2; i <= this.state.hintList.length; i++) {
+          let myCallback = callbackGen(i);
+          let seconds = (i - 1) * INTERVAL;
+          this.timeouts.push(
+            setTimeout(myCallback, (diff_seconds + seconds) * 1000)
+          );
+        }
       }
     };
 
