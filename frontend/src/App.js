@@ -1,5 +1,5 @@
 import React from "react";
-import logo from "./logo.svg";
+
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
@@ -14,6 +14,7 @@ import LobbyPage from "./Pages/LobbyPage";
 import HuntPage from "./Pages/HuntPage";
 import WaldoPage from "./Pages/WaldoPage";
 import PostGamePage from "./Pages/PostGamePage";
+import PreLandingPage from "./Pages/PreLandingPage";
 
 import { Pages } from "./Globals/Enums";
 
@@ -494,6 +495,12 @@ class App extends React.Component {
             style={{ height: 0, border: "1px solid #EDEDED", marginBottom: 10 }}
           />
           <div id="content" style={{ maxWidth: "450px", margin: "auto" }}>
+            {this.state.currentPage === Pages.PRELANDING && (
+              <PreLandingPage
+                goToLanding={this.goToLanding}
+                goToAbout={this.goToAbout}
+              />
+            )}
             {this.state.currentPage === Pages.LANDING && (
               <LandingPage
                 goToCreate={this.goToCreate}
