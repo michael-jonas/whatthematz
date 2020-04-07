@@ -226,14 +226,8 @@ class App extends React.Component {
         //console.log("success new_user");
       }
     );
-    // load the players in the lobby
-    // TODO SPINNER HERE
-
-    // fire off non-blocking calls
-    // playerlist is necessary for lobby
     // hintlist is necessary if joining mid game - cant show empty block
 
-    // todo this will be replaced in socket event
     await this.getHintList();
 
     this.preloadWaldoImage();
@@ -291,7 +285,6 @@ class App extends React.Component {
     if (response.ok) {
       const json = await response.json();
       if (json.found === true) {
-        // complete hunt, navigate away TODO
         this.goToWaldo();
       } else {
         this.props.toastManager.add(
@@ -434,11 +427,6 @@ class App extends React.Component {
   };
 
   joinNextLobby = () => {
-    // todo
-    // join next hunt with "next hunt id" from "conclude_hunt" socket
-    // set huntId state to be the nexthuntid
-    // clear winnersList and oldPlayerList and hintList and reloadWaldoImage and boundingBox
-
     let onSuccess = () => {
       // fetch
       for (let i = 0; i < this.timeouts.length; i++) {

@@ -17,10 +17,9 @@ export default class HuntPage extends React.Component {
   }
   markerLayer = [];
   minZoom = 10;
-  // todo revert to 0 0 1
-  lat = 43.65;
-  lng = -79.38;
-  zoom = 9;
+  lat = 0;
+  lng = 0;
+  zoom = 1;
 
   updateZoomState = () => {
     const map = this.mapRef.current;
