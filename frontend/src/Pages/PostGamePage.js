@@ -53,7 +53,7 @@ export default class PostGamePage extends React.Component {
             </Container>
           </>
         )}
-        <div style={{ textAlign: "center" }}>
+        <div style={{ marginTop: 15, textAlign: "center" }}>
           <Button
             variant="outline-primary"
             // todo actually handle click
