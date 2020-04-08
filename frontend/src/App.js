@@ -190,7 +190,7 @@ class App extends React.Component {
 
       setTimeout(() => {
         this.setPage(Pages.HUNT);
-      }, diff_seconds * 1000);
+      }, 3 * 1000);
 
       this.setState({ showCountdown: true });
     });
@@ -438,7 +438,7 @@ class App extends React.Component {
   };
 
   joinNextLobby = () => {
-    let onSuccess = () => {
+    let onSuccess = async () => {
       // fetch
       for (let i = 0; i < this.timeouts.length; i++) {
         clearTimeout(this.timeouts[i]);
@@ -459,7 +459,7 @@ class App extends React.Component {
       });
       this.preloadWaldoImage();
       this.loadBoundingBox(0);
-      this.getHintList();
+      await this.getHintList();
       if (!this.isActive) {
         this.setState({
           currentPage: Pages.LOBBY,
