@@ -6,6 +6,7 @@
 #pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
 #pylint:disable=unused-import
 
+from copy import deepcopy
 import time
 import os
 import io
@@ -369,7 +370,7 @@ def updateCitiesInSeder(sederData, huntId):
     city = unusedCities.pop(random.randint(0,len(unusedCities)-1)) # Remove city from the unused list
     usedCities.append(city) # Add city to the used list
     db.seders.update_one(
-        {'_id': sederId}, 
+        {'_id': sederData['_id']},
         {
             '$pull': {'unusedCities': city},
             '$push': {'usedCities': city},
@@ -882,10 +883,17 @@ def createSeder():
     insertionResult = db.seders.insert_one(insertSederData)
     sederId = insertionResult.inserted_id
     
+
+    remainingCities = deepcopy(CITIES)
+    city = remainingCities.pop(random.randint(0, len(remainingCities)-1))
+
     # Create a hunt and update seders to include the hunt
-    newHuntId = createHuntInSeder(insertionResult)
-    city = updateCitiesInSeder(sederData, newHuntId)
+    insertHuntData = HuntData(sederId=sederId, roomCode=roomCode, participants=baseUsers, city=city)
+    newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
+
+    # newHuntId = createHuntInSeder(insertionResult)
     setupHunt(newHuntId, city)
+    db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
     
     response = {
         'sederId': sederId,
