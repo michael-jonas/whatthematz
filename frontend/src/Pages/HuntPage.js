@@ -11,13 +11,11 @@ export default class HuntPage extends React.Component {
     this.mapRef = React.createRef();
 
     this.state = {
-      markersLoaded: false,
       showMarkers: false,
       curZoom: 1,
       isBusy: false,
     };
   }
-  markerLayer = [];
   minZoom = 10;
   lat = 0;
   lng = 0;

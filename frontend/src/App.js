@@ -41,7 +41,6 @@ class App extends React.Component {
       boundingBox: null,
       showCountdown: false,
       gameEndTime: Date.now(),
-      markerLayer: <></>,
       currentHuntOver: false,
     };
   }
@@ -243,7 +242,6 @@ class App extends React.Component {
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
-    this.loadMarkers();
   }
 
   async getHintList() {
@@ -258,37 +256,59 @@ class App extends React.Component {
     }
   }
 
-  async loadMarkers(retries) {
-    // fetch list of cities
-    const response = await fetch(`/api/get_cities`);
-    if (response.ok) {
-      const json = await response.json();
+  cityList = [
+    ["Amsterdam", 52.3727598, 4.8936041],
+    ["Berlin", 52.5170365, 13.3888599],
+    ["Buenos Aires", -34.6075682, -58.4370894],
+    ["Chicago", 41.8755616, -87.6244212],
+    ["Florence", 43.7698712, 11.2555757],
+    ["Jerusalem", 31.778345, 35.2250786],
+    ["Kiev", 50.4500336, 30.5241361],
+    ["London", 51.5073219, -0.1276474],
+    ["Los Angeles", 34.0536909, -118.2427666],
+    ["Melbourne", -37.8142176, 144.9631608],
+    ["Montreal", 45.4972159, -73.6103642],
+    ["New York City", 40.7127281, -74.0060152],
+    ["Paris", 48.8566969, 2.3514616],
+    ["Philadelphia", 39.9527237, -75.1635262],
+    ["Prague", 50.0874654, 14.4212535],
+    ["Tel Aviv", 32.0804808, 34.7805274],
+    ["Toronto", 43.6534817, -79.3839347],
+    ["Vancouver", 49.2608724, -123.1139529],
+    ["Warsaw", 52.2337172, 21.07141112883227],
+  ];
 
-      const markerLayer = json.result.map((marker) => {
-        let latlng = { lat: marker[1], lng: marker[2] };
-        return (
-          <Marker
-            key={marker[0]}
-            position={latlng}
-            onclick={() => this.checkRightCity(marker[0])}
-          >
-            {/* <Tooltip>{marker[0]}</Tooltip> */}
-          </Marker>
-        );
-      });
+  markerLayer = this.cityList.map((marker) => {
+    let latlng = { lat: marker[1], lng: marker[2] };
+    return (
+      <Marker
+        key={marker[0]}
+        position={latlng}
+        onclick={() => this.checkRightCity(marker[0])}
+      >
+        {/* <Tooltip>{marker[0]}</Tooltip> */}
+      </Marker>
+    );
+  });
 
-      this.setState({
-        markerLayer: markerLayer,
-      });
-    } else {
-      //retry loop, max timeouts? nahhh
-      if (retries < 3) {
-        setTimeout(() => {
-          this.loadMarkers(++retries);
-        }, 1000);
-      }
-    }
-  }
+  // loadMarkers(retries) {
+  //   // fetch list of cities
+  //   const response = await fetch(`/api/get_cities`);
+  //   if (response.ok) {
+  //     const json = await response.json();
+
+  //     this.setState({
+  //       markerLayer: markerLayer,
+  //     });
+  //   } else {
+  //     //retry loop, max timeouts? nahhh
+  //     if (retries < 3) {
+  //       setTimeout(() => {
+  //         this.loadMarkers(++retries);
+  //       }, 1000);
+  //     }
+  //   }
+  // }
   async checkRightCity(name, retries) {
     const response = await fetch(
       `/api/check_location?huntId=${this.state.huntId}&locationName=${name}`
@@ -598,7 +618,7 @@ class App extends React.Component {
                 goToWaldo={this.goToWaldo}
                 hintList={this.state.hintList}
                 numberOfHints={this.state.numberOfHints}
-                markerLayer={this.state.markerLayer}
+                markerLayer={this.markerLayer}
               />
             )}
             {this.state.currentPage === Pages.WALDO && (
