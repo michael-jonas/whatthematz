@@ -13,6 +13,7 @@
     "react-bootstrap": "^1.0.0",
     "react-device-detect": "^1.11.14",
     "react-dom": "^16.13.1",
+    "react-google-maps": "^9.4.5",
     "react-leaflet": "^2.6.3",
     "react-scripts": "3.4.1",
     "react-toast-notifications": "^2.4.0",
