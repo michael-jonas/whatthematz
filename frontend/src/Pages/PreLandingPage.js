@@ -3,7 +3,6 @@ import { withToastManager } from "react-toast-notifications";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Instructions from "../Components/Instructions";
-import AboutTeam from "../Components/AboutTeam";
 
 import mag from "../Images/magpink.png";
 
