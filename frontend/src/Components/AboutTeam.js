@@ -18,7 +18,7 @@ export default class AboutTeam extends React.Component {
         nameText: "Allison Kapps, UX Designer",
         img: allisonheadshot,
         text:
-          "They say there's a first time for everything, but I still never thought I'd have to convince my team to not 'just ship the figma design'. I currently work at Shift Technology in Paris as UX designer. Paris isn't as romantic when you're stuck indoors, but at least the pastries are still yummy... Oh wait. Chag sameach everyone!",
+          "They say there's a first time for everything, but I still never thought I'd have to convince my team to not 'just ship the figma design'. I currently work at Shift Technology in Paris as a UX product designer. Paris isn't as romantic when you're stuck indoors, but at least the pastries are still yummy... Oh wait. Chag sameach everyone!",
       },
       {
         nameText: "David Weisdorf, Software Developer",
