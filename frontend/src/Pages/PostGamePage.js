@@ -2,13 +2,27 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
 import Button from "react-bootstrap/Button";
+import { withToastManager } from "react-toast-notifications";
 
-export default class PostGamePage extends React.Component {
+class PostGamePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isBusy: false,
     };
+  }
+
+  tryJoinNextLobby() {
+    if (this.props.currentTimeRemaining > 0) {
+      this.props.toastManager.add(
+        "Wait until everyone is finished before playing again, you don't want to leave someone behind!",
+        {
+          appearance: "warning",
+        }
+      );
+    } else {
+      this.props.joinNextLobby();
+    }
   }
 
   render() {
@@ -55,6 +69,15 @@ export default class PostGamePage extends React.Component {
             </Container>
           </>
         )}
+        {this.props.currentTimeRemaining > 0 && (
+          <div>
+            <span style={{ color: "#0066FF" }}>
+              {this.props.currentTimeRemaining}
+            </span>{" "}
+            seconds until hunt ends.
+          </div>
+        )}
+
         <div style={{ marginTop: 15, textAlign: "center" }}>
           <Button
             onClick={() => {
@@ -74,8 +97,9 @@ export default class PostGamePage extends React.Component {
           >
             Exit the room
           </Button>
+
           <Button
-            onClick={() => this.props.joinNextLobby()}
+            onClick={() => this.tryJoinNextLobby()}
             style={{
               marginLeft: "11px",
               borderRadius: "25.5px",
@@ -88,3 +112,4 @@ export default class PostGamePage extends React.Component {
     );
   }
 }
+export default withToastManager(PostGamePage);

@@ -5,6 +5,7 @@ import backButton from "./Images/return-button-2.png";
 import "./App.css";
 import Navbar from "react-bootstrap/Navbar";
 import { Marker } from "react-leaflet";
+import Countdown from "./Components/Countdown";
 
 import LandingPage from "./Pages/LandingPage";
 import CreatePage from "./Pages/CreatePage";
@@ -42,6 +43,7 @@ class App extends React.Component {
       showCountdown: false,
       gameEndTime: Date.now(),
       currentHuntOver: false,
+      currentTimeRemaining: 0,
     };
   }
   firstJoin = true;
@@ -146,6 +148,10 @@ class App extends React.Component {
           winnersList: data.winnerList,
           playerList: [],
         });
+        if (this.toastId) {
+          this.props.toastManager.remove(this.toastId);
+          this.toastId = null;
+        }
         this.goToPostGame();
       }
     );
@@ -240,10 +246,12 @@ class App extends React.Component {
       // winners list
       // next hunt id
       // old player list conditionally
-      console.log(data);
+      //console.log(data);
       this.isActive = false;
+
       if (!this.state.currentHuntOver) {
         // todo kick off timers
+        this.startGameEnd();
         if (
           !this.haveWon &&
           (this.state.currentPage === Pages.HUNT ||
@@ -553,6 +561,95 @@ class App extends React.Component {
     );
   };
 
+  toastId = null;
+  gameEndInterval = null;
+  gameEndTimeout = null;
+  oldPlayerList = null;
+
+  startGameEnd() {
+    // Toast info if you're on the Hunt/Waldo page
+    // Don't toast if you're on Postgame
+    // save toast id to close on arriving to postgame page
+    this.oldPlayerList = this.state.playerList;
+
+    this.setState({
+      currentTimeRemaining: 60,
+      playerList: [],
+    });
+
+    // Every second - check if game has ended, and update timer for all components
+    this.gameEndInterval = setInterval(() => {
+      this.checkGameEnd();
+      this.setState((state) => ({
+        currentTimeRemaining: state.currentTimeRemaining - 1,
+      }));
+    }, 1000);
+
+    // After 60 seconds, if no game end, then force game end
+    this.gameEndTimeout = setTimeout(() => {
+      this.props.toastManager.add(
+        "Sorry, you ran out of time. Better luck next time!",
+        {
+          appearance: "warning",
+        }
+      );
+      this.endGameEnd();
+    }, 60000);
+
+    if (
+      this.state.currentPage === Pages.HUNT ||
+      this.state.currentPage === Pages.WALDO
+    ) {
+      this.toastId = this.props.toastManager.add(
+        <>
+          <Countdown
+            color={"#0066FF"}
+            startingCount={this.state.currentTimeRemaining}
+          />{" "}
+          seconds until hunt ends.
+        </>,
+        {
+          appearance: "info",
+          autoDismiss: false,
+        }
+      );
+    }
+
+    // kick off timer that updates state every second
+    // Take a copy of current players in case future players join next lobby and pollute your local list
+    // checks for game end every second
+  }
+  checkGameEnd() {
+    // Check local copy of current players against winners list length to see if everyone's out and you can end early
+    if (this.oldPlayerList?.length === this.state.winnersList?.length) {
+      this.endGameEnd();
+    }
+  }
+
+  // Called when timer hits 0 or when currentlist = winners list
+  endGameEnd() {
+    // Close toast via id
+    // Clear everything
+    // Set time to 0
+    if (this.state.currentPage !== Pages.POSTGAME) {
+      this.goToPostGame();
+    }
+    if (this.toastId) {
+      this.props.toastManager.remove(this.toastId);
+      this.toastId = null;
+    }
+
+    clearInterval(this.gameEndInterval);
+    clearTimeout(this.gameEndTimeout);
+
+    this.oldPlayerList = null;
+    this.gameEndInterval = null;
+    this.gameEndTimeout = null;
+    this.setState({
+      currentTimeRemaining: 0,
+    });
+  }
+
   render() {
     return (
       <>
@@ -692,6 +789,7 @@ class App extends React.Component {
                 sederName={this.state.sederName}
                 huntId={this.state.huntId}
                 joinNextLobby={this.joinNextLobby}
+                currentTimeRemaining={this.state.currentTimeRemaining}
               />
             )}
           </div>
