@@ -2,8 +2,32 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Carousel from "react-bootstrap/Carousel";
 import { Map, TileLayer, ZoomControl } from "react-leaflet";
+import GoogleMapReact from "google-map-react";
 import "./HuntPage.css";
 import mag from "../Images/mag.png";
+
+class SimpleMap extends React.Component {
+  static defaultProps = {
+    center: {
+      lat: 59.95,
+      lng: 30.33,
+    },
+    zoom: 0,
+  };
+
+  render() {
+    return (
+      // Important! Always set the container height explicitly
+      <div style={{ height: 550 }}>
+        <GoogleMapReact
+          bootstrapURLKeys={{ key: process.env.REACT_APP_API_KEY }}
+          defaultCenter={this.props.center}
+          defaultZoom={this.props.zoom}
+        ></GoogleMapReact>
+      </div>
+    );
+  }
+}
 
 export default class HuntPage extends React.Component {
   constructor(props) {
@@ -131,7 +155,11 @@ export default class HuntPage extends React.Component {
               </div>
             </>
           )}
-          <Map
+
+          <SimpleMap>
+            {this.state.curZoom >= this.minZoom && this.props.markerLayer}
+          </SimpleMap>
+          {/* <Map
             style={{ height: 550 }}
             ref={this.mapRef}
             center={position}
@@ -145,7 +173,7 @@ export default class HuntPage extends React.Component {
             />
             {this.state.curZoom >= this.minZoom && this.props.markerLayer}
             <ZoomControl position="topleft" />
-          </Map>
+          </Map> */}
           <div
             style={{
               padding: 10,
