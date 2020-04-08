@@ -359,8 +359,8 @@ def createHuntInSeder(sederData):
 
 
 def updateCitiesInSeder(sederData, huntId):
-    unusedCities = sederData.unusedCities
-    usedCities = sederData.usedCities
+    unusedCities = sederData['unusedCities']
+    usedCities = sederData['usedCities']
 
     # Reset the lists if the cities have been exhausted
     if (len(unusedCities) == 0):
