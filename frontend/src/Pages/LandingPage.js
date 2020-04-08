@@ -5,54 +5,15 @@ import startSeder from "../Images/Landing/start.png";
 import joinSeder from "../Images/Landing/join.png";
 
 export default class LandingPage extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { canNext: false };
-  }
-  createHighlight = false;
-  joinHighlight = false;
-
-  setCreate = () => {
-    document
-      .getElementById("createSederButton")
-      .classList.replace("normal-button", "highlight-button");
-
-    document
-      .getElementById("joinSederButton")
-      .classList.replace("highlight-button", "normal-button");
-
-    this.createHighlight = true;
-    this.joinHighlight = false;
-
-    this.setState({ canNext: true });
-  };
-
-  setJoin = () => {
-    console.log(document.getElementById("joinSederButton"));
-    document
-      .getElementById("joinSederButton")
-      .classList.replace("normal-button", "highlight-button");
-
-    document
-      .getElementById("createSederButton")
-      .classList.replace("highlight-button", "normal-button");
-
-    this.createHighlight = false;
-    this.joinHighlight = true;
-
-    this.setState({ canNext: true });
-  };
-
   render() {
     return (
-      <Container style={{ position: "relative" }}>
+      <Container>
         <div style={{ textAlign: "center", marginTop: 20 }}>
           Select an option
         </div>
         <div style={{ margin: "auto", textAlign: "center" }}>
           <Button
-            id="createSederButton"
-            onClick={() => this.setCreate()}
+            onClick={() => this.props.goToCreate()}
             className="normal-button"
             style={{
               margin: 10,
@@ -68,7 +29,7 @@ export default class LandingPage extends React.Component {
           </Button>
           <Button
             id="joinSederButton"
-            onClick={() => this.setJoin()}
+            onClick={() => this.props.goToJoin()}
             className="normal-button"
             style={{
               margin: 10,
@@ -83,23 +44,6 @@ export default class LandingPage extends React.Component {
             <div style={{ fontSize: "12px" }}>Join a Seder</div>
           </Button>
         </div>
-        <Button
-          disabled={!this.state.canNext}
-          onClick={() => {
-            this.createHighlight
-              ? this.props.goToCreate()
-              : this.props.goToJoin();
-          }}
-          style={{
-            position: "relative",
-            left: "250px",
-            width: "114px",
-            borderRadius: "25.5px",
-            marginTop: "10px",
-          }}
-        >
-          Next
-        </Button>
       </Container>
     );
   }

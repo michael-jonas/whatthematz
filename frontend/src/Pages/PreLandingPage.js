@@ -1,4 +1,5 @@
 import React from "react";
+import { withToastManager } from "react-toast-notifications";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Instructions from "../Components/Instructions";
@@ -6,7 +7,7 @@ import AboutTeam from "../Components/AboutTeam";
 
 import mag from "../Images/magpink.png";
 
-export default class PreLandingPage extends React.Component {
+class PreLandingPage extends React.Component {
   blueColor = "rgba(0, 102, 255, 0.95)";
 
   constructor(props) {
@@ -96,6 +97,15 @@ export default class PreLandingPage extends React.Component {
             <div style={{ marginTop: "25px" }}>
               <Button
                 onClick={() => {
+                  this.props.toastManager.add(
+                    "Under construction, come back later!",
+                    {
+                      appearance: "warning",
+                    }
+                  );
+                  this.setState({
+                    isBusy: false,
+                  });
                   this.setState(function (state, props) {
                     return {
                       // TODO: turn this on
@@ -145,3 +155,4 @@ export default class PreLandingPage extends React.Component {
     );
   }
 }
+export default withToastManager(PreLandingPage);

@@ -94,7 +94,7 @@ class JoinPage extends React.Component {
       <Container>
         <Form>
           <Form.Group controlId="roomCode">
-            <Form.Label>Room Code</Form.Label>
+            <Form.Label>Room code</Form.Label>
             <Form.Control
               style={{ textTransform: "uppercase" }}
               autoComplete="off"
@@ -106,7 +106,7 @@ class JoinPage extends React.Component {
             />
           </Form.Group>
           <Form.Group controlId="Nickname">
-            <Form.Label>Treasure Hunter Name</Form.Label>
+            <Form.Label>Treasure hunter name</Form.Label>
             <Form.Control
               type="text"
               autoComplete="off"
@@ -117,18 +117,41 @@ class JoinPage extends React.Component {
           </Form.Group>
 
           <div style={{ textAlign: "center" }}>
-            <Button
-              style={{ borderRadius: "1rem", width: 220 }}
-              disabled={!this.state.canJoin || this.state.isBusy}
-              variant="primary"
-              onClick={() => this.tryJoinSeder()}
-            >
-              {this.state.isBusy ? (
-                <Spinner animation="border" />
-              ) : (
-                "Join the Seder"
-              )}
-            </Button>
+            {!this.state.canJoin ? (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                }}
+                disabled={true}
+                variant="secondary"
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Join the seder"
+                )}
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  backgroundColor: "#0066ff",
+                }}
+                disabled={this.state.isBusy}
+                variant="primary"
+                onClick={() => this.tryJoinSeder(0)}
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Join the seder"
+                )}
+              </Button>
+            )}
           </div>
         </Form>
       </Container>

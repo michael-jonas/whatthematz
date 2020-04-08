@@ -33,21 +33,23 @@ export default class PostGamePage extends React.Component {
     return (
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
-        <h5>
+        <div style={{ fontSize: "18px", marginTop: "27px", fontWeight: "600" }}>
           <span style={{ color: "#0066FF" }}>
             {this.props.winnersList[0].nickname}
           </span>{" "}
           won {this.props.sederName} game! Congratulations!
-        </h5>
-        <h5 style={{ marginTop: 20 }}>Afikoman Finders!</h5>
+        </div>
+        <div style={{ marginTop: 10, fontWeight: "600", fontSize: "16px" }}>
+          Afikoman Finders!
+        </div>
         <Container style={{ textAlign: "center" }} id="winnerList">
           {winnersList}
         </Container>
         {this.props.players?.length > 0 && (
           <>
-            <h5 style={{ marginTop: 10 }}>
+            <div style={{ marginTop: 10, fontWeight: "600", fontSize: "16px" }}>
               Other players who are playing again
-            </h5>
+            </div>
             <Container style={{ textAlign: "center" }} id="playerList">
               {playerList}
             </Container>
@@ -55,12 +57,19 @@ export default class PostGamePage extends React.Component {
         )}
         <div style={{ marginTop: 15, textAlign: "center" }}>
           <Button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              sessionStorage.clear();
+              window.location.reload();
+            }}
             variant="outline-primary"
             style={{
               marginLeft: "20px",
-              marginRight: "20px",
-              borderRadius: "1rem",
+              marginRight: "10px",
+              background: "#FFFFFF",
+              boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.08)",
+              borderRadius: "25.5px",
+              borderColor: "#999999",
+              color: "#999999",
             }}
           >
             Exit the room
@@ -68,9 +77,8 @@ export default class PostGamePage extends React.Component {
           <Button
             onClick={() => this.props.joinNextLobby()}
             style={{
-              marginLeft: "20px",
-              marginRight: "20px",
-              borderRadius: "1rem",
+              marginLeft: "11px",
+              borderRadius: "25.5px",
             }}
           >
             Play a new round

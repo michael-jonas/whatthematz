@@ -1,7 +1,8 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
+import { withToastManager } from "react-toast-notifications";
 
-export default class WaldoPage extends React.Component {
+class WaldoPage extends React.Component {
   handleClickEvent = (e) => {
     const img = document.getElementById("waldoImg");
 
@@ -15,7 +16,15 @@ export default class WaldoPage extends React.Component {
     const x = e.pageX - img.offsetLeft;
     const y = e.pageY - img.offsetTop;
 
-    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
+    if (
+      x > this.xMin - 3 &&
+      x < this.xMax + 3 &&
+      y > this.yMin - 3 &&
+      y < this.yMax + 3
+    ) {
+      this.props.toastManager.add("Congratulations, you found the afikoman!", {
+        appearance: "success",
+      });
       this.props.concludeHuntHandler();
     }
   };
@@ -25,9 +34,16 @@ export default class WaldoPage extends React.Component {
   render() {
     return (
       <Container>
-        <h5 style={{ marginTop: 10, marginBottom: 20 }}>
+        <div
+          style={{
+            marginTop: 20,
+            marginBottom: 20,
+            fontWeight: 600,
+            fontSize: "16px",
+          }}
+        >
           Spot the Afikoman hidden away!
-        </h5>
+        </div>
         <div style={{ textAlign: "center" }}>
           <img
             id="waldoImg"
@@ -35,7 +51,7 @@ export default class WaldoPage extends React.Component {
             onLoad={() => this.onImageLoad()}
             src={`/api/get_image?huntId=${this.props.huntId}`}
             style={{
-              maxWidth: "95%",
+              maxWidth: "100%",
             }}
             onClick={(e) => this.handleClickEvent(e)}
           />
@@ -44,3 +60,4 @@ export default class WaldoPage extends React.Component {
     );
   }
 }
+export default withToastManager(WaldoPage);
