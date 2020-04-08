@@ -102,6 +102,7 @@ class LobbyPage extends React.Component {
               type="image"
               onClick={() => this.copyCodeToClipboard()}
               src={clipboard}
+              alt="copy to clipboard"
               width="20px"
               style={{ marginLeft: "5px", marginBottom: "-3px" }}
             />
