@@ -117,18 +117,40 @@ class JoinPage extends React.Component {
           </Form.Group>
 
           <div style={{ textAlign: "center" }}>
-            <Button
-              style={{ borderRadius: "1rem", width: 220 }}
-              disabled={!this.state.canJoin || this.state.isBusy}
-              variant="primary"
-              onClick={() => this.tryJoinSeder()}
-            >
-              {this.state.isBusy ? (
-                <Spinner animation="border" />
-              ) : (
-                "Join the Seder"
-              )}
-            </Button>
+            {!this.state.canJoin ? (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                }}
+                disabled={true}
+                variant="secondary"
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Join the Seder"
+                )}
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  backgroundColor: "#0066ff",
+                }}
+                variant="primary"
+                onClick={() => this.tryJoinSeder()}
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Join the Seder"
+                )}
+              </Button>
+            )}
           </div>
         </Form>
       </Container>
