@@ -172,18 +172,18 @@ class App extends React.Component {
     this.props.socket.on("start_time_update", (data) => {
       this.isActive = true;
       if (this.state.currentPage !== Pages.LOBBY) return;
-      // console.log('Got start time update:');
-      let dt_str = data["startTime"];
-      // console.log('dt string: ' + dt_str);
-      let datetime_start = new Date(dt_str);
-      let datetime_now = Date.now();
+      // // console.log('Got start time update:');
+      // let dt_str = data["startTime"];
+      // // console.log('dt string: ' + dt_str);
+      // let datetime_start = new Date(dt_str);
+      // let datetime_now = Date.now();
 
-      // todo time doesnt work
-      let diff = datetime_start - datetime_now;
-      // console.log('diff: ')
-      // console.log(datetime_start)
-      // console.log(datetime_now)
-      // console.log(diff)
+      // // todo time doesnt work
+      // let diff = datetime_start - datetime_now;
+      // // console.log('diff: ')
+      // // console.log(datetime_start)
+      // // console.log(datetime_now)
+      // // console.log(diff)
 
       this.setHintTimeouts(3);
 

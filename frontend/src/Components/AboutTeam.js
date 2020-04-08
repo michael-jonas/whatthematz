@@ -41,6 +41,7 @@ export default class AboutTeam extends React.Component {
               width: "50vw",
               borderRadius: "25vw",
             }}
+            alt={"headshot"}
             src={person.img}
           ></img>
         </div>
