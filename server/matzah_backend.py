@@ -371,12 +371,12 @@ def updateCitiesInSeder(sederData, huntId):
     db.seders.update_one(
         {'_id': sederId}, 
         {
-            "$push": {"huntIds": str(huntId)},
-            '$set': {'usedCities': usedCities, 'unusedCities': unusedCities}
+            '$pull': {'unusedCities': city},
+            '$push': {'usedCities': city},
         }
-
     )
     return city
+
 @socket.on('trigger_win')
 def trigger_win(data):
 
@@ -407,9 +407,7 @@ def trigger_win(data):
         # create a new hunt!
         # print('creating a new hunt in the seder')
         newHuntId = createHuntInSeder(sederData)
-
         city = updateCitiesInSeder(sederData, newHuntId)
-        
         setupHunt(newHuntId, city)
     else:
         # print('finding latest hunt id a new hunt in the seder')
