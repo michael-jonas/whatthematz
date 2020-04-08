@@ -70,7 +70,7 @@ class PostGamePage extends React.Component {
           </>
         )}
         {this.props.currentTimeRemaining > 0 && (
-          <div>
+          <div style={{ marginTop: "10px" }}>
             <span style={{ color: "#0066FF" }}>
               {this.props.currentTimeRemaining}
             </span>{" "}
