@@ -784,7 +784,7 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        {(this.state.currentPage === Pages.LOBBY ||
+        {/* {(this.state.currentPage === Pages.LOBBY ||
           this.state.currentPage === Pages.POSTGAME) && (
           <div
             style={{
@@ -805,7 +805,7 @@ class App extends React.Component {
               </a>
             </span>
           </div>
-        )}
+        )} */}
       </>
     );
   }
