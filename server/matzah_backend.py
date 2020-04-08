@@ -50,6 +50,47 @@ CITIES = [
     'Melbourne'
 ]
 
+img_cache = dict()
+def get_img_cached(imageId):
+
+    # decompose the imageId, paths etc
+    city, hideImgIdx = imageId
+    city = city.lower().replace(" ", "_")
+    folderPath = os.path.join('cities', city, 'img')
+    imgPath = os.path.join(folderPath, f'{city}_hidden{hideImgIdx}.jpg')
+
+    # imgPath is the key into the cache
+    if imgPath in img_cache:
+        return img_cache[imgPath]
+
+    # figure out the coords
+    txtPath = os.path.join(folderPath, 'matza_xy.txt')
+    with open(txtPath, 'r') as file:
+        lines = file.readlines()
+
+    numHides = len(lines)
+    if hideImgIdx >= numHides:
+        # if there is no image for this idx, then forget it
+        return None
+    coords = lines[hideImgIdx].split(',')
+    x = int(coords[0])
+    y = int(coords[1])
+    w, h = getMatzahImage().size
+    img = PIL.Image.open(imgPath)
+
+    imgByteArr = io.BytesIO()
+    img.save(imgByteArr, format='PNG')
+    imgByteArr = imgByteArr.getvalue()
+
+    rect = (x, y, w, h)
+    W, H = img.size
+    percentRect = (x/W, y/H, w/W, h/H)
+
+    result = (imgByteArr, rect, percentRect)
+    # store into the cache since its not there already
+    img_cache[imgPath] = result
+    return result
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 #  async_mode='eventlet'
@@ -140,7 +181,7 @@ def getRandomImageForHunt(city):
     with open(txtPath, 'r') as file:
         lines = file.readlines()
         numHides = len(lines)
-        hideImgIdx = random.randint(0, numHides-1)
+    hideImgIdx = random.randint(0, numHides-1)
 
     coords = lines[hideImgIdx].split(',')
     x = int(coords[0])
@@ -152,7 +193,7 @@ def getRandomImageForHunt(city):
     w, h = getMatzahImage().size
     return img, (x,y,w,h)
 
-def setupHunt(huntId, city=None, matzahXY=None):
+def setupHunt(huntId, city=None):
     """Sets up the hunt by generating the image based
     on params and storing it in DB.
 
@@ -165,19 +206,15 @@ def setupHunt(huntId, city=None, matzahXY=None):
     if not city:
         city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
 
-    if not matzahXY:
-        img, rect = getRandomImageForHunt(city)
-    # otherwise generate the hunt based on params
-    else:
-        img = getCityImage(city)
-        matzahImg = getMatzahImage()
-        img.paste(matzahImg, matzahXY, matzahImg)
-        x, y = matzahXY
-        w, h = matzahImg.size
-        rect = (x, y, w, h)
+    folderPath = os.path.join('cities', city.lower().replace(' ', '-'), 'img')
+    txtPath = os.path.join(folderPath, 'matza_xy.txt')
 
-    # put the image in the images db, and link to it from the hunt
-    imageId = db.hidden_images.insert_one(ImageData(img, rect)).inserted_id
+    with open(txtPath, 'r') as fin:
+        lines = fin.readlines()
+    numImages = len(lines)
+    hiddenImageIdx = random.randint(0, numImages-1)
+    imageId = (city, hiddenImageIdx)
+
     db.hunts.update_one({'_id': huntId}, {'$set': {'city': city, 'imageId': imageId}})
     return imageId
 
@@ -363,7 +400,7 @@ def updateCitiesInSeder(sederData, huntId):
     usedCities = sederData['usedCities']
 
     # Reset the lists if the cities have been exhausted
-    if (len(unusedCities) == 0):
+    if len(unusedCities) == 0:
         unusedCities = CITIES
         usedCities = []
 
@@ -660,11 +697,10 @@ def getImage():
         return badResponse('Hunt has no image associated')
 
     imageId = hunt['imageId']
-    hidden_image = db.hidden_images.find_one({'_id': imageId})
-    if not hidden_image:
-        return badResponse('Could not find image in DB')
+    imgBytes, _, _ = get_img_cached(imageId)
 
-    imgBytes = hidden_image['imgBytes']
+    if not imgBytes:
+        return badResponse('Could not find image in DB')
 
     return send_file(
         io.BytesIO(imgBytes),
@@ -685,16 +721,10 @@ def getBoundingBox():
         return badResponse('Hunt has no image associated')
 
     imageId = hunt['imageId']
-    hidden_image = db.hidden_images.find_one({'_id': imageId})
-    # TODO optimization
-            # projection={'rect': True, 'percentRect': True}
-    # )
+    _, rect, percentRect = get_img_cached(imageId)
 
-    if not hidden_image:
+    if not rect or not percentRect:
         return badResponse('Could not find image in DB')
-
-    rect = hidden_image['rect']
-    percentRect = hidden_image['percentRect']
 
     return goodResponse({'boundingBox': percentRect, 'originalBox': rect})
 
@@ -813,57 +843,6 @@ def triggerHunt():
     response = {'ok:': True, 'participants': hunt['participants']}
     return (response, status.HTTP_200_OK)
 
-
-
-
-# @app.route('/conclude_hunt', methods=['PUT'])
-# def concludeHuntAndCreateNewHunt():
-#     # this guy takes people off the seder queue and puts them in this hunt
-
-#     # get parameters and sanitize
-#     huntToConcludeId = request.args.get('huntId')
-#     roomCode         = request.args.get('roomCode')
-#     winnerId         = request.args.get('winnerId')
-
-#     huntToConcludeId = parseIdArg(huntToConcludeId)
-#     if not huntToConcludeId:
-#         response = {'Error': "Whoops! Bad args"}
-#         return (response, status.HTTP_400_BAD_REQUEST)
-
-#     # 1. Update the hunt that just concluded
-#     # # a) isActive = False
-#     # # b) isFinished = True
-#     # # c) winner = winner_nickname
-#     updates = {'$set': {'isActive': False, 'isFinished': True, 'winner': winnerId}}
-#     hunt = db.hunts.find_one_and_update({'_id': huntToConcludeId}, updates, return_document=ReturnDocument.AFTER)
-
-#     # 2. Create a new hunt
-#     # # a) increment winner count
-#     # # b) Pop manz off the huntQueue from the seder and into the finders list
-#     # # c) Create new mongo hunt document
-#     sederData = db.seders.find_one({"roomCode": roomCode})
-
-#     # Check that the seder exists
-#     if sederData is None:
-#         response = {'ok': False, 'message': 'Seder not found'}
-#         return (response, status.HTTP_400_BAD_REQUEST)
-
-#     # TODO update to use db.users
-#     sederId = sederData['_id']
-#     members = sederData['members']
-#     members[winnerId][M_SCORE] += 1
-
-#     # pops the player queue for the next hunt
-#     newHuntParticipants = tuple(sederData['huntQueue'])
-#     newHuntId = createHuntInSeder(sederData, newHuntParticipants, hunt)
-#     # sets up new hunt with random image (by setting args None)
-#     setupHunt(newHuntId, city=None, matzahXY=None)
-
-#     # updates the seder with the newest hunt
-#     updates = {'$set': {'huntQueue': []}, 'members': members, "$push": {"huntIds": newHuntId}}
-#     db.seders.update_one({'_id': sederId}, updates)
-#     response = {'ok:': True}
-#     return (response, status.HTTP_200_OK)
 
 @app.route('/api/create_seder', methods=['POST'])
 def createSeder():
