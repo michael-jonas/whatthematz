@@ -2,13 +2,27 @@ import React from "react";
 import Container from "react-bootstrap/Container";
 import Player from "../Components/Player";
 import Button from "react-bootstrap/Button";
+import { withToastManager } from "react-toast-notifications";
 
-export default class PostGamePage extends React.Component {
+class PostGamePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       isBusy: false,
     };
+  }
+
+  tryJoinNextLobby() {
+    if (this.props.currentTimeRemaining > 0) {
+      this.props.toastManager.add(
+        "Wait until everyone is finished before playing again, you don't want to leave someone behind!",
+        {
+          appearance: "warning",
+        }
+      );
+    } else {
+      this.props.joinNextLobby();
+    }
   }
 
   render() {
@@ -33,14 +47,15 @@ export default class PostGamePage extends React.Component {
     return (
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
-        <div style={{ fontSize: "18px", marginTop: "27px", fontWeight: "600" }}>
+        <div style={{ fontSize: "20px", marginTop: "27px", fontWeight: "700" }}>
           <span style={{ color: "#0066FF" }}>
             {this.props.winnersList[0].nickname}
           </span>{" "}
-          won {this.props.sederName} game! Congratulations!
+          won {this.props.sederName} game!{" "}
+          <span style={{ fontWeight: "800" }}>Congratulations!</span>
         </div>
         <div style={{ marginTop: 10, fontWeight: "600", fontSize: "16px" }}>
-          Afikoman Finders!
+          Afikoman finders!
         </div>
         <Container style={{ textAlign: "center" }} id="winnerList">
           {winnersList}
@@ -55,6 +70,24 @@ export default class PostGamePage extends React.Component {
             </Container>
           </>
         )}
+        {this.props.currentTimeRemaining > 0 && (
+          <div
+            style={{
+              marginTop: "10px",
+              fontFamily: "Source Sans Pro",
+              fontStyle: "normal",
+              fontWeight: "600",
+              fontSize: "16px",
+              lineHeight: "120%",
+            }}
+          >
+            <span style={{ color: "#0066FF" }}>
+              {this.props.currentTimeRemaining}
+            </span>{" "}
+            seconds until hunt ends.
+          </div>
+        )}
+
         <div style={{ marginTop: 15, textAlign: "center" }}>
           <Button
             onClick={() => {
@@ -63,7 +96,8 @@ export default class PostGamePage extends React.Component {
             }}
             variant="outline-primary"
             style={{
-              marginLeft: "20px",
+              width: "142px",
+              marginLeft: "10px",
               marginRight: "10px",
               background: "#FFFFFF",
               boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.08)",
@@ -74,10 +108,13 @@ export default class PostGamePage extends React.Component {
           >
             Exit the room
           </Button>
+
           <Button
-            onClick={() => this.props.joinNextLobby()}
+            onClick={() => this.tryJoinNextLobby()}
             style={{
-              marginLeft: "11px",
+              width: "142px",
+              marginLeft: "10px",
+              marginRight: "10px",
               borderRadius: "25.5px",
             }}
           >
@@ -88,3 +125,4 @@ export default class PostGamePage extends React.Component {
     );
   }
 }
+export default withToastManager(PostGamePage);

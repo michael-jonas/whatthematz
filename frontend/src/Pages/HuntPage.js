@@ -30,6 +30,33 @@ export default class HuntPage extends React.Component {
     }
   };
 
+  currentIndex = 0;
+  updateIndex(e) {
+    this.currentIndex = e;
+    this.changeCarouselButtonsActive();
+  }
+  changeCarouselButtonsActive() {
+    let prev = document.querySelector(".carousel-control-prev");
+    let next = document.querySelector(".carousel-control-next");
+    prev.classList.remove("disabled");
+    next.classList.remove("disabled");
+    if (this.currentIndex === 0) {
+      prev.classList.add("disabled");
+    }
+    if (this.currentIndex === this.props.numberOfHints - 1) {
+      next.classList.add("disabled");
+    }
+  }
+  componentDidMount() {
+    let prev = document.querySelector(".carousel-control-prev");
+    let next = document.querySelector(".carousel-control-next");
+    prev.classList.add("disabled");
+    next.classList.add("disabled");
+  }
+  componentDidUpdate() {
+    this.changeCarouselButtonsActive();
+  }
+
   render() {
     const position = [this.lat, this.lng];
     const carouselHints = this.props.hintList.slice(
@@ -65,11 +92,11 @@ export default class HuntPage extends React.Component {
               style={{
                 height: "33px",
                 width: "33px",
-                marginTop: "4px",
-                marginRight: "10px",
+                marginTop: "-2px",
+                marginRight: "2px",
               }}
             />
-            <div>
+            <div style={{ textAlign: "left" }}>
               <span style={{ color: "#0066FF" }}>Hint {index + 1}:</span>{" "}
               <span style={{ fontWeight: "normal" }}>{hint}</span>
             </div>
@@ -110,7 +137,8 @@ export default class HuntPage extends React.Component {
                 <Carousel
                   defaultActiveIndex={this.props.numberOfHints - 1}
                   interval={null}
-                  wrap={false}
+                  onSelect={(e) => this.updateIndex(e)}
+                  wrap={TextTrackCueList}
                   style={{
                     padding: 10,
                     position: "absolute",

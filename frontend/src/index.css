@@ -54,6 +54,19 @@ body {
   text-transform: initial;
 }
 
+a.disabled {
+  pointer-events: none;
+  cursor: default;
+  opacity: 0.15;
+}
+a.disabled:focus {
+  outline: none;
+}
+a.disabled:hover {
+  outline: none;
+  text-decoration: none;
+}
+
 h1,
 h2,
 h3,

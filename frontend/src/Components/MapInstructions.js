@@ -45,11 +45,11 @@ export default class MapInstructions extends React.Component {
             style={{
               height: "33px",
               width: "33px",
-              marginTop: "4px",
-              marginRight: "10px",
+              marginTop: "-2px",
+              marginRight: "2px",
             }}
           />
-          <div style={{ fontFamily: "Muli" }}>
+          <div style={{ fontFamily: "Muli", textAlign: "left" }}>
             <span style={{ color: "#0066FF" }}>Hint 1:</span> Find the right
             city with the help of a few clues and some research!
           </div>
