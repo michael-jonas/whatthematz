@@ -5,7 +5,6 @@ import WelcomeAnnouncement from "../Components/WelcomeAnnouncement";
 import WaitingAnnouncement from "../Components/WaitingAnnouncement";
 
 import Button from "react-bootstrap/Button";
-import mapExample from "../Images/lobbyMapExample.png";
 import Spinner from "react-bootstrap/Spinner";
 import Countdown from "../Components/Countdown.js";
 import Instructions from "../Components/Instructions.js";
