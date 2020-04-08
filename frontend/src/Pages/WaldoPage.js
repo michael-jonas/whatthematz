@@ -25,9 +25,16 @@ export default class WaldoPage extends React.Component {
   render() {
     return (
       <Container>
-        <h5 style={{ marginTop: 10, marginBottom: 20 }}>
+        <div
+          style={{
+            marginTop: 20,
+            marginBottom: 20,
+            fontWeight: 600,
+            fontSize: "16px",
+          }}
+        >
           Spot the Afikoman hidden away!
-        </h5>
+        </div>
         <div style={{ textAlign: "center" }}>
           <img
             id="waldoImg"
@@ -35,7 +42,7 @@ export default class WaldoPage extends React.Component {
             onLoad={() => this.onImageLoad()}
             src={`${this.props.apiUrl}/api/get_image?huntId=${this.props.huntId}`}
             style={{
-              maxWidth: "95%",
+              maxWidth: "100%",
             }}
             onClick={(e) => this.handleClickEvent(e)}
           />
