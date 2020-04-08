@@ -514,9 +514,11 @@ class App extends React.Component {
         <div>
           <Navbar
             //bg="dark"
+            expand="xs"
             variant="light"
             style={{ height: "50px" }}
           >
+            <Navbar.Toggle as="div" style={{ color: "blue", opacity: "0" }} />
             <Navbar.Brand
               style={{
                 position: "absolute",
