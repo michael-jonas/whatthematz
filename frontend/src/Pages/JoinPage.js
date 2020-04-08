@@ -94,7 +94,7 @@ class JoinPage extends React.Component {
       <Container>
         <Form>
           <Form.Group controlId="roomCode">
-            <Form.Label>Room Code</Form.Label>
+            <Form.Label>Room code</Form.Label>
             <Form.Control
               style={{ textTransform: "uppercase" }}
               autoComplete="off"
@@ -106,7 +106,7 @@ class JoinPage extends React.Component {
             />
           </Form.Group>
           <Form.Group controlId="Nickname">
-            <Form.Label>Treasure Hunter Name</Form.Label>
+            <Form.Label>Treasure hunter name</Form.Label>
             <Form.Control
               type="text"
               autoComplete="off"
@@ -130,7 +130,7 @@ class JoinPage extends React.Component {
                 {this.state.isBusy ? (
                   <Spinner animation="border" />
                 ) : (
-                  "Join the Seder"
+                  "Join the seder"
                 )}
               </Button>
             ) : (
@@ -147,7 +147,7 @@ class JoinPage extends React.Component {
                 {this.state.isBusy ? (
                   <Spinner animation="border" />
                 ) : (
-                  "Join the Seder"
+                  "Join the seder"
                 )}
               </Button>
             )}
