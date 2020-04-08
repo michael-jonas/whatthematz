@@ -244,7 +244,11 @@ class App extends React.Component {
       this.isActive = false;
       if (!this.state.currentHuntOver) {
         // todo kick off timers
-        if (!this.haveWon) {
+        if (
+          !this.haveWon &&
+          (this.state.currentPage === Pages.HUNT ||
+            this.state.currentPage === Pages.WALDO)
+        ) {
           this.props.toastManager.add(
             `Uh oh, ${data.winnerList?.[0]?.nickname} found the afikoman! Finish quick before time runs out!`,
             {
