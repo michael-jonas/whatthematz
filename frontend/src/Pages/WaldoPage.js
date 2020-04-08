@@ -1,6 +1,7 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
 import { withToastManager } from "react-toast-notifications";
+import matzah from "../Images/afikomen.png";
 
 class WaldoPage extends React.Component {
   handleClickEvent = (e) => {
@@ -43,6 +44,15 @@ class WaldoPage extends React.Component {
           }}
         >
           Spot the Afikoman hidden away!
+          <img
+            src={matzah}
+            alt={"afikoman"}
+            style={{
+              height: "33px",
+              width: "33px",
+              float: "right",
+            }}
+          />
         </div>
         <div style={{ textAlign: "center" }}>
           <img
