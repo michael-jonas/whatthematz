@@ -6,6 +6,7 @@
 #pylint:disable=import-error,fixme,bad-whitespace,trailing-whitespace,too-many-arguments
 #pylint:disable=unused-import
 
+from copy import deepcopy
 import time
 import os
 import io
@@ -79,6 +80,8 @@ def SederData(
         # 'huntQueue': [],
         # a list of UIDs to the users table
         'members': members or list(),
+        'unusedCities': CITIES,
+        'usedCities': [],
     }
 
 def HuntData(
@@ -354,6 +357,27 @@ def createHuntInSeder(sederData):
 
     return newHuntId
 
+
+def updateCitiesInSeder(sederData, huntId):
+    unusedCities = sederData['unusedCities']
+    usedCities = sederData['usedCities']
+
+    # Reset the lists if the cities have been exhausted
+    if (len(unusedCities) == 0):
+        unusedCities = CITIES
+        usedCities = []
+
+    city = unusedCities.pop(random.randint(0,len(unusedCities)-1)) # Remove city from the unused list
+    usedCities.append(city) # Add city to the used list
+    db.seders.update_one(
+        {'_id': sederData['_id']},
+        {
+            '$pull': {'unusedCities': city},
+            '$push': {'usedCities': city},
+        }
+    )
+    return city
+
 @socket.on('trigger_win')
 def trigger_win(data):
 
@@ -384,7 +408,7 @@ def trigger_win(data):
         # create a new hunt!
         # print('creating a new hunt in the seder')
         newHuntId = createHuntInSeder(sederData)
-        city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
+        city = updateCitiesInSeder(sederData, newHuntId)
         setupHunt(newHuntId, city)
     else:
         # print('finding latest hunt id a new hunt in the seder')
@@ -856,15 +880,18 @@ def createSeder():
     insertionResult = db.seders.insert_one(insertSederData)
     sederId = insertionResult.inserted_id
     
+
+    remainingCities = deepcopy(CITIES)
+    city = remainingCities.pop(random.randint(0, len(remainingCities)-1))
+
     # Create a hunt and update seders to include the hunt
-    city = CITIES[random.randint(0,len(CITIES)-1)]
-    if DEBUG:
-        city = 'Toronto'
     insertHuntData = HuntData(sederId=sederId, roomCode=roomCode, participants=baseUsers, city=city)
     newHuntId = db.hunts.insert_one(insertHuntData).inserted_id
+
+    # newHuntId = createHuntInSeder(insertionResult)
     setupHunt(newHuntId, city)
     db.seders.update_one({'_id': sederId}, {"$push": {"huntIds": str(newHuntId)} })
-
+    
     response = {
         'sederId': sederId,
         SEDER_NAME: sederName,
