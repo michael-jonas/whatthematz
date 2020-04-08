@@ -3,7 +3,6 @@ import { withToastManager } from "react-toast-notifications";
 import Container from "react-bootstrap/Container";
 import Button from "react-bootstrap/Button";
 import Instructions from "../Components/Instructions";
-import AboutTeam from "../Components/AboutTeam";
 
 import mag from "../Images/magpink.png";
 
@@ -103,19 +102,18 @@ class PreLandingPage extends React.Component {
                   //     appearance: "warning",
                   //   }
                   // );
-                  this.setState(function (state, props) {
-                    return {
-                      // TODO: turn this on
-                      learnMoreShown: !state.learnMoreShown,
-                      //learnMoreShown: false,
-                    };
-                  });
+                  // this.setState(function (state, props) {
+                  //   return {
+                  //     // TODO: turn this on
+                  //     learnMoreShown: !state.learnMoreShown,
+                  //     //learnMoreShown: false,
+                  //   };
+                  // });
+                  this.props.goToAbout();
                 }}
                 style={{
-                  backgroundColor: this.state.learnMoreShown
-                    ? this.blueColor
-                    : "white",
-                  color: this.state.learnMoreShown ? "white" : this.blueColor,
+                  backgroundColor: this.blueColor,
+                  color: "white",
                   borderRadius: "20px",
                   borderColor: "white",
                   fontSize: "14px",
@@ -148,7 +146,7 @@ class PreLandingPage extends React.Component {
           </Container>
         </div>
         <div style={{ width: "100%" }}>
-          {this.state.learnMoreShown ? <AboutTeam /> : <Instructions />}
+          <Instructions />
         </div>
       </>
     );
