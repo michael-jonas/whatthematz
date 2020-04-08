@@ -59,7 +59,7 @@ export default class Instructions extends React.Component {
           onClick={() => this.showMapInstructions()}
           id="discover"
         >
-          Discover the location
+          Locate the city
         </Button>
         <Button
           variant="outline-primary"
