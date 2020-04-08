@@ -16,7 +16,12 @@ class WaldoPage extends React.Component {
     const x = e.pageX - img.offsetLeft;
     const y = e.pageY - img.offsetTop;
 
-    if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
+    if (
+      x > this.xMin - 3 &&
+      x < this.xMax + 3 &&
+      y > this.yMin - 3 &&
+      y < this.yMax + 3
+    ) {
       this.props.toastManager.add("Congratulations, you found the afikoman!", {
         appearance: "success",
       });
