@@ -33,17 +33,18 @@ export default class Instructions extends React.Component {
   }
   render() {
     return (
-      <div style={{ width: "90%" }}>
-        <h4
+      <div style={{ width: "100%" }}>
+        <div
           style={{
             marginTop: 30,
-            marginBottom: 15,
+            marginBottom: 0,
             fontWeight: "600",
             marginLeft: "5%",
+            fontSize: "16px",
           }}
         >
           How to play
-        </h4>
+        </div>
         <Button
           style={{
             fontSize: 12,
@@ -58,7 +59,7 @@ export default class Instructions extends React.Component {
           onClick={() => this.showMapInstructions()}
           id="discover"
         >
-          Discover the Location
+          Discover the location
         </Button>
         <Button
           variant="outline-primary"
@@ -71,7 +72,7 @@ export default class Instructions extends React.Component {
           onClick={() => this.showWaldoInstructions()}
           id="waldo"
         >
-          Find the Afikoman
+          Find the afikoman
         </Button>
         <div
           style={{

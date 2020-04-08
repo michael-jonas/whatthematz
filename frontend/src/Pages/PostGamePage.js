@@ -34,7 +34,7 @@ export default class PostGamePage extends React.Component {
       <Container>
         {/* <Button onClick={() => this.props.goToHunt()}>Go To Hunt</Button> */}
         <h5>
-          <span style={{ color: "blue" }}>
+          <span style={{ color: "#0066FF" }}>
             {this.props.winnersList[0].nickname}
           </span>{" "}
           won {this.props.sederName} game! Congratulations!

@@ -41,6 +41,7 @@ export default class AboutTeam extends React.Component {
               width: "50vw",
               borderRadius: "25vw",
             }}
+            alt={"headshot"}
             src={person.img}
           ></img>
         </div>
@@ -80,7 +81,7 @@ export default class AboutTeam extends React.Component {
           />
           <div>
             <span>
-              <span style={{ color: "blue", height: "100%" }}>Hint 1:</span>{" "}
+              <span style={{ color: "#0066FF", height: "100%" }}>Hint 1:</span>{" "}
               <span>{person.nameText}</span>{" "}
             </span>
           </div>

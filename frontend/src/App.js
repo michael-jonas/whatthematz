@@ -41,7 +41,6 @@ class App extends React.Component {
       boundingBox: null,
       showCountdown: false,
       gameEndTime: Date.now(),
-      markerLayer: <></>,
       currentHuntOver: false,
     };
   }
@@ -112,6 +111,27 @@ class App extends React.Component {
 
   timeouts = [];
 
+  setHintTimeouts(diff_seconds = 0) {
+    let callbackGen = (nHints) => {
+      return () => {
+        this.setState({ numberOfHints: nHints });
+      };
+    };
+
+    const timeDeltas = [10, 20, 30, 40, 50, 60, 70, 80, 90, 10];
+    let sumSeconds = 0;
+    // const INTERVAL = 30; // 30 seconds between each
+    for (let i = 2; i <= this.state.hintList.length; i++) {
+      let myCallback = callbackGen(i);
+      sumSeconds += timeDeltas[i - 2];
+      // let seconds = (i - 1) * INTERVAL;
+      console.log(sumSeconds);
+      this.timeouts.push(
+        setTimeout(myCallback, (diff_seconds + sumSeconds) * 1000)
+      );
+    }
+  }
+
   async goToLobby() {
     //console.log("emit user");
 
@@ -136,21 +156,8 @@ class App extends React.Component {
           this.setState({
             currentPage: Pages.HUNT,
           });
-          let diff_seconds = 3;
-          let callbackGen = (nHints) => {
-            return () => {
-              this.setState({ numberOfHints: nHints });
-            };
-          };
 
-          const INTERVAL = 30; // 30 seconds between each
-          for (let i = 2; i <= this.state.hintList.length; i++) {
-            let myCallback = callbackGen(i);
-            let seconds = (i - 1) * INTERVAL;
-            this.timeouts.push(
-              setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-            );
-          }
+          this.setHintTimeouts();
         }
       }
 
@@ -165,39 +172,24 @@ class App extends React.Component {
     this.props.socket.on("start_time_update", (data) => {
       this.isActive = true;
       if (this.state.currentPage !== Pages.LOBBY) return;
-      // console.log('Got start time update:');
-      let dt_str = data["startTime"];
-      // console.log('dt string: ' + dt_str);
-      let datetime_start = new Date(dt_str);
-      let datetime_now = Date.now();
+      // // console.log('Got start time update:');
+      // let dt_str = data["startTime"];
+      // // console.log('dt string: ' + dt_str);
+      // let datetime_start = new Date(dt_str);
+      // let datetime_now = Date.now();
 
-      // todo time doesnt work
-      let diff = datetime_start - datetime_now;
-      // console.log('diff: ')
-      // console.log(datetime_start)
-      // console.log(datetime_now)
-      // console.log(diff)
+      // // todo time doesnt work
+      // let diff = datetime_start - datetime_now;
+      // // console.log('diff: ')
+      // // console.log(datetime_start)
+      // // console.log(datetime_now)
+      // // console.log(diff)
 
-      let diff_seconds = 3;
-
-      let callbackGen = (nHints) => {
-        return () => {
-          this.setState({ numberOfHints: nHints });
-        };
-      };
-
-      const INTERVAL = 30; // 30 seconds between each
-      for (let i = 2; i <= this.state.hintList.length; i++) {
-        let myCallback = callbackGen(i);
-        let seconds = (i - 1) * INTERVAL;
-        this.timeouts.push(
-          setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-        );
-      }
+      this.setHintTimeouts(3);
 
       setTimeout(() => {
         this.setPage(Pages.HUNT);
-      }, diff_seconds * 1000);
+      }, 3 * 1000);
 
       this.setState({ showCountdown: true });
     });
@@ -250,7 +242,6 @@ class App extends React.Component {
 
     this.preloadWaldoImage();
     this.loadBoundingBox(0);
-    this.loadMarkers();
   }
 
   async getHintList() {
@@ -265,37 +256,59 @@ class App extends React.Component {
     }
   }
 
-  async loadMarkers(retries) {
-    // fetch list of cities
-    const response = await fetch(`/api/get_cities`);
-    if (response.ok) {
-      const json = await response.json();
+  cityList = [
+    ["Amsterdam", 52.3727598, 4.8936041],
+    ["Berlin", 52.5170365, 13.3888599],
+    ["Buenos Aires", -34.6075682, -58.4370894],
+    ["Chicago", 41.8755616, -87.6244212],
+    ["Florence", 43.7698712, 11.2555757],
+    ["Jerusalem", 31.778345, 35.2250786],
+    ["Kiev", 50.4500336, 30.5241361],
+    ["London", 51.5073219, -0.1276474],
+    ["Los Angeles", 34.0536909, -118.2427666],
+    ["Melbourne", -37.8142176, 144.9631608],
+    ["Montreal", 45.4972159, -73.6103642],
+    ["New York City", 40.7127281, -74.0060152],
+    ["Paris", 48.8566969, 2.3514616],
+    ["Philadelphia", 39.9527237, -75.1635262],
+    ["Prague", 50.0874654, 14.4212535],
+    ["Tel Aviv", 32.0804808, 34.7805274],
+    ["Toronto", 43.6534817, -79.3839347],
+    ["Vancouver", 49.2608724, -123.1139529],
+    ["Warsaw", 52.2337172, 21.07141112883227],
+  ];
 
-      const markerLayer = json.result.map((marker) => {
-        let latlng = { lat: marker[1], lng: marker[2] };
-        return (
-          <Marker
-            key={marker[0]}
-            position={latlng}
-            onclick={() => this.checkRightCity(marker[0])}
-          >
-            {/* <Tooltip>{marker[0]}</Tooltip> */}
-          </Marker>
-        );
-      });
+  markerLayer = this.cityList.map((marker) => {
+    let latlng = { lat: marker[1], lng: marker[2] };
+    return (
+      <Marker
+        key={marker[0]}
+        position={latlng}
+        onclick={() => this.checkRightCity(marker[0])}
+      >
+        {/* <Tooltip>{marker[0]}</Tooltip> */}
+      </Marker>
+    );
+  });
 
-      this.setState({
-        markerLayer: markerLayer,
-      });
-    } else {
-      //retry loop, max timeouts? nahhh
-      if (retries < 3) {
-        setTimeout(() => {
-          this.loadMarkers(++retries);
-        }, 1000);
-      }
-    }
-  }
+  // loadMarkers(retries) {
+  //   // fetch list of cities
+  //   const response = await fetch(`/api/get_cities`);
+  //   if (response.ok) {
+  //     const json = await response.json();
+
+  //     this.setState({
+  //       markerLayer: markerLayer,
+  //     });
+  //   } else {
+  //     //retry loop, max timeouts? nahhh
+  //     if (retries < 3) {
+  //       setTimeout(() => {
+  //         this.loadMarkers(++retries);
+  //       }, 1000);
+  //     }
+  //   }
+  // }
   async checkRightCity(name, retries) {
     const response = await fetch(
       `/api/check_location?huntId=${this.state.huntId}&locationName=${name}`
@@ -446,7 +459,7 @@ class App extends React.Component {
   };
 
   joinNextLobby = () => {
-    let onSuccess = () => {
+    let onSuccess = async () => {
       // fetch
       for (let i = 0; i < this.timeouts.length; i++) {
         clearTimeout(this.timeouts[i]);
@@ -467,7 +480,7 @@ class App extends React.Component {
       });
       this.preloadWaldoImage();
       this.loadBoundingBox(0);
-      this.getHintList();
+      await this.getHintList();
       if (!this.isActive) {
         this.setState({
           currentPage: Pages.LOBBY,
@@ -476,21 +489,8 @@ class App extends React.Component {
         this.setState({
           currentPage: Pages.HUNT,
         });
-        let diff_seconds = 3;
-        let callbackGen = (nHints) => {
-          return () => {
-            this.setState({ numberOfHints: nHints });
-          };
-        };
 
-        const INTERVAL = 30; // 30 seconds between each
-        for (let i = 2; i <= this.state.hintList.length; i++) {
-          let myCallback = callbackGen(i);
-          let seconds = (i - 1) * INTERVAL;
-          this.timeouts.push(
-            setTimeout(myCallback, (diff_seconds + seconds) * 1000)
-          );
-        }
+        this.setHintTimeouts();
       }
     };
 
@@ -511,18 +511,12 @@ class App extends React.Component {
   render() {
     return (
       <>
-        <div
-          style={{
-            maxHeight: "calc(100vh - 40px)",
-            overflowY: "auto",
-          }}
-        >
+        <div>
           <Navbar
-            expand="xs"
             //bg="dark"
             variant="light"
+            style={{ height: "50px" }}
           >
-            <Navbar.Toggle style={{ color: "blue" }} />
             <Navbar.Brand
               style={{
                 position: "absolute",
@@ -538,6 +532,7 @@ class App extends React.Component {
                   fontSize: "14px",
                   fontWeight: "600",
                   lineHeight: "17px",
+                  color: "#212121",
                 }}
               >
                 FLATTEN THE BREAD
@@ -547,7 +542,9 @@ class App extends React.Component {
                   fontFamily: "Muli",
                   fontSize: "12px",
                   fontWeight: "normal",
+                  fontStyle: "normal",
                   lineHeight: "15px",
+                  color: "#424242",
                 }}
               >
                 Keeping a tradition alive during Covid-19
@@ -622,7 +619,7 @@ class App extends React.Component {
                 goToWaldo={this.goToWaldo}
                 hintList={this.state.hintList}
                 numberOfHints={this.state.numberOfHints}
-                markerLayer={this.state.markerLayer}
+                markerLayer={this.markerLayer}
               />
             )}
             {this.state.currentPage === Pages.WALDO && (
@@ -652,21 +649,21 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        {this.state.currentPage !== Pages.WALDO &&
-          this.state.currentPage !== Pages.HUNT && (
-            <div
-              style={{
-                position: "fixed",
-                bottom: "10px",
-                width: "100%",
-                textAlign: "center",
-              }}
-            >
-              <span>
-                Learn more about this <a href="/">project</a>
-              </span>
-            </div>
-          )}
+        {(this.state.currentPage === Pages.LOBBY ||
+          this.state.currentPage === Pages.POSTGAME) && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: "10px",
+              width: "100%",
+              textAlign: "center",
+            }}
+          >
+            <span>
+              Learn more about this <a href="/">project</a>
+            </span>
+          </div>
+        )}
       </>
     );
   }

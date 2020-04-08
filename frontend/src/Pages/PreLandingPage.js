@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import Instructions from "../Components/Instructions";
 import AboutTeam from "../Components/AboutTeam";
 
-import mag from "../Images/mag.png";
+import mag from "../Images/magpink.png";
 
 export default class PreLandingPage extends React.Component {
   blueColor = "rgba(0, 102, 255, 0.95)";
@@ -88,7 +88,7 @@ export default class PreLandingPage extends React.Component {
                 }}
               />
               <div>
-                <span style={{ color: "blue" }}>Hint 1:</span> Search,
+                <span style={{ color: "#0066FF" }}>Hint 1:</span> Search,
                 discovery, and puzzling adventure!
               </div>
             </div>
@@ -109,7 +109,7 @@ export default class PreLandingPage extends React.Component {
                   color: "white",
                   borderRadius: "20px",
                   borderColor: "white",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
                   width: "120px",
@@ -117,7 +117,7 @@ export default class PreLandingPage extends React.Component {
                   marginRight: "5px",
                 }}
               >
-                Learn More
+                Learn more
               </Button>
               <Button
                 onClick={() => this.props.goToLanding()}
@@ -126,7 +126,7 @@ export default class PreLandingPage extends React.Component {
                   color: this.blueColor,
                   borderRadius: "20px",
                   borderColor: "white",
-                  fontSize: "15px",
+                  fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
                   width: "120px",
@@ -139,13 +139,7 @@ export default class PreLandingPage extends React.Component {
           </Container>
         </div>
         <div style={{ width: "100%" }}>
-          {this.state.learnMoreShown ? (
-            <AboutTeam />
-          ) : (
-            <Container>
-              <Instructions />
-            </Container>
-          )}
+          {this.state.learnMoreShown ? <AboutTeam /> : <Instructions />}
         </div>
       </>
     );

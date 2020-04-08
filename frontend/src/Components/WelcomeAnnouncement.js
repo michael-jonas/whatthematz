@@ -3,10 +3,13 @@ import React from "react";
 export default class WelcomeAnnouncement extends React.Component {
   render() {
     return (
-      <h3>
-        Welcome to <span style={{ color: "blue" }}>{this.props.sederName}</span>{" "}
-        game room!
-      </h3>
+      <div style={{ fontSize: "20px" }}>
+        <strong>
+          Welcome to{" "}
+          <span style={{ color: "#0066FF" }}>{this.props.sederName}</span> game
+          room
+        </strong>
+      </div>
     );
   }
 }
