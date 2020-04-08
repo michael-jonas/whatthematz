@@ -658,10 +658,16 @@ class App extends React.Component {
               bottom: "10px",
               width: "100%",
               textAlign: "center",
+              fontWeight: "600",
+              fontFamily: "Muli",
+              letterSpacing: "0.1em",
             }}
           >
             <span>
-              Learn more about this <a href="/">project</a>
+              Learn more about this{" "}
+              <a href="/" style={{ color: "#0066FF" }}>
+                project
+              </a>
             </span>
           </div>
         )}
