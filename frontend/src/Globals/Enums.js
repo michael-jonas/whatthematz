@@ -17,4 +17,5 @@ export const Pages = {
   WALDO: "waldo",
   POSTGAME: "postgame",
   PRELANDING: "prelanding",
+  ABOUT: "about",
 };

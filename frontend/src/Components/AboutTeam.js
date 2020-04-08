@@ -128,8 +128,20 @@ export default class AboutTeam extends React.Component {
         style={{
           backgroundColor: "#F7F7F7",
           width: "100%",
+          paddingTop: "20px",
         }}
       >
+        <div style={{ padding: "5px", fontSize: "16px", textAlign: "center" }}>
+          FlattenTheBread
+        </div>
+        <div style={{ fontWeight: "normal", padding: "10px" }}>
+          Faced with the challenge of keeping traditions alive while stuck at
+          home due to Covid-19, we decided to build a fun game to replace the
+          Afikoman hunt we all know and love. Faced with a serious time crunch,
+          and a hit-or-miss deadline, we worked around the clock for the past
+          four days to bring you this online treasure hunt.
+        </div>
+        <div style={{ textAlign: "center" }}>The team</div>
         <div style={{ marginTop: "10px" }}>{aboutList}</div>
       </div>
     );

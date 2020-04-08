@@ -1,5 +1,6 @@
 import React from "react";
 import { withToastManager } from "react-toast-notifications";
+import AboutTeam from "./Components/AboutTeam";
 
 import backButton from "./Images/return-button-2.png";
 import "./App.css";
@@ -426,6 +427,9 @@ class App extends React.Component {
   goToPostGame = () => {
     this.setState({ currentPage: Pages.POSTGAME });
   };
+  goToAbout = () => {
+    this.setState({ currentPage: Pages.ABOUT });
+  };
 
   openBackModal = () => {
     this.setState({
@@ -455,6 +459,8 @@ class App extends React.Component {
       case Pages.LANDING:
         this.goToPreLanding();
         break;
+      case Pages.ABOUT:
+        this.goToPreLanding();
       default:
         break;
     }
@@ -659,7 +665,12 @@ class App extends React.Component {
                 textAlign: "center",
               }}
             >
-              <div
+              <a
+                onclick={() => {
+                  sessionStorage.clear();
+                  window.location.reload();
+                }}
+                href="/"
                 style={{
                   fontFamily: "Montserrat",
                   letterSpacing: "0.1em",
@@ -670,7 +681,7 @@ class App extends React.Component {
                 }}
               >
                 FLATTEN THE BREAD
-              </div>
+              </a>
               <div
                 style={{
                   fontFamily: "Muli",
@@ -686,7 +697,8 @@ class App extends React.Component {
             </Navbar.Brand>
             {(this.state.currentPage === Pages.CREATE ||
               this.state.currentPage === Pages.JOIN ||
-              this.state.currentPage === Pages.LANDING) && (
+              this.state.currentPage === Pages.LANDING ||
+              this.state.currentPage === Pages.ABOUT) && (
               <input
                 style={{ width: "40px", height: "40px" }}
                 type="image"
@@ -782,6 +794,7 @@ class App extends React.Component {
                 currentTimeRemaining={this.state.currentTimeRemaining}
               />
             )}
+            {this.state.currentPage === Pages.ABOUT && <AboutTeam />}
           </div>
         </div>
         {/* {(this.state.currentPage === Pages.LOBBY ||
