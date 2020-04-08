@@ -97,37 +97,36 @@ class PreLandingPage extends React.Component {
             <div style={{ marginTop: "25px" }}>
               <Button
                 onClick={() => {
-                  this.props.toastManager.add(
-                    "Under construction, come back later!",
-                    {
-                      appearance: "warning",
-                    }
-                  );
-                  this.setState({
-                    isBusy: false,
-                  });
+                  // this.props.toastManager.add(
+                  //   "Under construction, come back later!",
+                  //   {
+                  //     appearance: "warning",
+                  //   }
+                  // );
                   this.setState(function (state, props) {
                     return {
                       // TODO: turn this on
-                      // learnMoreShown: !state.learnMoreShown
-                      learnMoreShown: false,
+                      learnMoreShown: !state.learnMoreShown,
+                      //learnMoreShown: false,
                     };
                   });
                 }}
                 style={{
-                  backgroundColor: this.blueColor,
-                  color: "white",
+                  backgroundColor: this.state.learnMoreShown
+                    ? this.blueColor
+                    : "white",
+                  color: this.state.learnMoreShown ? "white" : this.blueColor,
                   borderRadius: "20px",
                   borderColor: "white",
                   fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
-                  width: "120px",
+                  width: "140px",
                   fontFamily: "Lato",
                   marginRight: "5px",
                 }}
               >
-                Learn more
+                About the team
               </Button>
               <Button
                 onClick={() => this.props.goToLanding()}
@@ -139,7 +138,7 @@ class PreLandingPage extends React.Component {
                   fontSize: "14px",
                   paddingLeft: "15px",
                   paddingRight: "15px",
-                  width: "120px",
+                  width: "140px",
                   fontFamily: "Lato",
                 }}
               >

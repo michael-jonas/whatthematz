@@ -212,7 +212,7 @@ def setupHunt(huntId, city=None):
     if not city:
         city = CITIES[random.randint(0,len(CITIES)-1)] if not DEBUG else 'Toronto'
 
-    folderPath = os.path.join('cities', city.lower().replace(' ', '-'), 'img')
+    folderPath = os.path.join('cities', city.lower().replace(' ', '_'), 'img')
     txtPath = os.path.join(folderPath, 'matza_xy.txt')
 
     with open(txtPath, 'r') as fin:

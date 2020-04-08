@@ -38,6 +38,8 @@ export default class HuntPage extends React.Component {
   changeCarouselButtonsActive() {
     let prev = document.querySelector(".carousel-control-prev");
     let next = document.querySelector(".carousel-control-next");
+    if (!prev) return;
+    if (!next) return;
     prev.classList.remove("disabled");
     next.classList.remove("disabled");
     if (this.currentIndex === 0) {
@@ -50,6 +52,8 @@ export default class HuntPage extends React.Component {
   componentDidMount() {
     let prev = document.querySelector(".carousel-control-prev");
     let next = document.querySelector(".carousel-control-next");
+    if (!prev) return;
+    if (!next) return;
     prev.classList.add("disabled");
     next.classList.add("disabled");
   }

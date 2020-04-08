@@ -35,7 +35,7 @@ class App extends React.Component {
       sederName: "",
       playerList: [],
       winnersList: [],
-      hintList: ["help me", "im so cold"],
+      hintList: [],
       numberOfHints: 1,
       backModal: false,
       isOwner: false,
@@ -122,17 +122,6 @@ class App extends React.Component {
       e.returnValue = "are you sure";
     }
   }
-
-  playerList = [
-    {
-      name: "bob",
-      score: 0,
-    },
-    {
-      name: "ted",
-      score: 3,
-    },
-  ];
 
   concludeHunt = () => {
     this.haveWon = true;
@@ -796,7 +785,7 @@ class App extends React.Component {
             )}
           </div>
         </div>
-        {(this.state.currentPage === Pages.LOBBY ||
+        {/* {(this.state.currentPage === Pages.LOBBY ||
           this.state.currentPage === Pages.POSTGAME) && (
           <div
             style={{
@@ -807,6 +796,7 @@ class App extends React.Component {
               fontWeight: "600",
               fontFamily: "Muli",
               letterSpacing: "0.1em",
+              backgroundColor: "white",
             }}
           >
             <span>
@@ -816,7 +806,7 @@ class App extends React.Component {
               </a>
             </span>
           </div>
-        )}
+        )} */}
       </>
     );
   }
