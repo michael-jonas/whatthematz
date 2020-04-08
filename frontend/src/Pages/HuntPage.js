@@ -9,6 +9,7 @@ export default class HuntPage extends React.Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
+    this.carouselRef = React.createRef();
 
     this.state = {
       showMarkers: false,
@@ -29,6 +30,8 @@ export default class HuntPage extends React.Component {
       });
     }
   };
+
+  changeCarouselButtonsActive() {}
 
   render() {
     const position = [this.lat, this.lng];
@@ -65,11 +68,11 @@ export default class HuntPage extends React.Component {
               style={{
                 height: "33px",
                 width: "33px",
-                marginTop: "4px",
-                marginRight: "10px",
+                marginTop: "-2px",
+                marginRight: "2px",
               }}
             />
-            <div>
+            <div style={{ textAlign: "left" }}>
               <span style={{ color: "#0066FF" }}>Hint {index + 1}:</span>{" "}
               <span style={{ fontWeight: "normal" }}>{hint}</span>
             </div>
@@ -110,7 +113,9 @@ export default class HuntPage extends React.Component {
                 <Carousel
                   defaultActiveIndex={this.props.numberOfHints - 1}
                   interval={null}
-                  wrap={false}
+                  ref={this.carouselRef}
+                  onSelect={() => this.changeCarouselButtonsActive()}
+                  wrap={TextTrackCueList}
                   style={{
                     padding: 10,
                     position: "absolute",

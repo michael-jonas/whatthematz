@@ -45,11 +45,11 @@ export default class WaldoInstructions extends React.Component {
                 style={{
                   height: "33px",
                   width: "33px",
-                  marginTop: "4px",
-                  marginRight: "10px",
+                  marginTop: "-2px",
+                  marginRight: "2px",
                 }}
               />
-              <div style={{ fontFamily: "Muli" }}>
+              <div style={{ fontFamily: "Muli", textAlign: "left" }}>
                 Zoom in on a location and try to find the afikoman hidden in the
                 scene.
               </div>
@@ -95,11 +95,11 @@ export default class WaldoInstructions extends React.Component {
                 style={{
                   height: "33px",
                   width: "33px",
-                  marginTop: "4px",
-                  marginRight: "10px",
+                  marginTop: "-2px",
+                  marginRight: "2px",
                 }}
               />
-              <div style={{ fontFamily: "Muli" }}>
+              <div style={{ fontFamily: "Muli", textAlign: "left" }}>
                 When you find it, tap it to win the game!
               </div>
             </div>
