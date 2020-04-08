@@ -52,7 +52,49 @@ class App extends React.Component {
     this.setState({ currentPage: page });
   }
 
+  async joinOldSederFromRefresh(roomCode, uuid) {
+    const response = await fetch(
+      `/api/join_seder?roomCode=${roomCode.toUpperCase()}&userId=${uuid}&nickname=garbage`,
+      {
+        method: "POST",
+      }
+    );
+
+    if (response.ok) {
+      const json = await response.json();
+      this.updateInfo(
+        this.state.name,
+        json.userId,
+        json.sederId,
+        roomCode,
+        json.sederName,
+        json.huntId,
+        false,
+        json.isActive
+      );
+      this.goToLobby(json?.queued ?? false);
+    } else if (response.status === 400) {
+    } else {
+      this.props.toastManager.add(
+        "Hmm, something went wrong. Try again in a little bit!",
+        {
+          appearance: "error",
+        }
+      );
+      this.setState({
+        isBusy: false,
+      });
+    }
+  }
+
   componentDidMount() {
+    if (sessionStorage.getItem("uuid")) {
+      this.joinOldSederFromRefresh(
+        sessionStorage.getItem("roomCode"),
+        sessionStorage.getItem("uuid")
+      );
+    }
+
     window.addEventListener("beforeunload", (e) => {
       this.props.socket.emit(
         "unloading",
@@ -125,7 +167,7 @@ class App extends React.Component {
       let myCallback = callbackGen(i);
       sumSeconds += timeDeltas[i - 2];
       // let seconds = (i - 1) * INTERVAL;
-      console.log(sumSeconds);
+      //console.log(sumSeconds);
       this.timeouts.push(
         setTimeout(myCallback, (diff_seconds + sumSeconds) * 1000)
       );
@@ -134,7 +176,7 @@ class App extends React.Component {
 
   async goToLobby() {
     //console.log("emit user");
-
+    console.log("rip");
     // verify our websocket connection is established
     this.props.socket.on("message", (data) => {
       // console.log("Got message:");
@@ -144,7 +186,7 @@ class App extends React.Component {
     this.props.socket.on("player_list", (data) => {
       // console.log("Got player list:");
 
-      console.log(data["player_list"]);
+      //console.log(data["player_list"]);
       if (this.firstJoin) {
         this.firstJoin = false;
         if (!this.isActive) {
@@ -238,7 +280,7 @@ class App extends React.Component {
       }
     );
     // hintlist is necessary if joining mid game - cant show empty block
-
+    console.log("rip");
     await this.getHintList();
 
     this.preloadWaldoImage();
@@ -411,7 +453,6 @@ class App extends React.Component {
         this.openBackModal();
         break;
       case Pages.LANDING:
-        console.log("b)");
         this.goToPreLanding();
         break;
       default:
@@ -456,6 +497,8 @@ class App extends React.Component {
       huntId: huntId,
       isOwner: isOwner,
     });
+    sessionStorage.setItem("uuid", userId);
+    sessionStorage.setItem("roomCode", roomCode);
   };
 
   joinNextLobby = () => {

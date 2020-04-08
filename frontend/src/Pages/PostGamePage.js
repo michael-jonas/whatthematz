@@ -55,7 +55,10 @@ export default class PostGamePage extends React.Component {
         )}
         <div style={{ marginTop: 15, textAlign: "center" }}>
           <Button
-            onClick={() => window.location.reload()}
+            onClick={() => {
+              sessionStorage.clear();
+              window.location.reload();
+            }}
             variant="outline-primary"
             style={{
               marginLeft: "20px",
