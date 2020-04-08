@@ -454,12 +454,9 @@ def join_hunt(data):
 
 @socket.on('unloading')
 def on_disconnect(data):
-    # clientId = request.sid
-    # if clientId not in lookup_table:
-        # return
 
-    # data = lookup_table[clientId]
-    # room = data['room']
+    if 'sederId' not in data or not data['sederId']:
+        return
 
     sederId = ObjectId(data['sederId'])
     # cant trust the hunt id from the lookup since it is out of date
