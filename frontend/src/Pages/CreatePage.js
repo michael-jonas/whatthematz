@@ -106,17 +106,41 @@ export default class CreatePage extends React.Component {
           </Form.Group>
 
           <div style={{ textAlign: "center" }}>
-            <Button
-              disabled={!this.state.canCreate || this.state.isBusy}
-              variant="primary"
-              onClick={() => this.tryCreateSeder(0)}
-            >
-              {this.state.isBusy ? (
-                <Spinner animation="border" />
-              ) : (
-                "Create Seder"
-              )}
-            </Button>
+            {!this.state.canCreate ? (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                }}
+                disabled={true}
+                variant="secondary"
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Create seder"
+                )}
+              </Button>
+            ) : (
+              <Button
+                style={{
+                  borderRadius: "1rem",
+                  paddingLeft: "20px",
+                  paddingRight: "20px",
+                  backgroundColor: "#0066ff",
+                }}
+                disabled={this.state.isBusy}
+                variant="primary"
+                onClick={() => this.tryCreateSeder(0)}
+              >
+                {this.state.isBusy ? (
+                  <Spinner animation="border" />
+                ) : (
+                  "Create seder"
+                )}
+              </Button>
+            )}
           </div>
         </Form>
       </Container>

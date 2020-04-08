@@ -141,8 +141,9 @@ class JoinPage extends React.Component {
                   paddingRight: "20px",
                   backgroundColor: "#0066ff",
                 }}
+                disabled={this.state.isBusy}
                 variant="primary"
-                onClick={() => this.tryJoinSeder()}
+                onClick={() => this.tryJoinSeder(0)}
               >
                 {this.state.isBusy ? (
                   <Spinner animation="border" />
