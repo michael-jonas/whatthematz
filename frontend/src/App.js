@@ -806,6 +806,7 @@ class App extends React.Component {
               fontWeight: "600",
               fontFamily: "Muli",
               letterSpacing: "0.1em",
+              backgroundColor: "white",
             }}
           >
             <span>
