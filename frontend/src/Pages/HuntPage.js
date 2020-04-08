@@ -9,7 +9,6 @@ export default class HuntPage extends React.Component {
   constructor(props) {
     super(props);
     this.mapRef = React.createRef();
-    this.carouselRef = React.createRef();
 
     this.state = {
       showMarkers: false,
@@ -31,7 +30,32 @@ export default class HuntPage extends React.Component {
     }
   };
 
-  changeCarouselButtonsActive() {}
+  currentIndex = 0;
+  updateIndex(e) {
+    this.currentIndex = e;
+    this.changeCarouselButtonsActive();
+  }
+  changeCarouselButtonsActive() {
+    let prev = document.querySelector(".carousel-control-prev");
+    let next = document.querySelector(".carousel-control-next");
+    prev.classList.remove("disabled");
+    next.classList.remove("disabled");
+    if (this.currentIndex === 0) {
+      prev.classList.add("disabled");
+    }
+    if (this.currentIndex === this.props.numberOfHints - 1) {
+      next.classList.add("disabled");
+    }
+  }
+  componentDidMount() {
+    let prev = document.querySelector(".carousel-control-prev");
+    let next = document.querySelector(".carousel-control-next");
+    prev.classList.add("disabled");
+    next.classList.add("disabled");
+  }
+  componentDidUpdate() {
+    this.changeCarouselButtonsActive();
+  }
 
   render() {
     const position = [this.lat, this.lng];
@@ -113,8 +137,7 @@ export default class HuntPage extends React.Component {
                 <Carousel
                   defaultActiveIndex={this.props.numberOfHints - 1}
                   interval={null}
-                  ref={this.carouselRef}
-                  onSelect={() => this.changeCarouselButtonsActive()}
+                  onSelect={(e) => this.updateIndex(e)}
                   wrap={TextTrackCueList}
                   style={{
                     padding: 10,
