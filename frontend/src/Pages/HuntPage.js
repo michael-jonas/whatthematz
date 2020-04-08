@@ -80,9 +80,17 @@ export default class HuntPage extends React.Component {
 
     return (
       <Container>
-        <h5 style={{ marginTop: 10, marginBottom: 20 }}>
+        <div
+          style={{
+            marginTop: 10,
+            marginBottom: 20,
+            fontWeight: "600",
+            fontFamily: "Source Sans Pro",
+            fontSize: "16px",
+          }}
+        >
           Find the location of the Afikoman!
-        </h5>
+        </div>
         <h6>Click on a marker to check if the Afikoman is there!</h6>
         {/* <h6>zoom level {this.state.curZoom}</h6> */}
         <div style={{ position: "relative", textAlign: "center" }}>
@@ -113,7 +121,7 @@ export default class HuntPage extends React.Component {
                     left: 0,
                     right: 0,
                     minHeight: "auto",
-                    width: "80%",
+                    width: "90%",
                     opacity: 1,
                     zIndex: 501,
                   }}
@@ -158,9 +166,18 @@ export default class HuntPage extends React.Component {
               minWidth: "190px",
             }}
           >
-            {this.state.curZoom >= this.minZoom
-              ? "Wow, it's toasty here. Maybe there's something baking nearby..."
-              : "It's hard to see anything from up here, let's look closer!"}
+            <div
+              style={{
+                fontFamily: "Muli",
+                fontWeight: "normal",
+                fontSize: "12px",
+                lineHeight: "15px",
+              }}
+            >
+              {this.state.curZoom >= this.minZoom
+                ? "That's better, we should be able to see the markers from here!"
+                : "It's hard to see anything from up here, let's look closer!"}
+            </div>
           </div>
         </div>
       </Container>
