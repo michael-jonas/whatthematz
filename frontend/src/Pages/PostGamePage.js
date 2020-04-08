@@ -86,7 +86,8 @@ class PostGamePage extends React.Component {
             }}
             variant="outline-primary"
             style={{
-              marginLeft: "20px",
+              width: "142px",
+              marginLeft: "10px",
               marginRight: "10px",
               background: "#FFFFFF",
               boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.08)",
@@ -101,7 +102,9 @@ class PostGamePage extends React.Component {
           <Button
             onClick={() => this.tryJoinNextLobby()}
             style={{
-              marginLeft: "11px",
+              width: "142px",
+              marginLeft: "10px",
+              marginRight: "10px",
               borderRadius: "25.5px",
             }}
           >

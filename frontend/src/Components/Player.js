@@ -7,8 +7,23 @@ export default class Player extends React.Component {
   render() {
     return (
       <>
-        <div style={{ marginTop: 10, marginBottom: 10, display: "flex" }}>
-          <div style={{ width: 50, padding: 0 }}>
+        <div
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              width: 52,
+              background: "#FFF8FC",
+              padding: 0,
+              border: "1px solid #C4C4C4",
+              borderRadius: "26px",
+            }}
+          >
             <Avatar avatarNum={this.props.avatarNum} name={this.props.name} />
           </div>
           <div
@@ -19,8 +34,27 @@ export default class Player extends React.Component {
               marginLeft: "10px",
             }}
           >
-            <div>{this.props.name}</div>
-            <div className={"light"}>
+            <div
+              style={{
+                fontFamily: "Source Sans Pro",
+                fontStyle: "normal",
+                fontWeight: "600",
+                fontSize: "12px",
+                lineHeight: "130%",
+              }}
+            >
+              {this.props.name}
+            </div>
+            <div
+              style={{
+                fontFamily: "Source Sans Pro",
+                fontStyle: "normal",
+                fontWeight: "normal",
+                fontSize: "12px",
+                lineHeight: "130%",
+              }}
+              className={"light"}
+            >
               {this.props.score} point{this.props.score === 1 ? false : "s"}{" "}
               total
             </div>
