@@ -14,31 +14,35 @@ export default class AboutTeam extends React.Component {
       {
         nameText: "David Weisdorf, Software Developer",
         img: davidheadshot,
+        text: "This is an extended about me section. I like  cant reply. When a girl walks in with an ittie bitty face and a brown ring in your space your fret's strung"
       },
       {
         nameText: "Daniel Weisdorf, Web Developer",
         img: davidheadshot,
+        text: "This is an extended about me section. I like  reply. When a girl walks in with an ittie bitty face and a brown ring in your space your fret's strung"
       },
       {
         nameText: "Michael Jonas, Ideas Guy",
         img: davidheadshot,
+        text: "This is an extended about me section. I like  cant reply. When a girl walks in with an ittie bitty face and a brown ring in your space your fret's strung"      
       },
       {
         nameText: "Allison Kapps, UX Designer",
         img: davidheadshot,
+        text: "This is an extended about me section. I like  walks in with an ittie bitty face and a brown ring in your space your fret's strung"
       },
     ];
 
     const memberList = members.map((person) => (
-      <div class="memberInfo" style={{ position: "relative" }}>
+      <div class="memberInfo" style={{ position: "relative", marginBottom: "80px"}}>
         <div style={{ textAlign: "center" }}>
           <img
             style={{
               margin: "auto",
               marginTop: "12px",
               marginBottom: "30px",
-              height: "50vw",
-              width: "50vw",
+              height: "45vw",
+              width: "45vw",
               borderRadius: "25vw",
             }}
             alt={"headshot"}
@@ -65,7 +69,7 @@ export default class AboutTeam extends React.Component {
             display: "flex",
             letterSpacing: "0.03rem",
             position: "absolute",
-            bottom: 0,
+            bottom: 70,
           }}
         >
           <img
@@ -88,11 +92,20 @@ export default class AboutTeam extends React.Component {
         </div>
         <div
           style={{
-            position: "absolute",
-            bottom: 0,
+            // position: "relative",
+            // left: 10,
+            // right: 10,
+            top: 10,
+            // bottom: -10,
+            fontFamily: "Source Sans Pro",
+            fontStyle: "normal",
+            fontWeight: "normal",
+            lineHeight: "130%",
+            color: "#424242",
+            textAlign: "left",
           }}
         >
-          This is an extended about me section.
+            {person.text}
         </div>
       </div>
     ));

@@ -148,6 +148,7 @@ class App extends React.Component {
           winnersList: data.winnerList,
           playerList: [],
         });
+        clearTimeout(this.gameEndTimeout);
         if (this.toastId) {
           this.props.toastManager.remove(this.toastId);
           this.toastId = null;
