@@ -1,7 +1,8 @@
 import React from "react";
 import Container from "react-bootstrap/Container";
+import { withToastManager } from "react-toast-notifications";
 
-export default class WaldoPage extends React.Component {
+class WaldoPage extends React.Component {
   handleClickEvent = (e) => {
     const img = document.getElementById("waldoImg");
 
@@ -16,6 +17,9 @@ export default class WaldoPage extends React.Component {
     const y = e.pageY - img.offsetTop;
 
     if (x > this.xMin && x < this.xMax && y > this.yMin && y < this.yMax) {
+      this.props.toastManager.add("Congratulations, you found the afikoman!", {
+        appearance: "success",
+      });
       this.props.concludeHuntHandler();
     }
   };
@@ -51,3 +55,4 @@ export default class WaldoPage extends React.Component {
     );
   }
 }
+export default withToastManager(WaldoPage);

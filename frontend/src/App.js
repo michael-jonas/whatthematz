@@ -176,7 +176,6 @@ class App extends React.Component {
 
   async goToLobby() {
     //console.log("emit user");
-    console.log("rip");
     // verify our websocket connection is established
     this.props.socket.on("message", (data) => {
       // console.log("Got message:");
@@ -280,7 +279,6 @@ class App extends React.Component {
       }
     );
     // hintlist is necessary if joining mid game - cant show empty block
-    console.log("rip");
     await this.getHintList();
 
     this.preloadWaldoImage();
