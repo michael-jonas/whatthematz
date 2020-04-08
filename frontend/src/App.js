@@ -35,7 +35,7 @@ class App extends React.Component {
       sederName: "",
       playerList: [],
       winnersList: [],
-      hintList: ["help me", "im so cold"],
+      hintList: [],
       numberOfHints: 1,
       backModal: false,
       isOwner: false,
@@ -122,17 +122,6 @@ class App extends React.Component {
       e.returnValue = "are you sure";
     }
   }
-
-  playerList = [
-    {
-      name: "bob",
-      score: 0,
-    },
-    {
-      name: "ted",
-      score: 3,
-    },
-  ];
 
   concludeHunt = () => {
     this.haveWon = true;

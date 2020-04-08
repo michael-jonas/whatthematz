@@ -79,6 +79,7 @@ class PostGamePage extends React.Component {
               fontWeight: "600",
               fontSize: "16px",
               lineHeight: "120%",
+              textAlign: "center",
             }}
           >
             <span style={{ color: "#0066FF" }}>
