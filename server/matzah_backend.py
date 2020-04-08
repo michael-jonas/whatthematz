@@ -298,7 +298,7 @@ def on_new_user(data):
     data.update({'uid': str_uid})
     lookup_table.update({clientId: data})
 
-    db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
+    # db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
     db.hunts.update_one({"_id": huntId}, { "$push": {"participants": str_uid}})  
 
     player_list = generatePlayerList(huntId)
@@ -488,7 +488,7 @@ def on_disconnect(data):
     huntId = hunt['_id']
     room = hunt['roomCode']
     uid = ObjectId(data['userId'])
-    db.seders.update_one({'_id': ObjectId(sederId)}, {"$pull": {'members': str(uid)}})
+    # db.seders.update_one({'_id': ObjectId(sederId)}, {"$pull": {'members': str(uid)}})
     db.hunts.update_one({'_id': ObjectId(huntId)}, { "$pull": {"participants": str(uid)}})
 
     player_list = generatePlayerList(huntId)
@@ -708,6 +708,7 @@ def joinSeder():
     # Get data from the HTTP request
     roomCode = request.args.get('roomCode')
     nickname = request.args.get('nickname')
+    optUserId = request.args.get('userId', None)
 
     if nickname is None:
         response = {'ok': False, 'message': 'You need a nickname homie'}
@@ -732,7 +733,11 @@ def joinSeder():
 
     # generate a new user
     avatar = random.randint(0,9)
-    user_uuid = db.users.insert_one(User(nickname, 0, avatar)).inserted_id
+
+    if not optUserId:
+        user_uuid = db.users.insert_one(User(nickname, 0, avatar)).inserted_id
+    else:
+        user_uuid = ObjectId(optUserId)
 
     # Check to see if the hunt has started
     # if currentHunt['isActive']:
@@ -754,7 +759,7 @@ def joinSeder():
         # Hunt hasn't started yet, add them as a participant in the hunt
         # print(sederData['members'])
         str_uid = str(user_uuid)
-        db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
+        # db.seders.update_one({"_id": sederId}, {"$push": {'members': str_uid}})
 
         hunt = db.hunts.find_one_and_update(
             {'_id': currentHuntId},
