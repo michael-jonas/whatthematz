@@ -208,6 +208,7 @@ class App extends React.Component {
             `Uh oh, ${data.winnerList?.[0]?.nickname} found the afikoman! Finish quick before time runs out!`,
             {
               appearance: "warning",
+              autoDismissTimeout: 10000,
             }
           );
         }
