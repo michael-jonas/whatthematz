@@ -11,8 +11,18 @@ export default class AboutTeam extends React.Component {
       {
         nameText: "Daniel Weisdorf, Frontend Developer",
         img: danielheadshot,
-        text:
-          "I'd like to say that I developed the entire website, but I have to admit that David helped sprinkle a few bugs into my otherwise flawless code. I'm currently an Engineering student at the University of Waterloo, and am actively looking for coop positions! I hope you enjoy the site, and chag sameach!",
+        text: (
+          <>
+            I'd like to say that I developed the entire website, but I have to
+            admit that David helped sprinkle a few bugs into my otherwise
+            flawless code. I'm currently an Engineering student at the
+            University of Waterloo, and am{" "}
+            <a href="mailto:daniel.weisdorf@edu.uwaterloo.ca">
+              actively looking for coop positions
+            </a>
+            ! I hope you enjoy the site, and chag sameach!
+          </>
+        ),
       },
       {
         nameText: "Allison Kapps, UX Designer",
