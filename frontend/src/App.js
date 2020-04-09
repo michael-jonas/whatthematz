@@ -91,12 +91,12 @@ class App extends React.Component {
   }
 
   componentDidMount() {
-    if (sessionStorage.getItem("uuid")) {
-      this.joinOldSederFromRefresh(
-        sessionStorage.getItem("roomCode"),
-        sessionStorage.getItem("uuid")
-      );
-    }
+    // if (sessionStorage.getItem("uuid")) {
+    //   this.joinOldSederFromRefresh(
+    //     sessionStorage.getItem("roomCode"),
+    //     sessionStorage.getItem("uuid")
+    //   );
+    // }
 
     window.addEventListener("beforeunload", (e) => {
       this.props.socket.emit(
