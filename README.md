@@ -1,4 +1,4 @@
-# What the Matz?
+# [FlattenTheBread](http://flattenthebread.com)
 
 Installation:
 
