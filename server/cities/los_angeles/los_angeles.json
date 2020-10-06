@@ -1,0 +1,9 @@
+{
+    "name": "Los Angeles", 
+    "country": "USA", 
+    "easyHints": ["This city has a BOOMING performance industry, founded largely by Jewish immigrants in the early 20th century."], 
+    "mediumHints": ["No devils here! This city is full of their counterparts."], 
+    "hardHints": ["Feeling strong? Come on down to the beach and prove it."], 
+    "latitude": 34.0536909, 
+    "longitude": -118.2427666
+}

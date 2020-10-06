@@ -1,0 +1,12 @@
+.carousel-indicators {
+  bottom: -40px;
+}
+#instructions .carousel-indicators {
+  bottom: 0px;
+  width: 50px;
+  background-color: white;
+  position: absolute;
+  left: 50%;
+  margin-left: -25px;
+  border-radius: 15px;
+}

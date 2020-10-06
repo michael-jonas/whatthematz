@@ -1,0 +1,9 @@
+{
+    "name": "New York City", 
+    "country": "USA", 
+    "easyHints": ["Home to the largest Jewish community outside of Israel."], 
+    "mediumHints": ["This is no Time to be a Square! Get to exploring!"], 
+    "hardHints": ["How do ya like them apples? Big?"], 
+    "latitude": 40.7127281, 
+    "longitude": -74.0060152
+}

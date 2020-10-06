@@ -1,0 +1,9 @@
+{
+    "name": "Montreal", 
+    "country": "Canada", 
+    "easyHints": ["The Habs. Need we say more?"], 
+    "mediumHints": ["Canadian? More like Canadien."], 
+    "hardHints": ["You don't really care for music, do you?"], 
+    "latitude": 45.4972159, 
+    "longitude": -73.6103642
+}

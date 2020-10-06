@@ -1,0 +1,9 @@
+{
+    "name": "Toronto", 
+    "country": "Canada", 
+    "easyHints": ["Home of the 6ix G-d."], 
+    "mediumHints": ["Come here for the fastest parking lot, er, busiest highway in North America!"], 
+    "hardHints": ["Hopefully you're as honest as our old pal, Ed."], 
+    "latitude": 43.6534817, 
+    "longitude": -79.3839347
+}

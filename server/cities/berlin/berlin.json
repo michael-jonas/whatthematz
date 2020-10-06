@@ -1,0 +1,9 @@
+{
+    "name": "Berlin", 
+    "country": "Germany", 
+    "easyHints": ["World famous city for its outrageous, all hours nightclubs.", "Home of the largest Jewish museum in Europe."], 
+    "mediumHints": ["This city was physically and ideologically divided for close to 28 years."], 
+    "hardHints": ["With more museums than rainy days, you can soak up more culture than water in this city."], 
+    "latitude": 52.5170365, 
+    "longitude": 13.3888599
+}

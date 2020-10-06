@@ -1,0 +1,9 @@
+{
+    "name": "Paris", 
+    "country": "France", 
+    "easyHints": ["Come here for the wine, the croissants, and the love."], 
+    "mediumHints": ["Ei once Ffel from a Tower. It hurt a lot."], 
+    "hardHints": ["Fix your posture! That bell won't ring itself."], 
+    "latitude": 48.8566969, 
+    "longitude": 2.3514616
+}

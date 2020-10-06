@@ -1,0 +1,9 @@
+{
+    "name": "Melbourne", 
+    "country": "Australia", 
+    "easyHints": ["If only Jason Bourne had a sister named Mel."], 
+    "mediumHints": ["You might think it is the capital of Australia, but it is not."], 
+    "hardHints": ["Do you have a rose in every cheek?"], 
+    "latitude": -37.8142176, 
+    "longitude": 144.9631608
+}

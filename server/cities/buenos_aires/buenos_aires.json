@@ -1,0 +1,9 @@
+{
+    "name": "Buenos Aires", 
+    "country": "Argentina", 
+    "easyHints": ["The birthplace of Tango."], 
+    "mediumHints": ["The capital of the country with the 3rd largest Jewish population in the Americas."], 
+    "hardHints": ["Bookworms rejoice! This city has nearly 25 bookstores per 100,000 citizens."], 
+    "latitude": -34.6075682, 
+    "longitude": -58.4370894
+}
